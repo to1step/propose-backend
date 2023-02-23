@@ -1,0 +1,21 @@
+{
+  "name": "backend-main",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "prebuild": "echo prebuild",
+    "build": "echo build",
+    "prestart": "npm run build",
+    "start": "echo start"
+  },
+  "author": "rkdden",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+
+  }
+}
