@@ -1,0 +1,14 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "compilerOptions": {
+    "strict": true,
+    "target": "es6",
+    "module": "CommonJS",
+    "lib": ["es2020", "DOM"],
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "typeRoots": ["./types"]
+  }
+}
