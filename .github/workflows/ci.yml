@@ -1,0 +1,16 @@
+name: CI
+on:
+  release:
+    branches: 
+      - main
+    types: [created]
+    
+
+jobs: # job은 독립처리, step은 순차적처리라서 이전 단계의 처리 결과를 다음단계에서 활용가능
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker build -t test:$(date +%s) .
