@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-eslint --fix './src/**/*.{ts,tsx,js,jsx}'
+npm run build
