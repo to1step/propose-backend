@@ -2,10 +2,10 @@
 FROM node:14-alpine
 
 # Set the working directory to /app
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copy the package.json and package-lock.json files to the container
-COPY package*.json ./
+COPY . /usr/src/app
 
 # Install dependencies
 RUN npm install
@@ -15,3 +15,7 @@ COPY . .
 
 # Build the application using npm
 RUN npm run build
+
+EXPOSE 4000
+
+CMD ["npm", "run", "start"]
