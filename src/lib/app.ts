@@ -1,18 +1,13 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-
+import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
+// import { User } from '../database/models/models';
 
 const app = express();
 
-// swagger
-// const swaggerUi = require("swagger-ui-express");
-// const YAML = require("yamljs");
-// const swaggerSpec = YAML.load(path.join(__dirname, "swagger.yaml"));
-
-// 서버 가동
 dotenv.config();
 app.use(
 	cors({
@@ -36,6 +31,15 @@ app.get('/', (req, res, next) => {
 	res.json('Server working');
 });
 
+(async () => {
+	await mongoose.connect(`${process.env.DATABASE_URL}`, {
+		user: process.env.DATABASE_USER,
+		pass: process.env.DATABASE_PASSWORD,
+		dbName: process.env.DATABASE_NAME,
+	});
+	console.log('db connected!');
+})();
+
 // swagger
 // app.use(
 //   "/api-docs",
@@ -50,3 +54,12 @@ app.listen(4000, () => {
   ################################################
 `);
 });
+
+// (async () => {
+// 	const user = new User({
+// 		name: 'Bill',
+// 		email: 'bill@initech.com',
+// 		avatar: 'https://i.imgur.com/dM7Thhn.png',
+// 	});
+// 	await user.save();
+// })();
