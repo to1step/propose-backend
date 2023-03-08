@@ -1,18 +1,21 @@
 import { Model, model, Schema } from 'mongoose';
 
 interface IUser {
-	name: string;
+	uuid: string;
 	email: string;
-	avatar?: string;
-	test: string;
+	nickname: string;
+	provider: string;
+	snsId: string;
 }
 
 type IUserModel = Model<IUser>;
 
 const userSchema = new Schema<IUser, IUserModel>({
-	name: { type: String, required: true },
+	uuid: { type: String, required: true },
 	email: { type: String, required: true },
-	avatar: String,
+	nickname: { type: String, requred: true },
+	provider: { type: String, required: true },
+	snsId: { type: String, required: true },
 });
 
 const User = model<IUser, IUserModel>('User', userSchema);
