@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
-// import { User } from '../database/models/models';
+import path from 'path';
 
 const app = express();
 
@@ -31,6 +31,10 @@ app.get('/', (req, res, next) => {
 	res.json('Server working');
 });
 
+app.get('*', (req, res) => {
+	res.sendFile(path.resolve('public/404page/404page.html'));
+});
+
 (async () => {
 	await mongoose.connect(`${process.env.DATABASE_URL}`, {
 		user: process.env.DATABASE_USER,
@@ -40,13 +44,6 @@ app.get('/', (req, res, next) => {
 	console.log('db connected!');
 })();
 
-// swagger
-// app.use(
-//   "/api-docs",
-//   swaggerUi.serve,
-//   swaggerUi.setup(swaggerSpec, { explorer: true }) //검색 허용가능
-// );
-
 app.listen(4000, () => {
 	console.log(`
   ################################################
@@ -54,12 +51,3 @@ app.listen(4000, () => {
   ################################################
 `);
 });
-
-// (async () => {
-// 	const user = new User({
-// 		name: 'Bill',
-// 		email: 'bill@initech.com',
-// 		avatar: 'https://i.imgur.com/dM7Thhn.png',
-// 	});
-// 	await user.save();
-// })();
