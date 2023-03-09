@@ -1,16 +1,12 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-
+import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
 
 const app = express();
-
-// swagger
-// const swaggerUi = require("swagger-ui-express");
-// const YAML = require("yamljs");
-// const swaggerSpec = YAML.load(path.join(__dirname, "swagger.yaml"));
 
 // 서버 가동
 dotenv.config();
@@ -36,12 +32,18 @@ app.get('/', (req, res, next) => {
 	res.json('Server working');
 });
 
-// swagger
-// app.use(
-//   "/api-docs",
-//   swaggerUi.serve,
-//   swaggerUi.setup(swaggerSpec, { explorer: true }) //검색 허용가능
-// );
+app.get('*', (req, res) => {
+	res.sendFile(path.resolve('public/404page/404page.html'));
+});
+
+(async () => {
+	await mongoose.connect(`${process.env.DATABASE_URL}`, {
+		user: process.env.DATABASE_USER,
+		pass: process.env.DATABASE_PASSWORD,
+		dbName: process.env.DATABASE_NAME,
+	});
+	console.log('db connected!');
+})();
 
 app.listen(4000, () => {
 	console.log(`
