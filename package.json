@@ -12,7 +12,7 @@
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
     "prestart": "npm run build",
-    "start_local": "npm run build && cross-env NODE_ENV=production node dist/src/lib/app.js",
+    "start_local": "npm run build && cross-env NODE_ENV=local node dist/src/lib/app.js",
     "start_dev": "npm run build && cross-env NODE_ENV=development node dist/src/lib/app.js",
     "start_live": "npm run build && cross-env NODE_ENV=production node dist/src/lib/app.js"
   },

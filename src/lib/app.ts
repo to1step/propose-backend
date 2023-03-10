@@ -1,9 +1,9 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-
 import cors from 'cors';
 import helmet from 'helmet';
+import { logger } from './logger/logger';
 
 const app = express();
 
@@ -32,9 +32,9 @@ app.get('/', (req, res, next) => {
 });
 
 app.listen(4000, () => {
-	console.log(`
-  ################################################
-  🛡️  Server listening on port: 4000🛡️
-  ################################################
-`);
+	logger.info(`
+	################################################
+	🛡️  Server listening on port: 4000🛡️
+	################################################
+  `);
 });
