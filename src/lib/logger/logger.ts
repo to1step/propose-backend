@@ -23,7 +23,7 @@ const infoLog = new WinstonDaily({
 const httpLog = new WinstonDaily({
 	level: 'http',
 	datePattern: 'YYYY-MM-DD', // 파일 날짜 형식
-	dirname: `${process.cwd()}/logs/info`, // 파일 경로
+	dirname: `${process.cwd()}/logs/http`, // 파일 경로
 	filename: `%DATE%.info.log`, // 파일 이름 형식 2020-05-28.info.log
 });
 
@@ -42,6 +42,8 @@ const ExceptionLog = new WinstonDaily({
 });
 
 const terminalLog = new transports.Console({
+	// https://github.com/winstonjs/winston#using-logging-levels 참고
+	level: 'debug',
 	format: format.combine(
 		format.colorize(), // 색깔 넣어서 출력
 		timestamp({ format: Date.now().toString() }),
