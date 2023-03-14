@@ -82,5 +82,4 @@ class WintonLogger {
 	}
 }
 
-const logger = WintonLogger.getInstance().getLogger();
-export { logger };
+export default WintonLogger;

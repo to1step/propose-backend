@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
-import { logger } from './logger/logger';
+import WintonLogger from './logger/logger';
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-	logger.http(`[${req.method}] ${req.url}`);
+	WintonLogger.getInstance().getLogger().http(`[${req.method}] ${req.url}`);
 	next();
 });
 
@@ -51,7 +51,7 @@ app.use((req, res) => {
 });
 
 app.listen(4000, () => {
-	logger.info(`	
+	WintonLogger.getInstance().getLogger().info(`	
 	################################################
 	🛡️  Server listening on port: 4000🛡️
 	################################################
