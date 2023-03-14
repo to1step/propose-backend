@@ -1,73 +1,86 @@
-/**
- * @example logger.info("message")
- * @example logger.error("message")
- */
-
-import { createLogger, format, transports } from 'winston';
+import { createLogger, format, transports, Logger } from 'winston';
 import WinstonDaily from 'winston-daily-rotate-file';
 
 const { combine, timestamp, printf } = format;
 
-// log출력 형식 정의
 const logFormat = printf((info) => {
 	return `[${info.timestamp}] | [${info.level}] | ${info.message}`; // 날짜 시간 로그레벨: 메세지
 });
 
-const infoLog = new WinstonDaily({
-	level: 'info',
-	datePattern: 'YYYY-MM-DD', // 파일 날짜 형식
-	dirname: `${process.cwd()}/logs/info`, // 파일 경로
-	filename: `%DATE%.info.log`, // 파일 이름 형식 2020-05-28.info.log
-});
+class WintonLogger {
+	private static instance: WintonLogger;
 
-const httpLog = new WinstonDaily({
-	level: 'http',
-	datePattern: 'YYYY-MM-DD', // 파일 날짜 형식
-	dirname: `${process.cwd()}/logs/http`, // 파일 경로
-	filename: `%DATE%.info.log`, // 파일 이름 형식 2020-05-28.info.log
-});
+	private logger: Logger;
 
-const ErrorLog = new WinstonDaily({
-	level: 'error',
-	datePattern: 'YYYY-MM-DD', // 파일 날짜 형식
-	dirname: `${process.cwd()}/logs/error`, // 파일 경로
-	filename: `%DATE%.error.log`, // 파일 이름 형식 2020-05-28.error.log
-});
+	private constructor() {
+		const infoLog = new WinstonDaily({
+			level: 'info',
+			datePattern: 'YYYY-MM-DD', // 파일 날짜 형식
+			dirname: `${process.cwd()}/logs/info`, // 파일 경로
+			filename: `%DATE%.info.log`, // 파일 이름 형식 2020-05-28.info.log
+		});
 
-const ExceptionLog = new WinstonDaily({
-	level: 'error',
-	datePattern: 'YYYY-MM-DD', // 파일 날짜 형식
-	dirname: `${process.cwd()}/logs/exception`, // 파일 경로
-	filename: `%DATE%.exception.log`, // 파일 이름 형식 2020-05-28.exception.log
-});
+		const httpLog = new WinstonDaily({
+			level: 'http', // http보다 낮은애들은 모두 파일에 저장
+			datePattern: 'YYYY-MM-DD',
+			dirname: `${process.cwd()}/logs/http`,
+			filename: `%DATE%.info.log`,
+		});
 
-const terminalLog = new transports.Console({
-	// https://github.com/winstonjs/winston#using-logging-levels 참고
-	level: 'debug',
-	format: format.combine(
-		format.colorize(), // 색깔 넣어서 출력
-		timestamp({ format: Date.now().toString() }),
-		logFormat
-	),
-});
+		const errorLog = new WinstonDaily({
+			level: 'error',
+			datePattern: 'YYYY-MM-DD',
+			dirname: `${process.cwd()}/logs/error`,
+			filename: `%DATE%.error.log`,
+		});
 
-let transport;
-let exceptionHandler;
-if (process.env.NODE_ENV === 'production') {
-	transport = [infoLog, ErrorLog, httpLog];
-	exceptionHandler = ExceptionLog;
-} else if (process.env.NODE_ENV === 'development') {
-	transport = [infoLog, ErrorLog, httpLog];
-	exceptionHandler = ExceptionLog;
-} else {
-	transport = terminalLog;
-	exceptionHandler = terminalLog;
+		const exceptionLog = new WinstonDaily({
+			level: 'error',
+			datePattern: 'YYYY-MM-DD',
+			dirname: `${process.cwd()}/logs/exception`,
+			filename: `%DATE%.exception.log`,
+		});
+
+		const terminalLog = new transports.Console({
+			level: 'debug',
+			format: format.combine(
+				format.colorize(),
+				timestamp({ format: Date.now().toString() }),
+				logFormat
+			),
+		});
+
+		let transport;
+		let exceptionHandler;
+		if (process.env.NODE_ENV === 'production') {
+			transport = [infoLog, errorLog, httpLog];
+			exceptionHandler = exceptionLog;
+		} else if (process.env.NODE_ENV === 'development') {
+			transport = [infoLog, errorLog, httpLog];
+			exceptionHandler = exceptionLog;
+		} else {
+			transport = terminalLog;
+			exceptionHandler = terminalLog;
+		}
+
+		this.logger = createLogger({
+			format: combine(timestamp({ format: Date.now().toString() }), logFormat),
+			transports: transport,
+			exceptionHandlers: exceptionHandler,
+		});
+	}
+
+	public static getInstance(): WintonLogger {
+		if (!WintonLogger.instance) {
+			WintonLogger.instance = new WintonLogger();
+		}
+		return WintonLogger.instance;
+	}
+
+	public getLogger(): Logger {
+		return this.logger;
+	}
 }
 
-const logger = createLogger({
-	format: combine(timestamp({ format: Date.now().toString() }), logFormat),
-	transports: transport,
-	exceptionHandlers: exceptionHandler,
-});
-
+const logger = WintonLogger.getInstance().getLogger();
 export { logger };
