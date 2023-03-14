@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import WintonLogger from './logger/logger';
 
+const logger = WintonLogger.getInstance().getLogger();
 const app = express();
 
 // 서버 가동
@@ -29,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-	WintonLogger.getInstance().getLogger().http(`[${req.method}] ${req.url}`);
+	logger.http(`[${req.method}] ${req.url}`);
 	next();
 });
 
@@ -51,7 +52,7 @@ app.use((req, res) => {
 });
 
 app.listen(4000, () => {
-	WintonLogger.getInstance().getLogger().info(`	
+	logger.info(`	
 	################################################
 	🛡️  Server listening on port: 4000🛡️
 	################################################
