@@ -6,8 +6,8 @@
   "author": "rkdden, gkqkehs7",
   "scripts": {
     "prepare": "husky install",
-    "lint": "eslint './src/**/*.{ts,tsx,js,jsx}'",
-    "lint:fix": "eslint --fix './src/**/*.{ts,tsx,js,jsx}'",
+    "lint": "eslint './src/**/*.{ts,tsx,js,jsx,css,html}'",
+    "lint:fix": "eslint --fix './src/**/*.{ts,tsx,js,jsx,css,html}'",
     "lint-staged": "lint-staged",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
@@ -29,7 +29,8 @@
     "express": "4.18.2",
     "helmet": "^6.0.1",
     "winston": "^3.8.2",
-    "winston-daily-rotate-file": "^4.7.1"
+    "winston-daily-rotate-file": "^4.7.1",
+    "mongoose": "6.6.2"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",
