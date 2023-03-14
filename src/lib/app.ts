@@ -1,10 +1,8 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
-import path from 'path';
 
 const app = express();
 
@@ -32,22 +30,9 @@ app.get('/', (req, res, next) => {
 	res.json('Server working');
 });
 
-app.get('*', (req, res) => {
-	res.sendFile(path.resolve('public/404page/404page.html'));
-});
-
 app.use((req, res) => {
 	return res.status(404).send({ message: 'page not found' });
 });
-
-(async () => {
-	await mongoose.connect(`${process.env.DATABASE_URL}`, {
-		user: process.env.DATABASE_USER,
-		pass: process.env.DATABASE_PASSWORD,
-		dbName: process.env.DATABASE_NAME,
-	});
-	console.log('db connected!');
-})();
 
 app.listen(4000, () => {
 	console.log(`
