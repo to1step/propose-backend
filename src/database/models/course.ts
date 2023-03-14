@@ -28,12 +28,15 @@ interface ICourse {
 type ITransportModel = Model<ITransport>;
 type ICourseModel = Model<ICourse>;
 
-const transportSchema = new Schema<ITransport, ITransportModel>({
-	startStore: { type: String, required: true }, // 출발 가게 uuid
-	endStore: { type: String, required: true }, // 도착 가게 uuid
-	comment: { type: String }, // 이동 방법에 대한 코멘트
-	transportation: { type: Number }, // 이동할 수단 버스/지하철/도보 중 택 1
-});
+const transportSchema = new Schema<ITransport, ITransportModel>(
+	{
+		startStore: { type: String, required: true }, // 출발 가게 uuid
+		endStore: { type: String, required: true }, // 도착 가게 uuid
+		comment: { type: String }, // 이동 방법에 대한 코멘트
+		transportation: { type: Number }, // 이동할 수단 버스/지하철/도보 중 택 1
+	},
+	{ _id: false }
+);
 
 const Transport = model<ITransport, ITransportModel>(
 	'Transport',
