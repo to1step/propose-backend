@@ -7,6 +7,7 @@ import helmet from 'helmet';
 
 const app = express();
 
+// 서버 가동
 dotenv.config();
 app.use(
 	cors({
@@ -38,6 +39,10 @@ app.get('/', (req, res, next) => {
 	});
 	console.log('db connected!');
 })();
+
+app.use((req, res) => {
+	return res.status(404).send({ message: 'page not found' });
+});
 
 app.listen(4000, () => {
 	console.log(`
