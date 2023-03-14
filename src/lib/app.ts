@@ -1,16 +1,10 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-
 import cors from 'cors';
 import helmet from 'helmet';
 
 const app = express();
-
-// swagger
-// const swaggerUi = require("swagger-ui-express");
-// const YAML = require("yamljs");
-// const swaggerSpec = YAML.load(path.join(__dirname, "swagger.yaml"));
 
 // 서버 가동
 dotenv.config();
@@ -36,12 +30,9 @@ app.get('/', (req, res, next) => {
 	res.json('Server working');
 });
 
-// swagger
-// app.use(
-//   "/api-docs",
-//   swaggerUi.serve,
-//   swaggerUi.setup(swaggerSpec, { explorer: true }) //검색 허용가능
-// );
+app.use((req, res) => {
+	return res.status(404).send({ message: 'page not found' });
+});
 
 app.listen(4000, () => {
 	console.log(`
