@@ -4,7 +4,7 @@ import WinstonDaily from 'winston-daily-rotate-file';
 const { combine, timestamp, printf } = format;
 
 const logFormat = printf((info) => {
-	return `[${info.timestamp}] | [${info.level}] | ${info.message}`; // 날짜 시간 로그레벨: 메세지
+	return `[${info.timestamp}] [${info.level}] : ${info.message}`; // 날짜 시간 로그레벨: 메세지
 });
 
 class WintonLogger {
