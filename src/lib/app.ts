@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import WinstonLogger from './logger/logger';
+import { authRouter } from './routes/auth/authController';
 
 // 로깅용 initialize
 const logger = WinstonLogger.getInstance();
@@ -50,6 +51,10 @@ app.use((req, res, next) => {
 // health check
 app.get('/', (req, res, next) => {
 	res.json('Server working');
+});
+app.use('/api/auth', authRouter);
+app.use((req, res) => {
+	return res.status(404).send({ message: 'page not found' });
 });
 
 /**
