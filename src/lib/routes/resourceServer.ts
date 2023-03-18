@@ -12,7 +12,7 @@
 // 	const scope = req.query.scope;
 // 	const redirect_uri = req.query.redirect_uri;
 
-// 	// 3. 같으면 인가 코드(임시 비밀번호)를 query에 담아 redirect url을 resource Owner에게 전달
+// 	// 3. 같으면 인가 코드(임시 비밀번호)를 query에 담아 redirect url을 client에게 전달
 // 	const code = 'any';
 // 	res.send(`http://localhost:4000/api/auth/redirect/local?code=${code}`);
 // });
