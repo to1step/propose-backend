@@ -12,9 +12,9 @@
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
     "prestart": "npm run build",
-    "start_local": "npm run build && cross-env NODE_ENV=local node dist/src/lib/app.js",
-    "start_dev": "npm run build && cross-env NODE_ENV=development node dist/src/lib/app.js",
-    "start_live": "npm run build && cross-env NODE_ENV=production node dist/src/lib/app.js"
+    "start_local": "npm run build && cross-env NODE_ENV=local node dist/src/lib/server.js",
+    "start_dev": "npm run build && cross-env NODE_ENV=development node dist/src/lib/server.js",
+    "start_live": "npm run build && cross-env NODE_ENV=production node dist/src/lib/server.js"
   },
   "lint-staged": {
     "./src/**/*.{ts,tsx,js,jsx}": [
@@ -28,9 +28,9 @@
     "dotenv": "^16.0.3",
     "express": "4.18.2",
     "helmet": "^6.0.1",
+    "mongoose": "6.6.2",
     "winston": "^3.8.2",
-    "winston-daily-rotate-file": "^4.7.1",
-    "mongoose": "6.6.2"
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",
