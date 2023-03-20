@@ -1,9 +1,7 @@
 import { createLogger, format, transports, Logger } from 'winston';
 import WinstonDaily from 'winston-daily-rotate-file';
 
-const { combine, timestamp, printf } = format;
-
-const logFormat = printf((info) => {
+const logFormat = format.printf((info) => {
 	return `[${info.timestamp}] [${info.level}] : ${info.message}`; // 날짜 시간 로그레벨: 메세지
 });
 
@@ -45,7 +43,7 @@ class WintonLogger {
 			level: 'debug',
 			format: format.combine(
 				format.colorize(),
-				timestamp({ format: Date.now().toString() }),
+				format.timestamp({ format: Date.now().toString() }),
 				logFormat
 			),
 		});
@@ -64,7 +62,10 @@ class WintonLogger {
 		}
 
 		this.logger = createLogger({
-			format: combine(timestamp({ format: Date.now().toString() }), logFormat),
+			format: format.combine(
+				format.timestamp({ format: Date.now().toString() }),
+				logFormat
+			),
 			transports: transport,
 			exceptionHandlers: exceptionHandler,
 		});
