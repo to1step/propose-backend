@@ -1,6 +1,6 @@
 import { Model, model, Schema } from 'mongoose';
 
-interface IUser {
+interface UserDAO {
 	uuid: string;
 	email: string;
 	nickname: string;
@@ -8,9 +8,9 @@ interface IUser {
 	snsId: string;
 }
 
-type IUserModel = Model<IUser>;
+type UserDAOModel = Model<UserDAO>;
 
-const userSchema = new Schema<IUser, IUserModel>(
+const userSchema = new Schema<UserDAO, UserDAOModel>(
 	{
 		uuid: { type: String, required: true }, // 유저 식별 uuid
 		email: { type: String, required: true }, // 유저 email
@@ -23,6 +23,6 @@ const userSchema = new Schema<IUser, IUserModel>(
 	}
 );
 
-const User = model<IUser, IUserModel>('User', userSchema);
+const UserModel = model<UserDAO, UserDAOModel>('User', userSchema);
 
-export { User };
+export { UserModel };

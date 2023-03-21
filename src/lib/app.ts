@@ -56,7 +56,10 @@ app.get('/', (req, res, next) => {
 /**
  * 라우터 정의
  */
-app.use('/v1', authRouter);
+app.use('/api/auth', authRouter);
+app.use((req, res) => {
+	return res.status(404).send({ message: 'page not found' });
+});
 
 /**
  * TODO: Error 핸들러로 재작성
