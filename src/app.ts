@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
-import WinstonLogger from './logger/logger';
+import WinstonLogger from './utilies/logger';
 
 // 로깅용 initialize
 const logger = WinstonLogger.getInstance();

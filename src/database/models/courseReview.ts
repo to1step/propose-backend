@@ -1,14 +1,14 @@
 import { Model, model, Schema } from 'mongoose';
 
-interface ICourseReview {
+interface CourseReviewDAO {
 	user: string;
 	store: string;
 	comment: string;
 }
 
-type ICourseReviewModel = Model<ICourseReview>;
+type CourseReviewDAOModel = Model<CourseReviewDAO>;
 
-const courseReviewSchema = new Schema<ICourseReview, ICourseReviewModel>(
+const courseReviewSchema = new Schema<CourseReviewDAO, CourseReviewDAOModel>(
 	{
 		user: { type: String, required: true }, // 작성한 유저 식별 uuid
 		store: { type: String, required: true }, // 코스 식별 uuid
@@ -19,7 +19,7 @@ const courseReviewSchema = new Schema<ICourseReview, ICourseReviewModel>(
 	}
 );
 
-const CourseReview = model<ICourseReview, ICourseReviewModel>(
+const CourseReview = model<CourseReviewDAO, CourseReviewDAOModel>(
 	'CourseReview',
 	courseReviewSchema
 );

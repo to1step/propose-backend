@@ -1,13 +1,14 @@
 import { Model, model, Schema } from 'mongoose';
 
-interface IStoreImage {
+interface StoreImageDAO {
 	user: string;
 	store: string;
 	imageSrc: string;
 }
 
-type IStoreImageModel = Model<IStoreImage>;
-const storeImageSchema = new Schema<IStoreImage, IStoreImageModel>(
+type StoreImageDAOModel = Model<StoreImageDAO>;
+
+const storeImageSchema = new Schema<StoreImageDAO, StoreImageDAOModel>(
 	{
 		user: { type: String, required: true },
 		store: { type: String, required: true },
@@ -18,7 +19,7 @@ const storeImageSchema = new Schema<IStoreImage, IStoreImageModel>(
 	}
 );
 
-const StoreImage = model<IStoreImage, IStoreImageModel>(
+const StoreImage = model<StoreImageDAO, StoreImageDAOModel>(
 	'StoreImage',
 	storeImageSchema
 );

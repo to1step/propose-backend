@@ -1,13 +1,13 @@
 import { Model, model, Schema } from 'mongoose';
 
-interface IStoreLike {
+interface StoreLikeDAO {
 	user: string;
 	store: string;
 }
 
-type IStoreLikeModel = Model<IStoreLike>;
+type StoreLikeDAOModel = Model<StoreLikeDAO>;
 
-const storeLikeSchema = new Schema<IStoreLike, IStoreLikeModel>(
+const storeLikeSchema = new Schema<StoreLikeDAO, StoreLikeDAOModel>(
 	{
 		user: { type: String, required: true }, // 좋아요 누른 유저 식별 uuid
 		store: { type: String, required: true }, // 가게 식별 uuid
@@ -17,7 +17,7 @@ const storeLikeSchema = new Schema<IStoreLike, IStoreLikeModel>(
 	}
 );
 
-const StoreLike = model<IStoreLike, IStoreLikeModel>(
+const StoreLike = model<StoreLikeDAO, StoreLikeDAOModel>(
 	'StoreLike',
 	storeLikeSchema
 );

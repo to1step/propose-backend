@@ -1,14 +1,14 @@
 import { Model, model, Schema } from 'mongoose';
 
-interface IStoreReview {
+interface StoreReviewDAO {
 	user: string;
 	store: string;
 	comment: string;
 }
 
-type IStoreReviewModel = Model<IStoreReview>;
+type StoreReviewDAOModel = Model<StoreReviewDAO>;
 
-const storeReviewSchema = new Schema<IStoreReview, IStoreReviewModel>(
+const storeReviewSchema = new Schema<StoreReviewDAO, StoreReviewDAOModel>(
 	{
 		user: { type: String, required: true }, // 작성한 유저 식별 uuid
 		store: { type: String, required: true }, // 가게 식별 uuid
@@ -19,7 +19,7 @@ const storeReviewSchema = new Schema<IStoreReview, IStoreReviewModel>(
 	}
 );
 
-const StoreReview = model<IStoreReview, IStoreReviewModel>(
+const StoreReview = model<StoreReviewDAO, StoreReviewDAOModel>(
 	'StoreReview',
 	storeReviewSchema
 );

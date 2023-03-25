@@ -1,6 +1,6 @@
 import { Model, model, Schema } from 'mongoose';
 
-interface IStore {
+interface StoreDAO {
 	uuid: string;
 	name: string;
 	coordinates: number[];
@@ -10,8 +10,8 @@ interface IStore {
 	endTime?: string;
 }
 
-type IStoreModel = Model<IStore>;
-const storeSchema = new Schema<IStore, IStoreModel>(
+type StoreDAOModel = Model<StoreDAO>;
+const storeSchema = new Schema<StoreDAO, StoreDAOModel>(
 	{
 		uuid: { type: String, required: true }, // 가게 식별 uuid
 		name: { type: String, required: true }, // 가게 이름
@@ -26,6 +26,6 @@ const storeSchema = new Schema<IStore, IStoreModel>(
 	}
 );
 
-const Store = model<IStore, IStoreModel>('Store', storeSchema);
+const Store = model<StoreDAO, StoreDAOModel>('Store', storeSchema);
 
 export { Store };
