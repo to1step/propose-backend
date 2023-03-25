@@ -1,77 +1,57 @@
-// import { v4 as uuidv4 } from 'uuid';
-// import dotenv from 'dotenv';
-// import { UserModel } from '../../database/models/user';
-// import { User } from '../models/model';
+import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+import { UserModel } from '../../database/models/user';
+import ModelConverter from '../../utilies/modelConverter';
+import { User, UserLocalCreate } from '../types/type';
 
-// dotenv.config();
+dotenv.config();
 
-// class UserService {
-// 	private static instance: UserService;
+class UserService {
+	private static instance: UserService;
 
-// 	private constructor() {}
+	private constructor() {}
 
-// 	public static getInstance(): UserService {
-// 		if (!UserService.instance) {
-// 			UserService.instance = new UserService();
-// 		}
-// 		return UserService.instance;
-// 	}
+	public static getInstance(): UserService {
+		if (!UserService.instance) {
+			UserService.instance = new UserService();
+		}
+		return UserService.instance;
+	}
 
-// 	// 구조 분해 할당 방식으로 parameter 받기
-// 	static async createUser(
-// 		email: string,
-// 		nickname: string,
-// 		provider: string,
-// 		snsId: string
-// 	): Promise<User> {
-// 		try {
-// 			const newUser = await new UserModel({
-// 				uuid: uuidv4(),
-// 				email: email,
-// 				nickname: nickname,
-// 				provider: provider,
-// 				snsId: snsId,
-// 			}).save();
+	/**
+	 * 유저 생성
+	 * @param userCreateForm
+	 */
+	async createUser(userCreateForm: UserLocalCreate): Promise<User> {
+		const newUUID = uuidv4();
+		const { email, nickname, provider, snsId } = userCreateForm;
 
-// 			return {
-// 				uuid: newUser.uuid,
-// 				email: newUser.email,
-// 				nickname: newUser.email,
-// 				provider: newUser.provider,
-// 				snsId: newUser.snsId,
-// 			};
-// 		} catch (error) {
-// 			if (error instanceof Error) {
-// 				throw new Error(error.message);
-// 			}
+		const newUser = await new UserModel({
+			uuid: newUUID,
+			email,
+			nickname,
+			provider,
+			snsId,
+		}).save();
 
-// 			throw new Error('Unexpected error');
-// 		}
-// 	}
+		return ModelConverter.toUser(newUser);
+	}
 
-// 	static async findUser(snsId: string, provider: string): Promise<User | n> {
-// 		try {
-// 			const user = await UserModel.findOne({
-// 				snsId: snsId,
-// 				provider: provider,
-// 			});
+	async getUserWithSnsIDAndProvider(
+		snsId: string | null,
+		provider: 'kakao' | 'naver' | 'google' | 'local'
+	): Promise<User | null> {
+		const user = await UserModel.findOne({
+			snsId,
+			provider,
+		}).exec();
 
-// 			if (!user) return null;
-// 			return {
-// 				uuid: user.uuid,
-// 				email: user.email,
-// 				nickname: user.email,
-// 				provider: user.provider,
-// 				snsId: user.snsId,
-// 			};
-// 		} catch (error) {
-// 			if (error instanceof Error) {
-// 				throw new Error(error.message);
-// 			}
+		if (!user) {
+			return null;
+		}
 
-// 			throw new Error('Unexpected error');
-// 		}
-// 	}
-// }
+		return ModelConverter.toUser(user);
+	}
+}
 
-// export default UserService;
+export default UserService;

@@ -1,10 +1,12 @@
-import express from 'express';
+import express, { ErrorRequestHandler } from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import WinstonLogger from './utilies/logger';
+import UserService from './lib/services/userService';
+import v1UserRouter from './lib/routes/userController';
 
 // 로깅용 initialize
 const logger = WinstonLogger.getInstance();
@@ -48,7 +50,9 @@ app.use((req, res, next) => {
 });
 
 // health check
-app.get('/', (req, res, next) => {
+app.get('/', async (req, res, next) => {
+	const test = UserService.getInstance();
+	await test.getUserWithSnsIDAndProvider('kakao', 'kakao');
 	res.json('Server working');
 });
 
@@ -56,15 +60,17 @@ app.get('/', (req, res, next) => {
  * 라우터 정의
  */
 // app.use('/api/auth', authRouter);
+app.use('/v1', v1UserRouter);
 app.use((req, res) => {
-	return res.status(404).send({ message: 'page not found' });
+	res.status(404).send({ message: 'page not found' });
 });
 
-/**
- * TODO: Error 핸들러로 재작성
- */
-app.use((req, res) => {
-	return res.status(404).send({ message: 'page not found' });
-});
+// error handler
+app.use(((err, req, res, next) => {
+	res.status(err.status ?? 500).json({
+		message: err.message,
+		error: err,
+	});
+}) as ErrorRequestHandler);
 
 export default app;
