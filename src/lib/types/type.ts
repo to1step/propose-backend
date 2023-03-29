@@ -18,19 +18,78 @@ type KakaoUserReponse = {
 	};
 };
 
-type User = {
-	uuid: string;
+type EmailValidationForm = {
 	email: string;
+};
+
+type EmailValidation = {
+	exist: boolean;
+};
+
+type EmailVerificationForm = {
+	userToken: string | undefined;
+	verifyCode: string;
+};
+
+type EmailVerification = {
+	verify: boolean;
+	timeOut: boolean;
+};
+
+type ReVerifyEmailForm = {
+	userToken: string | undefined;
+};
+
+type SignUpForm = {
+	email: string;
+	nickname: string;
+	password: string;
+	provider: 'local';
+	snsId: null;
+};
+
+type UserTokenForm = {
+	email: string;
+	nickname: string;
+	password: string;
+	provider: 'local';
+	snsId: null;
+};
+
+type UserToken = {
+	userToken: string | undefined;
+};
+
+type UserLocalCreateForm = {
+	userToken: string | undefined;
+	verify: boolean;
+};
+
+type UserCreateForm = {
+	email: string;
+	password: string;
 	nickname: string;
 	provider: string;
 	snsId: string | null;
 };
 
-type UserLocalCreate = {
-	email: string;
-	nickname: string;
-	provider: string;
-	snsId: string | null;
+type Tokens = {
+	accessToken: string;
+	refreshToken: string;
 };
 
-export type { User, KakaoTokenResponse, KakaoUserReponse, UserLocalCreate };
+export type {
+	UserCreateForm,
+	KakaoTokenResponse,
+	KakaoUserReponse,
+	EmailValidationForm,
+	EmailValidation,
+	EmailVerificationForm,
+	EmailVerification,
+	ReVerifyEmailForm,
+	SignUpForm,
+	UserTokenForm,
+	UserToken,
+	UserLocalCreateForm,
+	Tokens,
+};

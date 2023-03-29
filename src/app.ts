@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import WinstonLogger from './utilies/logger';
 import UserService from './lib/services/userService';
+import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
 
 // 로깅용 initialize
@@ -33,7 +34,7 @@ app.use(
 		credentials: true,
 	})
 );
-app.all('/*', function (req, res, next) {
+app.all('/*', (req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Headers', 'X-Requested-With');
 	next();
@@ -52,14 +53,13 @@ app.use((req, res, next) => {
 // health check
 app.get('/', async (req, res, next) => {
 	const test = UserService.getInstance();
-	await test.getUserWithSnsIDAndProvider('kakao', 'kakao');
 	res.json('Server working');
 });
 
 /**
  * 라우터 정의
  */
-// app.use('/api/auth', authRouter);
+app.use('/v1', v1AuthRouter);
 app.use('/v1', v1UserRouter);
 app.use((req, res) => {
 	res.status(404).send({ message: 'page not found' });

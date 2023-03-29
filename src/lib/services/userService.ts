@@ -1,10 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
 import { UserModel } from '../../database/models/user';
-import ModelConverter from '../../utilies/modelConverter';
-import { User, UserLocalCreate } from '../types/type';
-
-dotenv.config();
+import ModelConverter from '../../utilies/converter/modelConverter';
+import { UserCreateForm } from '../types/type';
 
 class UserService {
 	private static instance: UserService;
@@ -18,37 +16,21 @@ class UserService {
 		return UserService.instance;
 	}
 
-	/**
-	 * 유저 생성
-	 * @param userCreateForm
-	 */
-	async createUser(userCreateForm: UserLocalCreate): Promise<User> {
-		const newUUID = uuidv4();
-		const { email, nickname, provider, snsId } = userCreateForm;
+	async createUser(userCreateForm: UserCreateForm): Promise<string> {
+		const { email, password, nickname, provider, snsId } = userCreateForm;
 
-		const newUser = await new UserModel({
+		const salt = await bcrypt.genSalt(10);
+		const hashedPassword = bcrypt.hash(password, salt);
+		const newUUID = uuidv4();
+
+		const user = await new UserModel({
 			uuid: newUUID,
 			email,
+			hashedPassword,
 			nickname,
 			provider,
 			snsId,
 		}).save();
-
-		return ModelConverter.toUser(newUser);
-	}
-
-	async getUserWithSnsIDAndProvider(
-		snsId: string | null,
-		provider: 'kakao' | 'naver' | 'google' | 'local'
-	): Promise<User | null> {
-		const user = await UserModel.findOne({
-			snsId,
-			provider,
-		}).exec();
-
-		if (!user) {
-			return null;
-		}
 
 		return ModelConverter.toUser(user);
 	}
