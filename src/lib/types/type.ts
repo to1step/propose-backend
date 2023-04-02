@@ -31,10 +31,6 @@ type EmailValidationForm = {
 	email: string;
 };
 
-type EmailValidation = {
-	exist: boolean;
-};
-
 type EmailVerificationForm = {
 	verifyCode: string;
 };
@@ -42,10 +38,6 @@ type EmailVerificationForm = {
 type EmailVerification = {
 	verify: boolean;
 	timeOut: boolean;
-};
-
-type ReVerifyEmailForm = {
-	userToken: string | undefined;
 };
 
 type SignUpForm = {
@@ -56,13 +48,7 @@ type SignUpForm = {
 	snsId: null;
 };
 
-type UserTokenForm = {
-	email: string;
-	nickname: string;
-	password: string;
-	provider: 'local';
-	snsId: null;
-};
+type UserTokenForm = SignUpForm;
 
 type UserCreateForm = {
 	email: string;
@@ -83,10 +69,8 @@ export type {
 	KakaoTokenResponse,
 	KakaoUserReponse,
 	EmailValidationForm,
-	EmailValidation,
 	EmailVerificationForm,
 	EmailVerification,
-	ReVerifyEmailForm,
 	SignUpForm,
 	UserTokenForm,
 	Tokens,

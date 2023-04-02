@@ -3,7 +3,6 @@ import UserService from './userService';
 import {
 	SignUpForm,
 	UserTokenForm,
-	EmailValidation,
 	EmailValidationForm,
 	EmailVerification,
 	EmailVerificationForm,
@@ -20,25 +19,30 @@ class AuthService {
 		this.userService = UserService.getInstance();
 	}
 
+	/**
+	 * 이메일 중복확인
+	 * @param emailValidationForm
+	 */
 	async validateEmail(
 		emailValidationForm: EmailValidationForm
-	): Promise<EmailValidation> {
+	): Promise<boolean> {
 		const { email } = emailValidationForm;
 
 		// fineOne method보다 성능 향상
 		const existEmail = await UserModel.exists({ email }).exec();
 
-		if (existEmail) {
-			return { exist: true };
-		}
-		return { exist: false };
+		return !!existEmail;
 	}
 
 	async signUp(signUpForm: SignUpForm): Promise<string> {
 		const { email, nickname, password, provider, snsId } = signUpForm;
-		await this.sendEmail(email);
+		try {
+			this.sendEmail(email);
+		} catch (e) {
+			// 할 작업 없음.
+		}
 
-		const userToken: UserTokenForm = {
+		const userToken: SignUpForm = {
 			email,
 			nickname,
 			password,
@@ -59,6 +63,8 @@ class AuthService {
 	createUserToken(userTokenForm: UserTokenForm): string {
 		const { email, nickname, password, provider, snsId } = userTokenForm;
 
+		// TODO: 패스워드 암호화 후 프론트로 보내기
+
 		// 유저 정보를 jwt로 암호화한 Token 만들기
 		return jwt.sign(
 			{ email, nickname, password, provider, snsId },
@@ -75,7 +81,7 @@ class AuthService {
 	): EmailVerification {
 		// TODO: token에서 이메일 추출
 		const { email } = jwt.verify(
-			userToken, // 아니 왜 여기는 씌워줘야하지?
+			userToken,
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
 		) as UserTokenForm;
 
@@ -94,7 +100,7 @@ class AuthService {
 
 	async reVerifyEmail(userToken: string): Promise<void> {
 		const { email } = jwt.verify(
-			userToken, // 아니 왜 여기는 씌워줘야하지?
+			userToken,
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
 		) as UserTokenForm;
 

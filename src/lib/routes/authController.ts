@@ -1,18 +1,17 @@
 import express from 'express';
 import { validateOrReject } from 'class-validator';
 import AuthService from '../services/authService';
-// #region request.dto
-import EmailValidationFormDto from '../types/requestTypes/emaliValidationForm.dto';
 import SignUpFormDto from '../types/requestTypes/signUpForm.dto';
 import EmailVerificationFormDto from '../types/requestTypes/emailVerificationForm.dto';
-// #region response.dto
-import EmailValidationDto from '../types/responseTypes/emailValidation.dto';
 import EmailVerificationDto from '../types/responseTypes/emailVerification.dto';
-import EmailReVerificationDto from '../types/responseTypes/emailReVerification.dto';
+import EmailValidationFormDto from '../types/requestTypes/emaliValidationForm.dto';
 
 const router = express.Router();
 const authService = AuthService.getInstance();
 
+/**
+ * 이메일 중복확인
+ */
 router.post('/auth/local/email-validation', async (req, res, next) => {
 	try {
 		const emailValidationFormDto = new EmailValidationFormDto(req.body);
@@ -24,14 +23,15 @@ router.post('/auth/local/email-validation', async (req, res, next) => {
 			emailValidationFormDto.toServiceModel()
 		);
 
-		const emailValidationDTO = new EmailValidationDto(emailValidation);
-
-		res.json(emailValidationDTO);
+		res.json({ data: emailValidation });
 	} catch (error) {
 		next(error);
 	}
 });
 
+/**
+ * 유저에게 이메일 확인
+ */
 router.post('/auth/local/sign-up', async (req, res, next) => {
 	try {
 		const signUpFormDto = new SignUpFormDto(req.body);
@@ -51,8 +51,9 @@ router.post('/auth/local/sign-up', async (req, res, next) => {
 router.post('/auth/local/email-verification', async (req, res, next) => {
 	try {
 		const userToken = req.header('userToken');
+
 		if (!userToken) {
-			throw new Error('no header');
+			throw new Error('user token required');
 		}
 
 		const emailVerificationFormDto = new EmailVerificationFormDto(req.body);
@@ -65,7 +66,8 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 		);
 
 		const verifyResult = new EmailVerificationDto(emailVerification);
-		res.json(verifyResult);
+
+		res.json({ data: verifyResult });
 	} catch (error) {
 		next(error);
 	}
@@ -81,9 +83,9 @@ router.post('/auth/local/email-re-verification', async (req, res, next) => {
 
 		await authService.reVerifyEmail(userToken);
 
-		const emailReVerificationDto = new EmailReVerificationDto();
-
-		res.json(emailReVerificationDto);
+		res.json({
+			data: true,
+		});
 	} catch (error) {
 		next(error);
 	}
@@ -125,13 +127,13 @@ router.get('/auth/kakao', async (req, res, next) => {
 
 router.get('/auth/kakao/redirect', async (req, res, next) => {
 	try {
-		const { code } = req.query;
+		const code = req.query.code as string;
 
 		if (!code) {
 			throw new Error('Code not found');
 		}
 
-		// await authService.kakaoLogin(code as string);
+		// await authService.kakaoLogin(code);
 	} catch (error) {
 		next(error);
 	}

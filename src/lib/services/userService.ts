@@ -19,8 +19,9 @@ class UserService {
 	async createUser(userCreateForm: UserCreateForm): Promise<User> {
 		const { email, password, nickname, provider, snsId } = userCreateForm;
 
+		// TODO: 암호화 토큰 생성쪽으로 뺍시다
 		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = bcrypt.hash(password, salt);
+		const hashedPassword = await bcrypt.hash(password, salt);
 		const newUUID = uuidv4();
 
 		const user = await new UserModel({

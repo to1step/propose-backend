@@ -2,8 +2,8 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { EmailVerificationForm } from '../type';
 
 class EmailVerificationFormDto {
-	@IsNotEmpty()
 	@IsString()
+	@IsNotEmpty()
 	verifyCode: string;
 
 	constructor(obj: EmailVerificationFormDto) {

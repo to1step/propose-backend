@@ -51,7 +51,7 @@ app.use((req, res, next) => {
 });
 
 // health check
-app.get('/', async (req, res, next) => {
+app.get('/', (req, res, next) => {
 	res.json('Server working');
 });
 
