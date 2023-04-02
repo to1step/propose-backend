@@ -1,14 +1,15 @@
 import express from 'express';
 import { validateOrReject } from 'class-validator';
 import AuthService from '../services/authService';
-import SignUpFormDto from '../types/requestTypes/signUpForm.dto';
-import EmailVerificationFormDto from '../types/requestTypes/emailVerificationForm.dto';
+import UserDataDto from '../types/requestTypes/userData.dto';
+import VerifyCodeDto from '../types/requestTypes/verifyCode.dto';
 import EmailVerificationDto from '../types/responseTypes/emailVerification.dto';
 import EmailValidationFormDto from '../types/requestTypes/emaliValidationForm.dto';
 
 const router = express.Router();
 const authService = AuthService.getInstance();
 
+//#region 로컬 회원가입
 /**
  * 이메일 중복확인
  */
@@ -30,24 +31,29 @@ router.post('/auth/local/email-validation', async (req, res, next) => {
 });
 
 /**
- * 유저에게 이메일 확인
+ * 유저정보 토큰으로 암호화, 인증메일 전송
  */
-router.post('/auth/local/sign-up', async (req, res, next) => {
+router.post('/auth/local/user-to-token', async (req, res, next) => {
 	try {
-		const signUpFormDto = new SignUpFormDto(req.body);
+		const userDataDto = new UserDataDto(req.body);
 
-		await validateOrReject(signUpFormDto);
+		await validateOrReject(userDataDto);
 
 		// 유저정보를 jwt로 암호화한 code 만들기
-		const userToken = await authService.signUp(signUpFormDto.toServiceModel());
+		const userToken = await authService.userToToken(
+			userDataDto.toServiceModel()
+		);
 
 		// userToken을 헤더에 담아 email 인증화면으로 redirect
-		res.header('userToken', userToken).redirect(`front`);
+		res.header('userToken', userToken).redirect(`${process.env.FRONT_PORT}`);
 	} catch (error) {
 		next(error);
 	}
 });
 
+/**
+ * 이메일 인증
+ */
 router.post('/auth/local/email-verification', async (req, res, next) => {
 	try {
 		const userToken = req.header('userToken');
@@ -56,13 +62,13 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 			throw new Error('user token required');
 		}
 
-		const emailVerificationFormDto = new EmailVerificationFormDto(req.body);
+		const verifyCodeDto = new VerifyCodeDto(req.body);
 
-		await validateOrReject(emailVerificationFormDto);
+		await validateOrReject(verifyCodeDto);
 
 		const emailVerification = await authService.verifyEmail(
 			userToken,
-			emailVerificationFormDto.toServiceModel()
+			verifyCodeDto.toServiceModel()
 		);
 
 		const verifyResult = new EmailVerificationDto(emailVerification);
@@ -73,7 +79,10 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 	}
 });
 
-router.post('/auth/local/email-re-verification', async (req, res, next) => {
+/**
+ * 인증메일 재전송
+ */
+router.post('/auth/local/re-send-email', async (req, res, next) => {
 	try {
 		const userToken = req.header('userToken');
 
@@ -81,7 +90,7 @@ router.post('/auth/local/email-re-verification', async (req, res, next) => {
 			throw new Error('no header');
 		}
 
-		await authService.reVerifyEmail(userToken);
+		await authService.reSendEmail(userToken);
 
 		res.json({
 			data: true,
@@ -91,7 +100,10 @@ router.post('/auth/local/email-re-verification', async (req, res, next) => {
 	}
 });
 
-router.post('/auth/local/user', async (req, res, next) => {
+/**
+ * 유저 회원가입
+ */
+router.post('/auth/local/sign-up', async (req, res, next) => {
 	try {
 		const userToken = req.header('userToken');
 
@@ -112,11 +124,12 @@ router.post('/auth/local/user', async (req, res, next) => {
 		res
 			.cookie('accessToken', accessToken)
 			.cookie('refreshToken', refreshToken)
-			.redirect(301, 'front');
+			.redirect(301, `${process.env.FRONT_PORT}`);
 	} catch (error) {
 		next(error);
 	}
 });
+//#endregion
 
 //#region 카카오 로그인
 router.get('/auth/kakao', async (req, res, next) => {

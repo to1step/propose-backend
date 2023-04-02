@@ -27,35 +27,33 @@ type User = {
 	provider: string;
 };
 
-type EmailValidationForm = {
-	email: string;
-};
-
-type EmailVerificationForm = {
-	verifyCode: string;
-};
-
-type EmailVerification = {
-	verify: boolean;
-	timeOut: boolean;
-};
-
-type SignUpForm = {
-	email: string;
-	nickname: string;
-	password: string;
-	provider: 'local';
-	snsId: null;
-};
-
-type UserTokenForm = SignUpForm;
-
-type UserCreateForm = {
+type UserData = {
 	email: string;
 	password: string;
 	nickname: string;
 	provider: string;
 	snsId: string | null;
+};
+
+type HashedUserData = {
+	email: string;
+	hashedPassword: string;
+	nickname: string;
+	provider: string;
+	snsId: string | null;
+};
+
+type EmailValidationForm = {
+	email: string;
+};
+
+type VerifyCode = {
+	code: string;
+};
+
+type VerifyResult = {
+	verify: boolean;
+	timeOut: boolean;
 };
 
 type Tokens = {
@@ -64,14 +62,13 @@ type Tokens = {
 };
 
 export type {
-	User,
-	UserCreateForm,
 	KakaoTokenResponse,
 	KakaoUserReponse,
+	User,
+	UserData,
+	HashedUserData,
 	EmailValidationForm,
-	EmailVerificationForm,
-	EmailVerification,
-	SignUpForm,
-	UserTokenForm,
+	VerifyCode,
+	VerifyResult,
 	Tokens,
 };

@@ -1,12 +1,13 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import UserService from './userService';
 import {
-	SignUpForm,
-	UserTokenForm,
+	UserData,
 	EmailValidationForm,
-	EmailVerification,
-	EmailVerificationForm,
+	VerifyCode,
+	VerifyResult,
 	Tokens,
+	HashedUserData,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 
@@ -28,46 +29,46 @@ class AuthService {
 	): Promise<boolean> {
 		const { email } = emailValidationForm;
 
-		// fineOne method보다 성능 향상
 		const existEmail = await UserModel.exists({ email }).exec();
 
 		return !!existEmail;
 	}
 
-	async signUp(signUpForm: SignUpForm): Promise<string> {
-		const { email, nickname, password, provider, snsId } = signUpForm;
-		try {
-			this.sendEmail(email);
-		} catch (e) {
-			// 할 작업 없음.
-		}
+	/**
+	 * 유저정보를 토큰에 저장, 해당 이메일로 인증메일을 보냄
+	 * @param userData
+	 */
+	async userToToken(userData: UserData): Promise<string> {
+		const { email } = userData;
 
-		const userToken: SignUpForm = {
-			email,
-			nickname,
-			password,
-			provider,
-			snsId,
-		};
+		this.sendEmail(email);
 
-		// 해당 정보로 userToken 만들기
-		return this.createUserToken(userToken);
+		return this.createUserToken(userData);
 	}
 
-	async sendEmail(email: string): Promise<void> {
+	/**
+	 * 이메일로 인증 코드 전송
+	 * @param email
+	 */
+	sendEmail(email: string): void {
 		// TODO: 해당 이메일에 대한 인증코드 만들기 8자리 랜덤 문자열
 		// TODO: { key: email, value: 인증코드 } redis에 저장 10분으로 expire time 설정
 		// TODO: 해당 이메일로 인증코드 보내기
 	}
 
-	createUserToken(userTokenForm: UserTokenForm): string {
-		const { email, nickname, password, provider, snsId } = userTokenForm;
+	/**
+	 * 유저 정보로 토큰 만들기
+	 * @param userData
+	 */
+	async createUserToken(userData: UserData): Promise<string> {
+		const { email, nickname, password, provider, snsId } = userData;
 
-		// TODO: 패스워드 암호화 후 프론트로 보내기
+		const salt = await bcrypt.genSalt(10);
+		const hashedPassword = await bcrypt.hash(password, salt);
 
 		// 유저 정보를 jwt로 암호화한 Token 만들기
 		return jwt.sign(
-			{ email, nickname, password, provider, snsId },
+			{ email, nickname, hashedPassword, provider, snsId },
 			`${process.env.EMAIL_VERIFY_TOKEN_SECRET_KEY}`,
 			{
 				algorithm: 'HS256',
@@ -75,15 +76,16 @@ class AuthService {
 		);
 	}
 
-	verifyEmail(
-		userToken: string,
-		emailVerificationForm: EmailVerificationForm
-	): EmailVerification {
-		// TODO: token에서 이메일 추출
+	/**
+	 * 토큰을 복호화해서 얻은 이메일의 인증코드와 유저가 보낸 인증코드가 같은지 확인
+	 * @param userToken
+	 * @param verifyCode
+	 */
+	verifyEmail(userToken: string, verifyCode: VerifyCode): VerifyResult {
 		const { email } = jwt.verify(
 			userToken,
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
-		) as UserTokenForm;
+		) as UserData;
 
 		// TODO: redis에서 해당 이메일에 맞는 value값 찾기
 		const redisVerifyCode = '';
@@ -91,39 +93,52 @@ class AuthService {
 		// TODO: 만료 판단 하기
 		// return { verify:false, timeOut: true };
 
-		const { verifyCode } = emailVerificationForm;
-		if (verifyCode === redisVerifyCode) {
+		const { code } = verifyCode;
+		if (code === redisVerifyCode) {
 			return { verify: true, timeOut: false };
 		}
 		return { verify: false, timeOut: false };
 	}
 
-	async reVerifyEmail(userToken: string): Promise<void> {
+	/**
+	 * 토큰을 복호화해서 얻은 이메일에 인증코드 재전송
+	 * @param userToken
+	 */
+	async reSendEmail(userToken: string): Promise<void> {
 		const { email } = jwt.verify(
 			userToken,
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
-		) as UserTokenForm;
+		) as HashedUserData;
 
 		// TODO: 해당 이메일에 대한 인증코드 만들기 8자리 랜덤 문자열
 
 		// TODO: { key: email, value: 인증코드 } redis에 저장 10분으로 expire time 설정
 
 		// TODO: 해당 이메일로 인증코드 보내기
-		await this.sendEmail(email);
+		this.sendEmail(email);
 	}
 
+	/**
+	 * 토큰을 복호화해서 얻은 유저정보로 새 유저 생성
+	 * @param userToken
+	 */
 	async createLocalUser(userToken: string): Promise<Tokens> {
-		// token decode
-		const decode = jwt.verify(
+		// token 복호화
+		const userData = jwt.verify(
 			userToken,
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
-		) as UserTokenForm;
+		) as HashedUserData;
 
 		// 토큰에 있는 정보로 유저 생성
-		const { uuid } = await this.userService.createUser(decode);
+		const { uuid } = await this.userService.createUser(userData);
+
 		return this.createTokens(uuid);
 	}
 
+	/**
+	 * userUUID로 accessToken, refreshToken 만들기
+	 * @param userUUID
+	 */
 	createTokens(userUUID: string): Tokens {
 		const accessToken = jwt.sign(
 			{ userUUId: userUUID },

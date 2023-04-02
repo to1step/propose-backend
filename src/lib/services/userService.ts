@@ -1,8 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcrypt';
 import { UserModel } from '../../database/models/user';
 import ModelConverter from '../../utilies/converter/modelConverter';
-import { User, UserCreateForm } from '../types/type';
+import { HashedUserData, User } from '../types/type';
 
 class UserService {
 	private static instance: UserService;
@@ -16,12 +15,9 @@ class UserService {
 		return UserService.instance;
 	}
 
-	async createUser(userCreateForm: UserCreateForm): Promise<User> {
-		const { email, password, nickname, provider, snsId } = userCreateForm;
+	async createUser(hashedUserData: HashedUserData): Promise<User> {
+		const { email, hashedPassword, nickname, provider, snsId } = hashedUserData;
 
-		// TODO: 암호화 토큰 생성쪽으로 뺍시다
-		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = await bcrypt.hash(password, salt);
 		const newUUID = uuidv4();
 
 		const user = await new UserModel({

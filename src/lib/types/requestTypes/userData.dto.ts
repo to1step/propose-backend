@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { SignUpForm } from '../type';
+import { UserData } from '../type';
 
-class SignUpFormDto {
+class UserDataDto {
 	@IsString()
 	@IsNotEmpty()
 	email: string;
@@ -14,13 +14,13 @@ class SignUpFormDto {
 	@IsNotEmpty()
 	password: string;
 
-	constructor(obj: SignUpFormDto) {
+	constructor(obj: UserDataDto) {
 		this.email = obj.email;
 		this.nickname = obj.nickname;
 		this.password = obj.password;
 	}
 
-	toServiceModel(): SignUpForm {
+	toServiceModel(): UserData {
 		return {
 			email: this.email,
 			nickname: this.nickname,
@@ -31,4 +31,4 @@ class SignUpFormDto {
 	}
 }
 
-export default SignUpFormDto;
+export default UserDataDto;
