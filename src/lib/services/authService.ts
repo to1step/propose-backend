@@ -8,7 +8,6 @@ import {
 	EmailVerification,
 	EmailVerificationForm,
 	Tokens,
-	UserLocalCreateForm,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 
@@ -107,17 +106,7 @@ class AuthService {
 		await this.sendEmail(email);
 	}
 
-	async createLocalUser(
-		userToken: string,
-		userLocalCreateForm: UserLocalCreateForm
-	): Promise<Tokens> {
-		const { verify } = userLocalCreateForm;
-
-		// verify == false시 error
-		if (!verify) {
-			throw new Error('unVerified');
-		}
-
+	async createLocalUser(userToken: string): Promise<Tokens> {
 		// token decode
 		const decode = jwt.verify(
 			userToken,
@@ -125,7 +114,7 @@ class AuthService {
 		) as UserTokenForm;
 
 		// 토큰에 있는 정보로 유저 생성
-		const uuid = await this.userService.createUser(decode);
+		const { uuid } = await this.userService.createUser(decode);
 		return this.createTokens(uuid);
 	}
 

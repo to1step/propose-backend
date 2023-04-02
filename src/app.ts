@@ -52,7 +52,6 @@ app.use((req, res, next) => {
 
 // health check
 app.get('/', async (req, res, next) => {
-	const test = UserService.getInstance();
 	res.json('Server working');
 });
 

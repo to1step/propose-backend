@@ -2,8 +2,8 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { EmailValidationForm } from '../type';
 
 class EmailValidationFormDto {
-	@IsNotEmpty()
 	@IsString()
+	@IsNotEmpty()
 	email: string;
 
 	constructor(obj: EmailValidationFormDto) {
@@ -17,5 +17,4 @@ class EmailValidationFormDto {
 	}
 }
 
-// TODO: export default로 하기
 export default EmailValidationFormDto;

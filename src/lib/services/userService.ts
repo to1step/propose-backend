@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import { UserModel } from '../../database/models/user';
 import ModelConverter from '../../utilies/converter/modelConverter';
-import { UserCreateForm } from '../types/type';
+import { User, UserCreateForm } from '../types/type';
 
 class UserService {
 	private static instance: UserService;
@@ -16,7 +16,7 @@ class UserService {
 		return UserService.instance;
 	}
 
-	async createUser(userCreateForm: UserCreateForm): Promise<string> {
+	async createUser(userCreateForm: UserCreateForm): Promise<User> {
 		const { email, password, nickname, provider, snsId } = userCreateForm;
 
 		const salt = await bcrypt.genSalt(10);

@@ -1,14 +1,17 @@
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { SignUpForm } from '../type';
 
 class SignUpFormDto {
 	@IsString()
+	@IsNotEmpty()
 	email: string;
 
 	@IsString()
+	@IsNotEmpty()
 	nickname: string;
 
 	@IsString()
+	@IsNotEmpty()
 	password: string;
 
 	constructor(obj: SignUpFormDto) {

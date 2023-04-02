@@ -5,8 +5,6 @@ import AuthService from '../services/authService';
 import EmailValidationFormDto from '../types/requestTypes/emaliValidationForm.dto';
 import SignUpFormDto from '../types/requestTypes/signUpForm.dto';
 import EmailVerificationFormDto from '../types/requestTypes/emailVerificationForm.dto';
-import EmailReVerificationFormDto from '../types/requestTypes/emailReVerificationForm.dto';
-import CreateLocalUserFormDto from '../types/requestTypes/createLocalUserForm.dto';
 // #region response.dto
 import EmailValidationDto from '../types/responseTypes/emailValidation.dto';
 import EmailVerificationDto from '../types/responseTypes/emailVerification.dto';
@@ -15,7 +13,7 @@ import EmailReVerificationDto from '../types/responseTypes/emailReVerification.d
 const router = express.Router();
 const authService = AuthService.getInstance();
 
-router.post('/auth/local/emailValidation', async (req, res, next) => {
+router.post('/auth/local/email-validation', async (req, res, next) => {
 	try {
 		const emailValidationFormDto = new EmailValidationFormDto(req.body);
 
@@ -34,7 +32,7 @@ router.post('/auth/local/emailValidation', async (req, res, next) => {
 	}
 });
 
-router.post('/auth/local/signUp', async (req, res, next) => {
+router.post('/auth/local/sign-up', async (req, res, next) => {
 	try {
 		const signUpFormDto = new SignUpFormDto(req.body);
 
@@ -50,7 +48,7 @@ router.post('/auth/local/signUp', async (req, res, next) => {
 	}
 });
 
-router.post('/auth/local/emailVerification', async (req, res, next) => {
+router.post('/auth/local/email-verification', async (req, res, next) => {
 	try {
 		const userToken = req.header('userToken');
 		if (!userToken) {
@@ -73,7 +71,7 @@ router.post('/auth/local/emailVerification', async (req, res, next) => {
 	}
 });
 
-router.post('/auth/local/emailReVerification', async (req, res, next) => {
+router.post('/auth/local/email-re-verification', async (req, res, next) => {
 	try {
 		const userToken = req.header('userToken');
 
@@ -99,13 +97,13 @@ router.post('/auth/local/user', async (req, res, next) => {
 			throw new Error('no header');
 		}
 
-		const createLocalUserDto = new CreateLocalUserFormDto(req.body);
-
-		await validateOrReject(createLocalUserDto);
+		const { verify } = req.body;
+		if (!verify) {
+			throw new Error('invalid access');
+		}
 
 		const { accessToken, refreshToken } = await authService.createLocalUser(
-			userToken,
-			createLocalUserDto.toServiceModel()
+			userToken
 		);
 
 		// 쿠키를 헤더에 담아 front로 redirect
