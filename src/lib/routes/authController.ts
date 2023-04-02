@@ -52,14 +52,17 @@ router.post('/auth/local/signUp', async (req, res, next) => {
 
 router.post('/auth/local/emailVerification', async (req, res, next) => {
 	try {
-		const emailVerificationFormDto = new EmailVerificationFormDto(
-			req.header('userToken'),
-			req.body
-		);
+		const userToken = req.header('userToken');
+		if (!userToken) {
+			throw new Error('no header');
+		}
+
+		const emailVerificationFormDto = new EmailVerificationFormDto(req.body);
 
 		await validateOrReject(emailVerificationFormDto);
 
 		const emailVerification = await authService.verifyEmail(
+			userToken,
 			emailVerificationFormDto.toServiceModel()
 		);
 
@@ -72,17 +75,16 @@ router.post('/auth/local/emailVerification', async (req, res, next) => {
 
 router.post('/auth/local/emailReVerification', async (req, res, next) => {
 	try {
-		const emailReVerificationFormDto = new EmailReVerificationFormDto(
-			req.header('userToken')
-		);
+		const userToken = req.header('userToken');
 
-		await validateOrReject(emailReVerificationFormDto);
+		if (!userToken) {
+			throw new Error('no header');
+		}
 
-		await authService.reVerifyEmail(
-			emailReVerificationFormDto.toServiceModel()
-		);
+		await authService.reVerifyEmail(userToken);
 
 		const emailReVerificationDto = new EmailReVerificationDto();
+
 		res.json(emailReVerificationDto);
 	} catch (error) {
 		next(error);
@@ -91,14 +93,18 @@ router.post('/auth/local/emailReVerification', async (req, res, next) => {
 
 router.post('/auth/local/user', async (req, res, next) => {
 	try {
-		const createLocalUserDto = new CreateLocalUserFormDto(
-			req.header('userToken'),
-			req.body
-		);
+		const userToken = req.header('userToken');
+
+		if (!userToken) {
+			throw new Error('no header');
+		}
+
+		const createLocalUserDto = new CreateLocalUserFormDto(req.body);
 
 		await validateOrReject(createLocalUserDto);
 
 		const { accessToken, refreshToken } = await authService.createLocalUser(
+			userToken,
 			createLocalUserDto.toServiceModel()
 		);
 

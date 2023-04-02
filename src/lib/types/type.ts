@@ -27,7 +27,6 @@ type EmailValidation = {
 };
 
 type EmailVerificationForm = {
-	userToken: string | undefined;
 	verifyCode: string;
 };
 
@@ -61,7 +60,6 @@ type UserToken = {
 };
 
 type UserLocalCreateForm = {
-	userToken: string | undefined;
 	verify: boolean;
 };
 

@@ -9,7 +9,6 @@ import {
 	EmailVerificationForm,
 	Tokens,
 	UserLocalCreateForm,
-	UserToken,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 
@@ -71,8 +70,15 @@ class AuthService {
 		);
 	}
 
-	verifyEmail(emailVerificationForm: EmailVerificationForm): EmailVerification {
+	verifyEmail(
+		userToken: string,
+		emailVerificationForm: EmailVerificationForm
+	): EmailVerification {
 		// TODO: token에서 이메일 추출
+		const { email } = jwt.verify(
+			userToken, // 아니 왜 여기는 씌워줘야하지?
+			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
+		) as UserTokenForm;
 
 		// TODO: redis에서 해당 이메일에 맞는 value값 찾기
 		const redisVerifyCode = '';
@@ -80,28 +86,32 @@ class AuthService {
 		// TODO: 만료 판단 하기
 		// return { verify:false, timeOut: true };
 
-		if (emailVerificationForm.verifyCode === redisVerifyCode) {
+		const { verifyCode } = emailVerificationForm;
+		if (verifyCode === redisVerifyCode) {
 			return { verify: true, timeOut: false };
 		}
 		return { verify: false, timeOut: false };
 	}
 
-	async reVerifyEmail(userToken: UserToken): Promise<void> {
+	async reVerifyEmail(userToken: string): Promise<void> {
 		const { email } = jwt.verify(
-			`${userToken!}`, // 아니 왜 여기는 씌워줘야하지?
+			userToken, // 아니 왜 여기는 씌워줘야하지?
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
 		) as UserTokenForm;
 
 		// TODO: 해당 이메일에 대한 인증코드 만들기 8자리 랜덤 문자열
+
 		// TODO: { key: email, value: 인증코드 } redis에 저장 10분으로 expire time 설정
+
 		// TODO: 해당 이메일로 인증코드 보내기
 		await this.sendEmail(email);
 	}
 
 	async createLocalUser(
+		userToken: string,
 		userLocalCreateForm: UserLocalCreateForm
 	): Promise<Tokens> {
-		const { userToken, verify } = userLocalCreateForm;
+		const { verify } = userLocalCreateForm;
 
 		// verify == false시 error
 		if (!verify) {
@@ -110,7 +120,7 @@ class AuthService {
 
 		// token decode
 		const decode = jwt.verify(
-			userToken!,
+			userToken,
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
 		) as UserTokenForm;
 
