@@ -12,8 +12,6 @@ const authService = AuthService.getInstance();
 //#region 로컬 회원가입
 /**
  * 이메일 중복확인
- * router.get('/auth/local/emails/:email/validation',
- * return {data: {exist: boolean}}
  */
 router.post('/auth/local/email-validation', async (req, res, next) => {
 	try {
@@ -34,9 +32,8 @@ router.post('/auth/local/email-validation', async (req, res, next) => {
 
 /**
  * 유저정보 토큰으로 암호화, 인증메일 전송
- * router.post('/auth/local/emails/:email',
  */
-router.post('/auth/local/user-to-token', async (req, res, next) => {
+router.post('/auth/local/email-code', async (req, res, next) => {
 	try {
 		const userDataDto = new UserDataDto(req.body);
 
@@ -48,7 +45,8 @@ router.post('/auth/local/user-to-token', async (req, res, next) => {
 		);
 
 		// userToken을 헤더에 담아 email 인증화면으로 redirect
-		res.header('userToken', userToken).redirect(`${process.env.FRONT_PORT}`);
+		res.header('userToken', userToken);
+		res.json({ data: true });
 	} catch (error) {
 		next(error);
 	}
@@ -56,51 +54,23 @@ router.post('/auth/local/user-to-token', async (req, res, next) => {
 
 /**
  * 이메일 인증
- * router.get('/auth/local/emails/:email/verification',
- * return { data: verifyResult }
  */
-router.post('/auth/local/email-verification', async (req, res, next) => {
+router.get('/auth/local/email-verification', async (req, res, next) => {
 	try {
 		const userToken = req.header('userToken');
-
+		const code = req.query.code as string;
 		if (!userToken) {
 			throw new Error('user token required');
 		}
+		if (!code) {
+			throw new Error('email code required in query');
+		}
 
-		const verifyCodeDto = new VerifyCodeDto(req.body);
-
-		await validateOrReject(verifyCodeDto);
-
-		const emailVerification = await authService.verifyEmail(
-			userToken,
-			verifyCodeDto.toServiceModel()
-		);
+		const emailVerification = await authService.verifyEmail(userToken, code);
 
 		const verifyResult = new EmailVerificationDto(emailVerification);
 
 		res.json({ data: verifyResult });
-	} catch (error) {
-		next(error);
-	}
-});
-
-/**
- * 인증메일 재전송
- * router.get('/auth/local/emails/:email/resend
- */
-router.post('/auth/local/re-send-email', async (req, res, next) => {
-	try {
-		const userToken = req.header('userToken');
-
-		if (!userToken) {
-			throw new Error('no header');
-		}
-
-		await authService.reSendEmail(userToken);
-
-		res.json({
-			data: true,
-		});
 	} catch (error) {
 		next(error);
 	}

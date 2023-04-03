@@ -81,7 +81,7 @@ class AuthService {
 	 * @param userToken
 	 * @param verifyCode
 	 */
-	verifyEmail(userToken: string, verifyCode: VerifyCode): VerifyResult {
+	verifyEmail(userToken: string, code: string): VerifyResult {
 		const { email } = jwt.verify(
 			userToken,
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
@@ -93,7 +93,6 @@ class AuthService {
 		// TODO: 만료 판단 하기
 		// return { verify:false, timeOut: true };
 
-		const { code } = verifyCode;
 		if (code === redisVerifyCode) {
 			return { verify: true, timeOut: false };
 		}
