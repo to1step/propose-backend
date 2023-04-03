@@ -12,6 +12,8 @@ const authService = AuthService.getInstance();
 //#region 로컬 회원가입
 /**
  * 이메일 중복확인
+ * router.get('/auth/local/emails/:email/validation',
+ * return {data: {exist: boolean}}
  */
 router.post('/auth/local/email-validation', async (req, res, next) => {
 	try {
@@ -32,6 +34,7 @@ router.post('/auth/local/email-validation', async (req, res, next) => {
 
 /**
  * 유저정보 토큰으로 암호화, 인증메일 전송
+ * router.post('/auth/local/emails/:email',
  */
 router.post('/auth/local/user-to-token', async (req, res, next) => {
 	try {
@@ -53,6 +56,8 @@ router.post('/auth/local/user-to-token', async (req, res, next) => {
 
 /**
  * 이메일 인증
+ * router.get('/auth/local/emails/:email/verification',
+ * return { data: verifyResult }
  */
 router.post('/auth/local/email-verification', async (req, res, next) => {
 	try {
@@ -81,6 +86,7 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 
 /**
  * 인증메일 재전송
+ * router.get('/auth/local/emails/:email/resend
  */
 router.post('/auth/local/re-send-email', async (req, res, next) => {
 	try {
