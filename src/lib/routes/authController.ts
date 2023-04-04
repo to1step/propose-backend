@@ -35,17 +35,24 @@ router.post('/auth/local/email-validation', async (req, res, next) => {
  */
 router.post('/auth/local/email-code', async (req, res, next) => {
 	try {
-		const userDataDto = new UserDataDto(req.body);
+		const userToken = req.header('userToken');
 
-		await validateOrReject(userDataDto);
+		let token = '';
+		if (userToken) {
+			token = await authService.reIssueToken(userToken);
+		} else {
+			const userDataDto = new UserDataDto(req.body);
 
-		// 유저정보를 jwt로 암호화한 code 만들기
-		const userToken = await authService.userToToken(
-			userDataDto.toServiceModel()
-		);
+			await validateOrReject(userDataDto);
 
-		// userToken을 헤더에 담아 email 인증화면으로 redirect
-		res.header('userToken', userToken);
+			token = await authService.issueToken(userDataDto.toServiceModel());
+		}
+
+		if (token === '') {
+			throw new Error('token Exception error');
+		}
+
+		res.header('userToken', token);
 		res.json({ data: true });
 	} catch (error) {
 		next(error);
@@ -96,11 +103,10 @@ router.post('/auth/local/sign-up', async (req, res, next) => {
 			userToken
 		);
 
-		// 쿠키를 헤더에 담아 front로 redirect
 		res
 			.cookie('accessToken', accessToken)
 			.cookie('refreshToken', refreshToken)
-			.redirect(301, `${process.env.FRONT_PORT}`);
+			.json({ data: true });
 	} catch (error) {
 		next(error);
 	}
