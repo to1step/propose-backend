@@ -29,15 +29,7 @@ type User = {
 
 type UserData = {
 	email: string;
-	password: string;
-	nickname: string;
-	provider: string;
-	snsId: string | null;
-};
-
-type HashedUserData = {
-	email: string;
-	hashedPassword: string;
+	password: string | null;
 	nickname: string;
 	provider: string;
 	snsId: string | null;
@@ -47,7 +39,8 @@ type EmailValidationForm = {
 	email: string;
 };
 
-type VerifyCode = {
+type EmailVerifyCode = {
+	email: string;
 	code: string;
 };
 
@@ -66,9 +59,8 @@ export type {
 	KakaoUserReponse,
 	User,
 	UserData,
-	HashedUserData,
 	EmailValidationForm,
-	VerifyCode,
+	EmailVerifyCode,
 	VerifyResult,
 	Tokens,
 };

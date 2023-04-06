@@ -1,12 +1,12 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { EmailValidationForm } from '../type';
 
-class EmailValidationFormDto {
+class EmailValidationDto {
 	@IsString()
 	@IsNotEmpty()
 	email: string;
 
-	constructor(obj: EmailValidationFormDto) {
+	constructor(obj: EmailValidationDto) {
 		this.email = obj.email;
 	}
 
@@ -17,4 +17,4 @@ class EmailValidationFormDto {
 	}
 }
 
-export default EmailValidationFormDto;
+export default EmailValidationDto;

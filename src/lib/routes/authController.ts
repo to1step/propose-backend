@@ -2,9 +2,8 @@ import express from 'express';
 import { validateOrReject } from 'class-validator';
 import AuthService from '../services/authService';
 import UserDataDto from '../types/requestTypes/userData.dto';
-import VerifyCodeDto from '../types/requestTypes/verifyCode.dto';
-import EmailVerificationDto from '../types/responseTypes/emailVerification.dto';
-import EmailValidationFormDto from '../types/requestTypes/emaliValidationForm.dto';
+import EmailVerificationDto from '../types/requestTypes/emailVerification.dto';
+import EmailValidationDto from '../types/requestTypes/emaliValidation.dto';
 
 const router = express.Router();
 const authService = AuthService.getInstance();
@@ -15,13 +14,12 @@ const authService = AuthService.getInstance();
  */
 router.post('/auth/local/email-validation', async (req, res, next) => {
 	try {
-		const emailValidationFormDto = new EmailValidationFormDto(req.body);
+		const emailValidationDto = new EmailValidationDto(req.body);
 
-		await validateOrReject(emailValidationFormDto);
+		await validateOrReject(emailValidationDto);
 
-		// 이메일 중복 체크
 		const emailValidation = await authService.validateEmail(
-			emailValidationFormDto.toServiceModel()
+			emailValidationDto.toServiceModel()
 		);
 
 		res.json({ data: emailValidation });
@@ -31,28 +29,22 @@ router.post('/auth/local/email-validation', async (req, res, next) => {
 });
 
 /**
- * 유저정보 토큰으로 암호화, 인증메일 전송
+ * 유저정보 redis에 저장, 인증메일 전송
  */
 router.post('/auth/local/email-code', async (req, res, next) => {
 	try {
-		const userToken = req.header('userToken');
+		const userIp = req.socket.remoteAddress;
 
-		let token = '';
-		if (userToken) {
-			token = await authService.reIssueToken(userToken);
-		} else {
-			const userDataDto = new UserDataDto(req.body);
-
-			await validateOrReject(userDataDto);
-
-			token = await authService.issueToken(userDataDto.toServiceModel());
+		if (!userIp) {
+			throw new Error('no ip in header');
 		}
 
-		if (token === '') {
-			throw new Error('token Exception error');
-		}
+		const userDataDto = new UserDataDto(req.body);
 
-		res.header('userToken', token);
+		await validateOrReject(userDataDto);
+
+		await authService.sendEmail(userDataDto.toServiceModel(), userIp);
+
 		res.json({ data: true });
 	} catch (error) {
 		next(error);
@@ -60,47 +52,23 @@ router.post('/auth/local/email-code', async (req, res, next) => {
 });
 
 /**
- * 이메일 인증
+ * 이메일 인증 및 유저 회원가입
  */
-router.get('/auth/local/email-verification', async (req, res, next) => {
+router.post('/auth/local/email-verification', async (req, res, next) => {
 	try {
-		const userToken = req.header('userToken');
-		const code = req.query.code as string;
-		if (!userToken) {
-			throw new Error('user token required');
-		}
-		if (!code) {
-			throw new Error('email code required in query');
+		const userIp = req.socket.remoteAddress;
+
+		if (!userIp) {
+			throw new Error('no ip in header');
 		}
 
-		const emailVerification = await authService.verifyEmail(userToken, code);
+		const emailVerificationDto = new EmailVerificationDto(req.body);
 
-		const verifyResult = new EmailVerificationDto(emailVerification);
+		await validateOrReject(emailVerificationDto);
 
-		res.json({ data: verifyResult });
-	} catch (error) {
-		next(error);
-	}
-});
-
-/**
- * 유저 회원가입
- */
-router.post('/auth/local/sign-up', async (req, res, next) => {
-	try {
-		const userToken = req.header('userToken');
-
-		if (!userToken) {
-			throw new Error('no header');
-		}
-
-		const { verify } = req.body;
-		if (!verify) {
-			throw new Error('invalid access');
-		}
-
-		const { accessToken, refreshToken } = await authService.createLocalUser(
-			userToken
+		const { accessToken, refreshToken } = await authService.verifyEmail(
+			emailVerificationDto.toServiceModel(),
+			userIp
 		);
 
 		res

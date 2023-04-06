@@ -1,12 +1,10 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import UserService from './userService';
 import {
 	EmailValidationForm,
-	HashedUserData,
+	EmailVerifyCode,
 	Tokens,
 	UserData,
-	VerifyResult,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 
@@ -34,94 +32,56 @@ class AuthService {
 	}
 
 	/**
-	 * 유저정보가 암호화된 토큰을 발급, 해당 이메일로 인증메일을 보냄
-	 * @param userData
-	 */
-	async issueToken(userData: UserData): Promise<string> {
-		const { email, nickname, password, provider, snsId } = userData;
-
-		this.sendEmail(email);
-
-		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = await bcrypt.hash(password, salt);
-
-		// 유저 정보를 jwt로 암호화한 Token 만들기
-		return jwt.sign(
-			{ email, nickname, hashedPassword, provider, snsId },
-			`${process.env.EMAIL_VERIFY_TOKEN_SECRET_KEY}`,
-			{
-				algorithm: 'HS256',
-			}
-		);
-	}
-
-	/**
-	 * 토큰을 복호화하여 새로운 토큰을 발급, 해당 이메일로 다시 인증메일을 보냄
-	 * @param userToken
-	 */
-	async reIssueToken(userToken: string): Promise<string> {
-		const { email, nickname, hashedPassword, provider, snsId } = jwt.verify(
-			userToken,
-			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
-		) as HashedUserData;
-
-		this.sendEmail(email);
-
-		return jwt.sign(
-			{ email, nickname, hashedPassword, provider, snsId },
-			`${process.env.EMAIL_VERIFY_TOKEN_SECRET_KEY}`,
-			{
-				algorithm: 'HS256',
-			}
-		);
-	}
-
-	/**
 	 * 이메일로 인증 코드 전송
-	 * @param email
+	 * @param userData
+	 * @param userIp
 	 */
-	sendEmail(email: string): void {
+	async sendEmail(userData: UserData, userIp: string): Promise<void> {
+		const { email, password, nickname } = userData;
+
 		// TODO: 해당 이메일에 대한 인증코드 만들기 8자리 랜덤 문자열
-		// TODO: { key: email, value: 인증코드 } redis에 저장 10분으로 expire time 설정
+		const verifyCode = Math.random()
+			.toString(36)
+			.substring(2, 10)
+			.toUpperCase();
+
+		// TODO: { key: email-[email]-userIp, value: email/password/nickname/verifyCode/count }
+		const redisKey = `email-${email}-${userIp}`;
+
+		// TODO: redis에 해당 키가 없다면 redis에 저장 10분 30초로 expire time 설정
+
+		// TODO: 만약 있다면 count++ / count가 5라면 error
+
 		// TODO: 해당 이메일로 인증코드 보내기
 	}
 
 	/**
-	 * 토큰을 복호화해서 얻은 이메일의 인증코드와 유저가 보낸 인증코드가 같은지 확인
-	 * @param userToken
-	 * @param code
+	 * client가 보낸 code와 redis에서 찾은 code가 같을 시 DB에 유저 저장
+	 * @param emailVerifyCode
+	 * @param userIp
 	 */
-	verifyEmail(userToken: string, code: string): VerifyResult {
-		const { email } = jwt.verify(
-			userToken,
-			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
-		) as UserData;
+	async verifyEmail(
+		emailVerifyCode: EmailVerifyCode,
+		userIp: string
+	): Promise<Tokens> {
+		const { email, code } = emailVerifyCode;
 
-		// TODO: redis에서 해당 이메일에 맞는 value값 찾기
-		const redisVerifyCode = '';
+		// TODO: redis에서 해당 key에 맞는 value값 찾기
+		const redisKey = `email-${email}-${userIp}`;
+		const redisValue = '';
 
-		// TODO: 만료 판단 하기
-		// return { verify:false, timeOut: true };
+		// TODO: code와 redis의 code 같은지 확인
 
-		if (code === redisVerifyCode) {
-			return { verify: true, timeOut: false };
-		}
-		return { verify: false, timeOut: false };
-	}
+		// TODO: 다르면 error
 
-	/**
-	 * 토큰을 복호화해서 얻은 유저정보로 새 유저 생성
-	 * @param userToken
-	 */
-	async createLocalUser(userToken: string): Promise<Tokens> {
-		// token 복호화
-		const userData = jwt.verify(
-			userToken,
-			`${process.env.ACCESS_TOKEN_SECRET_KEY}`
-		) as HashedUserData;
-
-		// 토큰에 있는 정보로 유저 생성
-		const { uuid } = await this.userService.createUser(userData);
+		// 같을시에 DB에 저장
+		const { uuid } = await this.userService.createUser({
+			email: '',
+			password: '',
+			nickname: '',
+			provider: '',
+			snsId: null,
+		});
 
 		return this.createTokens(uuid);
 	}
