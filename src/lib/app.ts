@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
+import swaggerOptions from './swagger/swagger';
 import WintonLogger from './logger/logger';
 
 // 로깅용 initialize
@@ -31,7 +33,7 @@ app.use(
 		credentials: true,
 	})
 );
-app.all('/*', function (req, res, next) {
+app.all('/*', (req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Headers', 'X-Requested-With');
 	next();
@@ -52,16 +54,19 @@ app.get('/', (req, res, next) => {
 	res.json('Server working');
 });
 
-/**
- * 라우터 정의
- */
+// swagger 설정
+app.use(
+	'/api-docs',
+	swaggerUi.serve,
+	swaggerUi.setup(swaggerOptions, { explorer: true })
+);
+
+// router 정의
 app.get('/v1/example', (req, res, next) => {
 	res.json('Example router');
 });
 
-/**
- * TODO: Error 핸들러로 재작성
- */
+// 404page
 app.use((req, res) => {
 	return res.status(404).send({ message: 'page not found' });
 });
