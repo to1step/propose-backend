@@ -52,7 +52,7 @@ class AuthService {
 
 		// TODO: 만약 있다면 count++ / count가 5라면 error
 
-		// TODO: 해당 이메일로 인증코드 보내기
+		// TODO: 해당 이메일로 인증코드 보내기 <-- (aws ses ?)
 	}
 
 	/**

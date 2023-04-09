@@ -27,8 +27,10 @@ type User = {
 	provider: string;
 };
 
+// TODO: 타입 변경 또는 분리
 type UserData = {
 	email: string;
+	// 소셜 로그인인 경우 password null
 	password: string | null;
 	nickname: string;
 	provider: string;

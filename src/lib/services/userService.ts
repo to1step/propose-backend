@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import { UserModel } from '../../database/models/user';
 import ModelConverter from '../../utilies/converter/modelConverter';
@@ -19,9 +19,10 @@ class UserService {
 	async createUser(userData: UserData): Promise<User> {
 		const { email, password, nickname, provider, snsId } = userData;
 
-		const newUUID = uuidv4();
+		const newUUID = v4();
 
 		const salt = await bcrypt.genSalt(10);
+		// 소셜 로그인인 경우 비밀번호 null
 		const hashedPassword = password ? await bcrypt.hash(password, salt) : null;
 
 		const user = await new UserModel({

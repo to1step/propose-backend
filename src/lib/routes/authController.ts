@@ -33,11 +33,7 @@ router.post('/auth/local/email-validation', async (req, res, next) => {
  */
 router.post('/auth/local/email-code', async (req, res, next) => {
 	try {
-		const userIp = req.socket.remoteAddress;
-
-		if (!userIp) {
-			throw new Error('no ip in header');
-		}
+		const userIp = req.ip;
 
 		const userDataDto = new UserDataDto(req.body);
 
@@ -56,11 +52,7 @@ router.post('/auth/local/email-code', async (req, res, next) => {
  */
 router.post('/auth/local/email-verification', async (req, res, next) => {
 	try {
-		const userIp = req.socket.remoteAddress;
-
-		if (!userIp) {
-			throw new Error('no ip in header');
-		}
+		const userIp = req.ip;
 
 		const emailVerificationDto = new EmailVerificationDto(req.body);
 
