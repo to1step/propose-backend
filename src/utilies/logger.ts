@@ -71,22 +71,22 @@ class WinstonLogger {
 		});
 	}
 
-	public static getInstance(): WinstonLogger {
+	static getInstance(): WinstonLogger {
 		if (!WinstonLogger.instance) {
 			WinstonLogger.instance = new WinstonLogger();
 		}
 		return WinstonLogger.instance;
 	}
 
-	public info(message: string) {
+	info(message: string) {
 		this.logger.info(message);
 	}
 
-	public error(message: string) {
+	error(message: string) {
 		this.logger.error(message);
 	}
 
-	public http(message: string) {
+	http(message: string) {
 		this.logger.http(message);
 	}
 }
