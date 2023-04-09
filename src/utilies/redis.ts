@@ -17,7 +17,7 @@ class Redis {
 
 	private constructor() {
 		this.client = createClient({
-			url: 'redis://15.235.163.75:4004',
+			url: `${process.env.REDIS_URL}`,
 		});
 
 		this.client.on('error', (err) => logger.error(err));
@@ -31,11 +31,13 @@ class Redis {
 	async setObjectData(
 		key: string,
 		value: { [key: string]: any },
-		second: number
+		seconds: number
 	): Promise<void> {
 		await this.client.hSet(key, value);
-		await this.client.expire(key, second);
-		logger.info(`${key} stored in redis`);
+	}
+
+	async setExpireTime(key: string, millisecond: number): Promise<void> {
+		await this.client.expire(key, millisecond);
 	}
 
 	async getObjectData(key: string): Promise<{ [key: string]: any }> {
