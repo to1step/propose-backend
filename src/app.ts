@@ -4,13 +4,12 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
+import Redis from './utilies/redis';
 import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
 
-import Redis from './utilies/redis';
-
-const redis = Redis.getInstance().getClient();
+const redis = Redis.getInstance();
 
 // 로깅용 initialize
 const logger = WinstonLogger.getInstance();
@@ -30,9 +29,9 @@ dotenv.config();
 	logger.info(`DB Connected`);
 })();
 
+//Connect to Redis
 (async () => {
 	await redis.connect();
-	logger.info(`Redis Connected`);
 })();
 
 // Express 설정
