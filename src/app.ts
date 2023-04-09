@@ -4,17 +4,21 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
+import Redis from './utilies/redis';
 import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
+// env
+dotenv.config();
 
-// 로깅용 initialize
-const logger = WinstonLogger.getInstance();
 // 서버 가동
 const app = express();
 
-// env
-dotenv.config();
+// redis initialize
+const redis = Redis.getInstance();
+
+// 로깅용 initialize
+const logger = WinstonLogger.getInstance();
 
 // Connect to MongoDB
 (async () => {
@@ -24,6 +28,11 @@ dotenv.config();
 		dbName: process.env.DATABASE_NAME,
 	});
 	logger.info(`DB Connected`);
+})();
+
+//Connect to Redis
+(async () => {
+	await redis.connect();
 })();
 
 // Express 설정
@@ -48,7 +57,6 @@ app.use((req, res, next) => {
 	logger.http(`[${req.method}] ${req.url}`);
 	next();
 });
-
 // health check
 app.get('/', (req, res, next) => {
 	res.json('Server working');
