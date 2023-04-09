@@ -37,7 +37,7 @@ class Redis {
 	}
 
 	async setExpireTime(key: string, millisecond: number): Promise<void> {
-		await this.client.expire(key, millisecond);
+		await this.client.pExpire(key, millisecond);
 	}
 
 	async getObjectData(key: string): Promise<{ [key: string]: any }> {
