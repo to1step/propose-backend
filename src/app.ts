@@ -8,6 +8,10 @@ import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
 
+import Redis from './utilies/redis';
+
+const redis = Redis.getInstance();
+
 // 로깅용 initialize
 const logger = WinstonLogger.getInstance();
 // 서버 가동
@@ -48,9 +52,9 @@ app.use((req, res, next) => {
 	logger.http(`[${req.method}] ${req.url}`);
 	next();
 });
-
 // health check
 app.get('/', (req, res, next) => {
+	redis.setObjectData('test', { a: 'a', b: 'b', c: 'c' });
 	res.json('Server working');
 });
 
