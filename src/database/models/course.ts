@@ -1,34 +1,29 @@
 import { Model, model, Schema } from 'mongoose';
+import { Transportation } from '../types/enums';
 
-enum ITransportation {
-	BUS = 0,
-	WALK = 1,
-	SUBWAY = 2,
-}
-
-interface ITransport {
+interface TransportDAO {
 	startStore: string;
 	endStore: string;
 	comment: string;
-	transportation: ITransportation;
+	transportation: Transportation;
 }
 
-interface ICourse {
+interface CourseDAO {
 	uuid: string;
 	name: string;
 	shortComment: string;
 	longComment?: string;
 	private: boolean;
 	storesUUID: string[];
-	transport: ITransport[];
+	transport: TransportDAO[];
 	tags: string[];
 	user: string;
 }
 
-type ITransportModel = Model<ITransport>;
-type ICourseModel = Model<ICourse>;
+type TransportDAOModel = Model<TransportDAO>;
+type CourseDAOModel = Model<CourseDAO>;
 
-const transportSchema = new Schema<ITransport, ITransportModel>(
+const transportSchema = new Schema<TransportDAO, TransportDAOModel>(
 	{
 		startStore: { type: String, required: true }, // 출발 가게 uuid
 		endStore: { type: String, required: true }, // 도착 가게 uuid
@@ -38,19 +33,14 @@ const transportSchema = new Schema<ITransport, ITransportModel>(
 	{ _id: false }
 );
 
-const Transport = model<ITransport, ITransportModel>(
-	'Transport',
-	transportSchema
-);
-
-const courseSchema = new Schema<ICourse, ICourseModel>(
+const courseSchema = new Schema<CourseDAO, CourseDAOModel>(
 	{
 		uuid: { type: String, required: true }, // 코스 식별 uuid
 		name: { type: String, required: true }, // 코스 이름
 		shortComment: { type: String, required: true }, // 코스에 대한 짧은 소개
 		longComment: { type: String }, // 코스에 대한 긴 설명
 		private: { type: Boolean, required: true }, // 공개 여부
-		transport: { type: [Transport], required: true }, // 이동 수단
+		transport: { type: [transportSchema], required: true }, // 이동 수단
 		storesUUID: { type: [String], required: true }, // 코스에 들어가는 가게들
 		tags: { type: [String], required: true }, // 태그
 		user: { type: String, required: true }, // 코스를 만든 유저 식별 uuid
@@ -60,6 +50,6 @@ const courseSchema = new Schema<ICourse, ICourseModel>(
 	}
 );
 
-const Course = model<ICourse, ICourseModel>('Course', courseSchema);
+const Course = model<CourseDAO, CourseDAOModel>('Course', courseSchema);
 
 export { Course };

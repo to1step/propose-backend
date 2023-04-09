@@ -1,28 +1,30 @@
 import { Model, model, Schema } from 'mongoose';
 
-interface IUser {
+interface UserDAO {
 	uuid: string;
 	email: string;
+	password: string | null;
 	nickname: string;
 	provider: string;
-	snsId: string;
+	snsId: string | null;
 }
 
-type IUserModel = Model<IUser>;
+type UserDAOModel = Model<UserDAO>;
 
-const userSchema = new Schema<IUser, IUserModel>(
+const userSchema = new Schema<UserDAO, UserDAOModel>(
 	{
-		uuid: { type: String, required: true }, // 유저 식별 uuid
-		email: { type: String, required: true }, // 유저 email
-		nickname: { type: String, requred: true }, // 유저 nickname
+		uuid: { type: String, required: true, unique: true }, // 유저 식별 uuid
+		email: { type: String, required: true, unique: true }, // 유저 email
+		password: { type: String },
+		nickname: { type: String, required: true }, // 유저 nickname
 		provider: { type: String, required: true }, // 소셜 로그인 종류 kakao/naver/google/local
-		snsId: { type: String, required: true }, // 소셜 로그인 아이디
+		snsId: { type: String }, // 소셜 로그인 아이디
 	},
 	{
 		timestamps: true,
 	}
 );
 
-const User = model<IUser, IUserModel>('User', userSchema);
+const UserModel = model<UserDAO, UserDAOModel>('User', userSchema);
 
-export { User };
+export { UserModel, UserDAO };
