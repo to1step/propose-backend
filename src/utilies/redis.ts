@@ -49,7 +49,7 @@ class Redis {
 	 * object 데이터 가져오기
 	 * @param key
 	 */
-	async getObjectData(key: string): Promise<{ [key: string]: any }> {
+	async getObjectData<T>(key: string): Promise<T | object> {
 		return this.client.hGetAll(key);
 	}
 

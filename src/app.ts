@@ -8,16 +8,17 @@ import Redis from './utilies/redis';
 import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
+// env
+dotenv.config();
 
+// 서버 가동
+const app = express();
+
+// redis initialize
 const redis = Redis.getInstance();
 
 // 로깅용 initialize
 const logger = WinstonLogger.getInstance();
-// 서버 가동
-const app = express();
-
-// env
-dotenv.config();
 
 // Connect to MongoDB
 (async () => {
