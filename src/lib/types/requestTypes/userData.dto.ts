@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { UserData } from '../type';
+import { LocalUser } from '../type';
 
 class UserDataDto {
 	@IsString()
@@ -20,7 +20,7 @@ class UserDataDto {
 		this.password = obj.password;
 	}
 
-	toServiceModel(): UserData {
+	toServiceModel(): LocalUser {
 		return {
 			email: this.email,
 			nickname: this.nickname,

@@ -27,14 +27,22 @@ type User = {
 	provider: string;
 };
 
-// TODO: 타입 변경 또는 분리
-type UserData = {
+type LocalUser = {
 	email: string;
-	// 소셜 로그인인 경우 password null
 	password: string | null;
 	nickname: string;
-	provider: string;
-	snsId: string | null;
+	provider: 'local';
+	// 로컬 로그인인 경우 password null
+	snsId: null;
+};
+
+type SocialUser = {
+	email: string;
+	// 소셜 로그인인 경우 password null
+	password: null;
+	nickname: string;
+	provider: 'naver' | 'kakao';
+	snsId: string;
 };
 
 type EmailValidationForm = {
@@ -46,11 +54,6 @@ type EmailVerifyCode = {
 	code: string;
 };
 
-type VerifyResult = {
-	verify: boolean;
-	timeOut: boolean;
-};
-
 type Tokens = {
 	accessToken: string;
 	refreshToken: string;
@@ -60,9 +63,8 @@ export type {
 	KakaoTokenResponse,
 	KakaoUserReponse,
 	User,
-	UserData,
+	LocalUser,
 	EmailValidationForm,
 	EmailVerifyCode,
-	VerifyResult,
 	Tokens,
 };

@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import { UserModel } from '../../database/models/user';
 import ModelConverter from '../../utilies/converter/modelConverter';
-import { User, UserData } from '../types/type';
+import { User, LocalUser } from '../types/type';
 
 class UserService {
 	private static instance: UserService;
@@ -16,7 +16,7 @@ class UserService {
 		return UserService.instance;
 	}
 
-	async createUser(userData: UserData): Promise<User> {
+	async createUser(userData: LocalUser): Promise<User> {
 		const { email, password, nickname, provider, snsId } = userData;
 
 		const newUUID = v4();

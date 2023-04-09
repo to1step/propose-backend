@@ -4,7 +4,7 @@ import {
 	EmailValidationForm,
 	EmailVerifyCode,
 	Tokens,
-	UserData,
+	LocalUser,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 
@@ -36,7 +36,7 @@ class AuthService {
 	 * @param userData
 	 * @param userIp
 	 */
-	async sendEmail(userData: UserData, userIp: string): Promise<void> {
+	async sendEmail(userData: LocalUser, userIp: string): Promise<void> {
 		const { email, password, nickname } = userData;
 
 		// TODO: 해당 이메일에 대한 인증코드 만들기 8자리 랜덤 문자열
@@ -79,7 +79,7 @@ class AuthService {
 			email: '',
 			password: '',
 			nickname: '',
-			provider: '',
+			provider: 'local',
 			snsId: null,
 		});
 
