@@ -5,10 +5,10 @@ const logFormat = format.printf((info) => {
 	return `[${info.timestamp}] [${info.level}] : ${info.message}`; // 날짜 시간 로그레벨: 메세지
 });
 
-class WintonLogger {
-	private static instance: WintonLogger;
+class WinstonLogger {
+	private static instance: WinstonLogger;
 
-	private logger: Logger;
+	private readonly logger: Logger;
 
 	private constructor() {
 		const infoLog = new WinstonDaily({
@@ -19,7 +19,7 @@ class WintonLogger {
 		});
 
 		const httpLog = new WinstonDaily({
-			level: 'http', // http보다 낮은애들은 모두 파일에 저장
+			level: 'http', // http 보다 낮은애들은 모두 파일에 저장
 			datePattern: 'YYYY-MM-DD',
 			dirname: `${process.cwd()}/logs/http`,
 			filename: `%DATE%.info.log`,
@@ -71,16 +71,24 @@ class WintonLogger {
 		});
 	}
 
-	public static getInstance(): WintonLogger {
-		if (!WintonLogger.instance) {
-			WintonLogger.instance = new WintonLogger();
+	public static getInstance(): WinstonLogger {
+		if (!WinstonLogger.instance) {
+			WinstonLogger.instance = new WinstonLogger();
 		}
-		return WintonLogger.instance;
+		return WinstonLogger.instance;
 	}
 
-	public getLogger(): Logger {
-		return this.logger;
+	public info(message: string) {
+		this.logger.info(message);
+	}
+
+	public error(message: string) {
+		this.logger.error(message);
+	}
+
+	public http(message: string) {
+		this.logger.http(message);
 	}
 }
 
-export default WintonLogger;
+export default WinstonLogger;
