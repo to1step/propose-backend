@@ -10,7 +10,7 @@ import v1UserRouter from './lib/routes/userController';
 
 import Redis from './utilies/redis';
 
-const redis = Redis.getInstance();
+const redis = Redis.getInstance().getClient();
 
 // 로깅용 initialize
 const logger = WinstonLogger.getInstance();
@@ -28,6 +28,11 @@ dotenv.config();
 		dbName: process.env.DATABASE_NAME,
 	});
 	logger.info(`DB Connected`);
+})();
+
+(async () => {
+	await redis.connect();
+	logger.info(`Redis Connected`);
 })();
 
 // Express 설정
@@ -54,7 +59,6 @@ app.use((req, res, next) => {
 });
 // health check
 app.get('/', (req, res, next) => {
-	redis.setObjectData('test', { a: 'a', b: 'b', c: 'c' });
 	res.json('Server working');
 });
 
