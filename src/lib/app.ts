@@ -4,10 +4,10 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
-import WintonLogger from './logger/logger';
+import WinstonLogger from './logger/logger';
 
 // 로깅용 initialize
-const logger = WintonLogger.getInstance().getLogger();
+const logger = WinstonLogger.getInstance();
 // 서버 가동
 const app = express();
 
