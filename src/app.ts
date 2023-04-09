@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import WinstonLogger from './utilies/logger';
-import UserService from './lib/services/userService';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
 
