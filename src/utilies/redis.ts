@@ -1,4 +1,5 @@
 import { createClient, RedisClientType } from 'redis';
+
 import WinstonLogger from './logger';
 
 const logger = WinstonLogger.getInstance();
@@ -10,7 +11,7 @@ class Redis {
 
 	constructor() {
 		this.client = createClient({
-			url: `${process.env.REDIS_URL}`,
+			url: process.env.REDIS_URL,
 		});
 
 		this.client.on('error', (err) => logger.error(err));
@@ -35,12 +36,10 @@ class Redis {
 	 * object type 데이터 저장
 	 * @param key
 	 * @param value
-	 * @param seconds
 	 */
 	async setObjectData(
 		key: string,
-		value: { [key: string]: any },
-		seconds: number
+		value: { [key: string]: any }
 	): Promise<void> {
 		await this.client.hSet(key, value);
 	}
