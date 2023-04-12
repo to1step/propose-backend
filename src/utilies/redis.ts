@@ -48,7 +48,7 @@ class Redis {
 	 * object 데이터 가져오기
 	 * @param key
 	 */
-	async getObjectData<T>(key: string): Promise<T | object> {
+	async getObjectData(key: string): Promise<{ [key: string]: string }> {
 		return this.client.hGetAll(key);
 	}
 
@@ -59,6 +59,14 @@ class Redis {
 	 */
 	async setExpireTime(key: string, millisecond: number): Promise<void> {
 		await this.client.pExpire(key, millisecond);
+	}
+
+	/**
+	 * key의 존재 여부 확인
+	 * @param key
+	 */
+	async isExist(key: string): Promise<number> {
+		return this.client.exists(key);
 	}
 }
 

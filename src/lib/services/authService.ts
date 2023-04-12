@@ -7,6 +7,9 @@ import {
 	LocalUser,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
+import Redis from '../../utilies/redis';
+
+const redis = Redis.getInstance();
 
 class AuthService {
 	private static instance: AuthService;
@@ -39,20 +42,42 @@ class AuthService {
 	async sendEmail(userData: LocalUser, userIp: string): Promise<void> {
 		const { email, password, nickname } = userData;
 
-		// TODO: 해당 이메일에 대한 인증코드 만들기 8자리 랜덤 문자열
+		// 8자리 랜덤 문자열 생성
 		const verifyCode = Math.random()
 			.toString(36)
 			.substring(2, 10)
 			.toUpperCase();
 
-		// TODO: { key: email-[email]-userIp, value: email/password/nickname/verifyCode/count }
+		// email-[email]-[userIp]로 redis key 생성
 		const redisKey = `email-${email}-${userIp}`;
 
-		// TODO: redis에 해당 키가 없다면 redis에 저장 10분 30초로 expire time 설정
+		// 해당 key가 존재하는 지 확인
+		const isExist = await redis.isExist(redisKey);
 
-		// TODO: 만약 있다면 count++ / count가 5라면 error
+		if (!isExist) {
+			// key가 존재하지 않을때 처음 보내는 것이므로 userData/verifyCode/count=1 10분 30초로 설정하여 저장
+			await redis.setObjectData(redisKey, {
+				email,
+				password,
+				nickname,
+				verifyCode,
+				count: 1,
+			});
+			await redis.setExpireTime(redisKey, 630000);
+		} else {
+			// key가 존재할때 count횟수 + 1하여 저장 / count가 5라면 요청 횟수 초과 에러 전송
+			const { count } = await redis.getObjectData(redisKey);
+			const countNum = parseInt(count, 10);
 
-		// TODO: 해당 이메일로 인증코드 보내기 <-- (aws ses ?)
+			if (countNum === 5) {
+				throw new Error('email send count exceeded 5 times');
+			}
+
+			// key가 같다면 덮어쓰므로 count와 인증코드만 재조정
+			await redis.setObjectData(redisKey, { count: countNum + 1, verifyCode });
+		}
+
+		// TODO: AWS SES로 해당 이메일 인증코드 보내기
 	}
 
 	/**
@@ -64,21 +89,23 @@ class AuthService {
 		emailVerifyCode: EmailVerifyCode,
 		userIp: string
 	): Promise<Tokens> {
-		const { email, code } = emailVerifyCode;
+		const redisKey = `email-${emailVerifyCode.email}-${userIp}`;
 
-		// TODO: redis에서 해당 key에 맞는 value값 찾기
-		const redisKey = `email-${email}-${userIp}`;
-		const redisValue = '';
+		// 이 값이 존재하지 않는다면 밑의 조건문에서 걸리므로 존재 판단 여부 생략
+		const { email, nickname, password, verifyCode } = await redis.getObjectData(
+			redisKey
+		);
 
-		// TODO: code와 redis의 code 같은지 확인
-
-		// TODO: 다르면 error
+		// redis에 저장된 verifyCode와 유저가 보낸 code가 같은지 확인
+		if (emailVerifyCode.code !== verifyCode) {
+			throw new Error('invalid code');
+		}
 
 		// 같을시에 DB에 저장
 		const { uuid } = await this.userService.createUser({
-			email: '',
-			password: '',
-			nickname: '',
+			email,
+			password,
+			nickname,
 			provider: 'local',
 			snsId: null,
 		});
