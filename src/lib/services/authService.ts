@@ -51,11 +51,10 @@ class AuthService {
 		// email-[email]-[userIp]로 redis key 생성
 		const redisKey = `email-${email}-${userIp}`;
 
-		// 해당 key가 존재하는 지 확인
-		const isExist = await redis.isExist(redisKey);
+		const { count } = await redis.getObjectData(redisKey);
 
-		if (!isExist) {
-			// key가 존재하지 않을때 처음 보내는 것이므로 userData/verifyCode/count=1 10분 30초로 설정하여 저장
+		// count가 undefined이면 key가 존재하지 않으므로 생성해줌
+		if (!count) {
 			await redis.setObjectData(redisKey, {
 				email,
 				password,
@@ -65,11 +64,9 @@ class AuthService {
 			});
 			await redis.setExpireTime(redisKey, 630000);
 		} else {
-			// key가 존재할때 count횟수 + 1하여 저장 / count가 5라면 요청 횟수 초과 에러 전송
-			const { count } = await redis.getObjectData(redisKey);
 			const countNum = parseInt(count, 10);
 
-			if (countNum === 5) {
+			if (countNum === 6) {
 				throw new Error('email send count exceeded 5 times');
 			}
 

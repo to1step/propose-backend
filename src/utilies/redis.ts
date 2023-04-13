@@ -68,6 +68,10 @@ class Redis {
 	async isExist(key: string): Promise<number> {
 		return this.client.exists(key);
 	}
+
+	async getTTL(key: string): Promise<number> {
+		return this.client.ttl(key);
+	}
 }
 
 export default Redis;
