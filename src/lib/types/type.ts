@@ -36,6 +36,12 @@ type LocalUser = {
 	snsId: null;
 };
 
+type SendMailForm = {
+	email: string;
+	password: string;
+	nickname: string;
+};
+
 type SocialUser = {
 	email: string;
 	// 소셜 로그인인 경우 password null
@@ -47,6 +53,10 @@ type SocialUser = {
 
 type EmailValidationForm = {
 	email: string;
+};
+
+type NicknameValidationForm = {
+	nickname: string;
 };
 
 type EmailVerifyCode = {
@@ -64,7 +74,9 @@ export type {
 	KakaoUserReponse,
 	User,
 	LocalUser,
+	SendMailForm,
 	EmailValidationForm,
+	NicknameValidationForm,
 	EmailVerifyCode,
 	Tokens,
 };

@@ -28,12 +28,13 @@ class UserService {
 
 		const user = await new UserModel({
 			uuid: newUUID,
-			email,
-			hashedPassword,
-			nickname,
-			provider,
-			snsId,
+			email: email,
+			password: hashedPassword,
+			nickname: nickname,
+			provider: provider,
+			snsId: snsId,
 		}).save();
+
 		return ModelConverter.toUser(user);
 	}
 }

@@ -4,12 +4,13 @@ import {
 	EmailValidationForm,
 	EmailVerifyCode,
 	Tokens,
-	LocalUser,
+	SendMailForm,
+	NicknameValidationForm,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 import Redis from '../../utilies/redis';
 
-const redis = Redis.getInstance();
+const redis = Redis.getInstance().getClient();
 
 class AuthService {
 	private static instance: AuthService;
@@ -29,9 +30,23 @@ class AuthService {
 	): Promise<boolean> {
 		const { email } = emailValidationForm;
 
-		const existEmail = await UserModel.exists({ email }).exec();
+		const existEmail = await UserModel.exists({ email: email }).exec();
 
 		return !!existEmail;
+	}
+
+	/**
+	 * 닉네임 중복확인
+	 * @param nicknameValidationForm
+	 */
+	async validateNickname(
+		nicknameValidationForm: NicknameValidationForm
+	): Promise<boolean> {
+		const { nickname } = nicknameValidationForm;
+
+		const existNickname = await UserModel.exists({ nickname: nickname }).exec();
+
+		return !!existNickname;
 	}
 
 	/**
@@ -39,7 +54,7 @@ class AuthService {
 	 * @param userData
 	 * @param userIp
 	 */
-	async sendEmail(userData: LocalUser, userIp: string): Promise<void> {
+	async sendEmail(userData: SendMailForm, userIp: string): Promise<void> {
 		const { email, password, nickname } = userData;
 
 		// 8자리 랜덤 문자열 생성
@@ -51,27 +66,26 @@ class AuthService {
 		// email-[email]-[userIp]로 redis key 생성
 		const redisKey = `email-${email}-${userIp}`;
 
-		const { count } = await redis.getObjectData(redisKey);
+		const redisValues = await redis.hGetAll(redisKey);
 
-		// count가 undefined이면 key가 존재하지 않으므로 생성해줌
-		if (!count) {
-			await redis.setObjectData(redisKey, {
+		if (Object.keys(redisValues).length === 0) {
+			await redis.hSet(redisKey, {
 				email,
 				password,
 				nickname,
 				verifyCode,
 				count: 1,
 			});
-			await redis.setExpireTime(redisKey, 630000);
+			await redis.expire(redisKey, 630000);
 		} else {
-			const countNum = parseInt(count, 10);
+			const countNum = parseInt(redisValues.count, 10);
 
 			if (countNum === 6) {
 				throw new Error('email send count exceeded 5 times');
 			}
 
 			// key가 같다면 덮어쓰므로 count와 인증코드만 재조정
-			await redis.setObjectData(redisKey, { count: countNum + 1, verifyCode });
+			await redis.hSet(redisKey, { count: countNum + 1, verifyCode });
 		}
 
 		// TODO: AWS SES로 해당 이메일 인증코드 보내기
@@ -88,13 +102,17 @@ class AuthService {
 	): Promise<Tokens> {
 		const redisKey = `email-${emailVerifyCode.email}-${userIp}`;
 
-		// 이 값이 존재하지 않는다면 밑의 조건문에서 걸리므로 존재 판단 여부 생략
-		const { email, nickname, password, verifyCode } = await redis.getObjectData(
+		const { email, password, nickname, verifyCode } = await redis.hGetAll(
 			redisKey
 		);
 
+		// 값 없는지 check
+		if (!email || !password || !nickname || !verifyCode) {
+			throw new Error('invalid value');
+		}
+
 		// redis에 저장된 verifyCode와 유저가 보낸 code가 같은지 확인
-		if (emailVerifyCode.code !== verifyCode) {
+		if (verifyCode !== emailVerifyCode.code) {
 			throw new Error('invalid code');
 		}
 
