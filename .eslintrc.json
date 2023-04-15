@@ -25,6 +25,7 @@
     "no-empty-function": "off",
     "@typescript-eslint/no-empty-function": "off",
     "spaced-comment": "off",
-    "object-shorthand": "off"
+    "object-shorthand": "off",
+    "yoda": "off"
   }
 }
