@@ -66,21 +66,32 @@ class AuthService {
 		// email-[email]-[userIp]로 redis key 생성
 		const redisKey = `email-${email}-${userIp}`;
 
-		const redisValues = await redis.hGetAll(redisKey);
+		const tempUserData = await redis.hGetAll(redisKey);
 
-		if (Object.keys(redisValues).length === 0) {
-			await redis.hSet(redisKey, {
-				email,
-				password,
-				nickname,
-				verifyCode,
-				count: 1,
-			});
-			await redis.expire(redisKey, 630000);
+		//  없는지 check
+		if (
+			!tempUserData.email ||
+			!tempUserData.password ||
+			!tempUserData.nickname ||
+			!tempUserData.verifyCode ||
+			!tempUserData.count
+		) {
+			await redis
+				.multi()
+				.hSet(redisKey, {
+					email,
+					password,
+					nickname,
+					verifyCode,
+					count: 1,
+				})
+				.pExpire(redisKey, 630000)
+				.exec();
 		} else {
-			const countNum = parseInt(redisValues.count, 10);
+			const countNum = parseInt(tempUserData.count, 10);
 
-			if (countNum === 6) {
+			if (6 <= countNum) {
+				// TODO: redis에서 제거 해주는 작업 추가
 				throw new Error('email send count exceeded 5 times');
 			}
 
