@@ -4,9 +4,32 @@ import AuthService from '../services/authService';
 import UserDataDto from '../types/requestTypes/userData.dto';
 import EmailVerificationDto from '../types/requestTypes/emailVerification.dto';
 import EmailValidationDto from '../types/requestTypes/emaliValidation.dto';
+import LocalSignInDto from '../types/requestTypes/localSignIn.dto';
 
 const router = express.Router();
 const authService = AuthService.getInstance();
+
+/**
+ * 로컬 로그인
+ */
+router.post('/auth/local/sign-in', async (req, res, next) => {
+	try {
+		const localSignInDto = new LocalSignInDto(req.body);
+
+		await validateOrReject(localSignInDto);
+
+		const { accessToken, refreshToken } = await authService.localSignIn(
+			localSignInDto
+		);
+
+		res
+			.cookie('accessToken', accessToken)
+			.cookie('refreshToken', refreshToken)
+			.json({ data: true });
+	} catch (error) {
+		next(error);
+	}
+});
 
 //#region 로컬 회원가입
 /**

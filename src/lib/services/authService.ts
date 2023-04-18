@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import UserService from './userService';
 import {
+	LocalSignInForm,
 	EmailValidationForm,
 	EmailVerifyCode,
 	Tokens,
@@ -15,6 +17,36 @@ class AuthService {
 
 	private constructor() {
 		this.userService = UserService.getInstance();
+	}
+
+	/**
+	 * 로컬 로그인
+	 * @param localSignInForm
+	 */
+	async localSignIn(localSignInForm: LocalSignInForm): Promise<Tokens> {
+		const { email, password } = localSignInForm;
+
+		// 이메일로 DB에서 유저 탐색
+		const user = await this.userService.findUserByEmail(email);
+
+		const userUUID = user.uuid;
+		const userPassword = user.password;
+
+		// 비밀번호가 존재하지 않으면 로컬 유저가 아니므로 에러
+		if (!userPassword) {
+			throw new Error('invalid user');
+		}
+
+		// DB의 비밀번호와 유저가 보낸 비밀번호 비교
+		const compare = await bcrypt.compare(password, userPassword);
+
+		// 틀릴시 에러
+		if (!compare) {
+			throw new Error('wrong password');
+		}
+
+		// 성공시 토큰 발급
+		return this.createTokens(userUUID);
 	}
 
 	/**

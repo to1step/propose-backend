@@ -45,6 +45,11 @@ type SocialUser = {
 	snsId: string;
 };
 
+type LocalSignInForm = {
+	email: string;
+	password: string;
+};
+
 type EmailValidationForm = {
 	email: string;
 };
@@ -64,6 +69,7 @@ export type {
 	KakaoUserReponse,
 	User,
 	LocalUser,
+	LocalSignInForm,
 	EmailValidationForm,
 	EmailVerifyCode,
 	Tokens,

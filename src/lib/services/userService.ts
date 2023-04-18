@@ -16,6 +16,16 @@ class UserService {
 		return UserService.instance;
 	}
 
+	async findUserByEmail(userEmail: string): Promise<User> {
+		const user = await UserModel.findOne({ email: userEmail });
+
+		if (!user) {
+			throw new Error('cannot find user');
+		}
+
+		return ModelConverter.toUser(user);
+	}
+
 	async createUser(userData: LocalUser): Promise<User> {
 		const { email, password, nickname, provider, snsId } = userData;
 
