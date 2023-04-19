@@ -8,6 +8,7 @@ import Redis from './utilies/redis';
 import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
+
 // env
 dotenv.config();
 
