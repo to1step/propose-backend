@@ -22,17 +22,19 @@ class UserService {
 		const newUUID = v4();
 
 		const salt = await bcrypt.genSalt(10);
+
 		// 소셜 로그인인 경우 비밀번호 null
 		const hashedPassword = password ? await bcrypt.hash(password, salt) : null;
 
 		const user = await new UserModel({
 			uuid: newUUID,
-			email,
-			hashedPassword,
-			nickname,
-			provider,
-			snsId,
+			email: email,
+			password: hashedPassword,
+			nickname: nickname,
+			provider: provider,
+			snsId: snsId,
 		}).save();
+
 		return ModelConverter.toUser(user);
 	}
 }

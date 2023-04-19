@@ -4,11 +4,13 @@ import AuthService from '../services/authService';
 import UserDataDto from '../types/requestTypes/userData.dto';
 import EmailVerificationDto from '../types/requestTypes/emailVerification.dto';
 import EmailValidationDto from '../types/requestTypes/emaliValidation.dto';
+import NicknameValidationDto from '../types/requestTypes/nicknameValidation.dto';
 
 const router = express.Router();
 const authService = AuthService.getInstance();
 
 //#region 로컬 회원가입
+
 /**
  * 이메일 중복확인
  */
@@ -23,6 +25,25 @@ router.post('/auth/local/email-validation', async (req, res, next) => {
 		);
 
 		res.json({ data: emailValidation });
+	} catch (error) {
+		next(error);
+	}
+});
+
+/**
+ * 닉네임 중복확인
+ */
+router.post('/auth/local/nickname-validation', async (req, res, next) => {
+	try {
+		const nicknameValidationDto = new NicknameValidationDto(req.body);
+
+		await validateOrReject(nicknameValidationDto);
+
+		const nicknameValidation = await authService.validateNickname(
+			nicknameValidationDto.toServiceModel()
+		);
+
+		res.json({ data: nicknameValidation });
 	} catch (error) {
 		next(error);
 	}
