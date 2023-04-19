@@ -1,8 +1,13 @@
 import { createClient, RedisClientType } from 'redis';
-
+import dotenv from 'dotenv';
 import WinstonLogger from './logger';
 
 const logger = WinstonLogger.getInstance();
+
+/**
+ * static 변수는 가장먼저 메모리에 올라가기 떄문에 dotenv.config()보다 먼저 실행되어 process.env가 적용되지 않는다.
+ */
+dotenv.config();
 
 class Redis {
 	private static instance: Redis;
@@ -14,6 +19,9 @@ class Redis {
 			url: process.env.REDIS_URL,
 		});
 
+		this.client.on('connect', () => {
+			logger.info('redis connect!!!');
+		});
 		this.client.on('error', (err) => logger.error(err));
 	}
 
@@ -21,6 +29,7 @@ class Redis {
 		if (!Redis.instance) {
 			Redis.instance = new Redis();
 		}
+
 		return Redis.instance;
 	}
 
@@ -32,33 +41,8 @@ class Redis {
 		logger.info(`Redis Connected`);
 	}
 
-	/**
-	 * object type 데이터 저장
-	 * @param key
-	 * @param value
-	 */
-	async setObjectData(
-		key: string,
-		value: { [key: string]: any }
-	): Promise<void> {
-		await this.client.hSet(key, value);
-	}
-
-	/**
-	 * object 데이터 가져오기
-	 * @param key
-	 */
-	async getObjectData<T>(key: string): Promise<T | object> {
-		return this.client.hGetAll(key);
-	}
-
-	/**
-	 * 해당 key에 대한 만료시간 설정 millisecond 단위
-	 * @param key
-	 * @param millisecond
-	 */
-	async setExpireTime(key: string, millisecond: number): Promise<void> {
-		await this.client.pExpire(key, millisecond);
+	getClient(): RedisClientType {
+		return this.client;
 	}
 }
 
