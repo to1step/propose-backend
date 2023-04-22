@@ -1,0 +1,12 @@
+.DS_Store
+.dockerignore
+.git
+.github
+.gitignore
+.husky
+.node-version
+DockerFile
+README.md
+dist
+docker-compose.yml
+node_modules

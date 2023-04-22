@@ -1,0 +1,31 @@
+{
+  "root": true,
+  "env": {
+    "node": true,
+    "es2021": true
+  },
+  "extends": [
+    "prettier",
+    "airbnb",
+    "airbnb/hooks",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "airbnb-typescript",
+    "plugin:prettier/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": { "project": ["**/tsconfig.json"] },
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "import/no-extraneous-dependencies": ["off"],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["off"],
+    "import/prefer-default-export": "off",
+    "class-methods-use-this": ["off"],
+    "no-empty-function": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "spaced-comment": "off",
+    "object-shorthand": "off",
+    "yoda": "off"
+  }
+}
