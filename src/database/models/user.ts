@@ -32,6 +32,17 @@ import { Model, model, Schema } from 'mongoose';
  *           description: 소셜 회원가입 유저의 소셜 Id
  */
 
+/**
+ * @swagger
+ * definitions:
+ *   Model:
+ *     type: object
+ *     properties:
+ *       id:
+ *         type: integer
+ *         format: int64
+ */
+
 interface UserDAO {
 	uuid: string;
 	email: string;

@@ -3,9 +3,24 @@ import { EmailVerifyCode } from '../type';
 
 /**
  * @swagger
- * tags
- *   - EmailVerificationDto
+ * components:
+ *    schemas:
+ *      emailVerificationDto:
+ *       properties:
+ *               email:
+ *                 type: string
+ *                 description: 유저 이메일
+ *                 example: aaa@example.com
+ *               nickname:
+ *                 type: string
+ *                 description: 유저 닉네임
+ *                 example: minwoo123
+ *               password:
+ *                 type: string
+ *                 description: 유저 비밀번호
+ *                 example: password123
  */
+
 class EmailVerificationDto {
 	@IsString()
 	@IsNotEmpty()

@@ -14,7 +14,12 @@ const options = {
 			},
 		],
 	},
-	apis: ['src/lib/routes/*.ts', 'src/database/models/*.ts'], // 절대경로로 작성해주어야 작동
+	apis: [
+		'src/lib/routes/*.ts',
+		'src/lib/types/requestTypes/*.ts',
+		'src/lib/types/responseTypes/*.ts',
+		'src/database/models/*.ts',
+	], // 절대경로로 작성해주어야 작동
 };
 const swaggerOption = swaggerJsdoc(options);
 
