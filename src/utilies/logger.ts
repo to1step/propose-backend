@@ -14,28 +14,28 @@ class WinstonLogger {
 		const infoLog = new WinstonDaily({
 			level: 'info',
 			datePattern: 'YYYY-MM-DD', // 파일 날짜 형식
-			dirname: `${process.cwd()}/logs/info`, // 파일 경로
+			dirname: `/tmp/logs/info`, // 파일 경로
 			filename: `%DATE%.info.log`, // 파일 이름 형식 2020-05-28.info.log
 		});
 
 		const httpLog = new WinstonDaily({
 			level: 'http', // http 보다 낮은애들은 모두 파일에 저장
 			datePattern: 'YYYY-MM-DD',
-			dirname: `${process.cwd()}/logs/http`,
+			dirname: `/tmp/logs/http`,
 			filename: `%DATE%.info.log`,
 		});
 
 		const errorLog = new WinstonDaily({
 			level: 'error',
 			datePattern: 'YYYY-MM-DD',
-			dirname: `${process.cwd()}/logs/error`,
+			dirname: `/tmp/logs/error`,
 			filename: `%DATE%.error.log`,
 		});
 
 		const exceptionLog = new WinstonDaily({
 			level: 'error',
 			datePattern: 'YYYY-MM-DD',
-			dirname: `${process.cwd()}/logs/exception`,
+			dirname: `/tmp/logs/exception`,
 			filename: `%DATE%.exception.log`,
 		});
 
