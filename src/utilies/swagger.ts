@@ -10,11 +10,11 @@ const options = {
 		},
 		servers: [
 			{
-				url: 'http://localhost:4000',
+				url: 'http://localhost:4000/v1',
 			},
 		],
 	},
-	apis: ['src/lib/routes/*.ts'], // 절대경로로 작성해주어야 작동
+	apis: ['src/lib/routes/*.ts', 'src/database/models/*.ts'], // 절대경로로 작성해주어야 작동
 };
 const swaggerOption = swaggerJsdoc(options);
 

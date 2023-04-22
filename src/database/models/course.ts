@@ -1,6 +1,72 @@
 import { Model, model, Schema } from 'mongoose';
 import { Transportation } from '../types/enums';
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Course:
+ *       type: object
+ *       required:
+ *         - uuid
+ *         - name
+ *         - shortComment
+ *         - private
+ *         - transport
+ *         - storesUUID
+ *         - tags
+ *         - user
+ *       properties:
+ *         uuid:
+ *           type: string
+ *           description: 코스 식별 uuid
+ *         name:
+ *           type: string
+ *           description: 코스 이름
+ *         shortComment:
+ *           type: string
+ *           description: 코스에 대한 짧은 소개
+ *         longComment:
+ *           type: string
+ *           description: 코스에 대한 긴 설명
+ *         private:
+ *           type: boolean
+ *           description: 코스 공개 여부
+ *         transport:
+ *           type: array
+ *           description: 가게들 사이 교통수단
+ *           items:
+ *             type: object
+ *             properties:
+ *               startStore:
+ *                 type: string
+ *                 description: 출발 가게 식별 uuid
+ *               endStore:
+ *                 type: string
+ *                 description: 도착 가게 식별 uuid
+ *               comment:
+ *                 type: string
+ *                 description: 이동 방법에 대한 코멘트
+ *               transportation:
+ *                 type: integer
+ *                 description: 이동 수단 버스 1/지하철 2/도보 3
+ *         storesUUID:
+ *           type: array
+ *           description: 코스에 들어가는 가게들 식별 uuid
+ *           items:
+ *             type: string
+ *             description: 가게 식별 uuid
+ *         tags:
+ *           type: array
+ *           description: 태그들
+ *           items:
+ *             type: string
+ *             description: 태그
+ *         user:
+ *           type: string
+ *           description: 코스 만든 유저 식별 uuid
+ */
+
 interface TransportDAO {
 	startStore: string;
 	endStore: string;

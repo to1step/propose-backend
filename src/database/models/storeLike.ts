@@ -1,5 +1,23 @@
 import { Model, model, Schema } from 'mongoose';
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     StoreLike:
+ *       type: object
+ *       required:
+ *         - user
+ *         - store
+ *       properties:
+ *         user:
+ *           type: string
+ *           description: 좋아요 누른 유저 식별 uuid
+ *         store:
+ *           type: string
+ *           description: 유저가 좋아요 누른 가게 식별 uuid
+ */
+
 interface StoreLikeDAO {
 	user: string;
 	store: string;

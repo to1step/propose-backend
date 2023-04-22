@@ -1,6 +1,11 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { EmailVerifyCode } from '../type';
 
+/**
+ * @swagger
+ * tags
+ *   - EmailVerificationDto
+ */
 class EmailVerificationDto {
 	@IsString()
 	@IsNotEmpty()
