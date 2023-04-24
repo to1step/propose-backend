@@ -1,6 +1,6 @@
-import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerJSDoc from 'swagger-jsdoc';
 
-const options = {
+const options: swaggerJSDoc.OAS3Options = {
 	swaggerDefinition: {
 		openapi: '3.0.0',
 		info: {
@@ -14,13 +14,9 @@ const options = {
 			},
 		],
 	},
-	apis: [
-		'src/lib/routes/*.ts',
-		'src/lib/types/requestTypes/*.ts',
-		'src/lib/types/responseTypes/*.ts',
-		'src/database/models/*.ts',
-	], // 절대경로로 작성해주어야 작동
+	// src에 있는
+	apis: ['src/**/*.ts'],
 };
-const swaggerOption = swaggerJsdoc(options);
+const swaggerOption = swaggerJSDoc(options);
 
 export default swaggerOption;
