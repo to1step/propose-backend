@@ -29,25 +29,25 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DATABASE_USER: ${{ secrets.DATABASE_USER }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          REDIS_URL: ${{ secrets.REDIS_URL }}
-          FRONT_PORT: ${{ secrets.FRONT_PORT }}
-          ACCESS_TOKEN_SECRET_KEY: ${{ secrets.ACCESS_TOKEN_SECRET_KEY }}
-          ACCESS_TOKEN_EXPIRE_TIME: ${{ secrets.ACCESS_TOKEN_EXPIRE_TIME }}
-          REFRESH_TOKEN_SECRET_KEY: ${{ secrets.REFRESH_TOKEN_SECRET_KEY }}
-          REFRESH_TOKEN_EXPIRE_TIME: ${{ secrets.REFRESH_TOKEN_EXPIRE_TIME }}
-          EMAIL_VERIFY_TOKEN_SECRET_KEY: ${{ secrets.EMAIL_VERIFY_TOKEN_SECRET_KEY }}
-          EMAIL_VERIFY_TOKEN_EXPIRE_TIME: ${{ secrets.EMAIL_VERIFY_TOKEN_EXPIRE_TIME }}
-          HASH_SALT_ROUNDS: ${{ secrets.HASH_SALT_ROUNDS }}
-          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
-          KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
+        build-args: |
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          DATABASE_USER=${{ secrets.DATABASE_USER }}
+          DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_NAME=${{ secrets.DATABASE_NAME }}
+          REDIS_URL=${{ secrets.REDIS_URL }}
+          FRONT_PORT=${{ secrets.FRONT_PORT }}
+          ACCESS_TOKEN_SECRET_KEY=${{ secrets.ACCESS_TOKEN_SECRET_KEY }}
+          ACCESS_TOKEN_EXPIRE_TIME=${{ secrets.ACCESS_TOKEN_EXPIRE_TIME }}
+          REFRESH_TOKEN_SECRET_KEY=${{ secrets.REFRESH_TOKEN_SECRET_KEY }}
+          REFRESH_TOKEN_EXPIRE_TIME=${{ secrets.REFRESH_TOKEN_EXPIRE_TIME }}
+          EMAIL_VERIFY_TOKEN_SECRET_KEY=${{ secrets.EMAIL_VERIFY_TOKEN_SECRET_KEY }}
+          EMAIL_VERIFY_TOKEN_EXPIRE_TIME=${{ secrets.EMAIL_VERIFY_TOKEN_EXPIRE_TIME }}
+          HASH_SALT_ROUNDS=${{ secrets.HASH_SALT_ROUNDS }}
+          KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
