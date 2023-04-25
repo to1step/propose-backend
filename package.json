@@ -5,7 +5,6 @@
   "main": "dist/src/lib/app.js",
   "author": "rkdden, gkqkehs7",
   "scripts": {
-    "prepare": "husky install",
     "lint": "eslint \"./src/**/*.{ts,js}\"",
     "lint:fix": "eslint --fix \"./src/**/*.{ts,js}\"",
     "lint-staged": "lint-staged",
