@@ -2,9 +2,6 @@ FROM node:16-alpine3.14
 
 WORKDIR /usr/src/app
 
-RUN NODE_ENV=production
-
-
 COPY . .
 
 # Get secret from git action
@@ -25,6 +22,7 @@ ARG KAKAO_CLIENT_ID
 ARG KAKAO_REDIRECT_URI
 
 # Copy secret to ENV
+ENV NODE_ENV=production
 ENV DATABASE_URL=$DATABASE_URL
 ENV DATABASE_USER=$DATABASE_USER
 ENV DATABASE_PASSWORD=$DATABASE_PASSWORD
@@ -44,5 +42,7 @@ ENV KAKAO_REDIRECT_URI=$KAKAO_REDIRECT_URI
 RUN npm install
 
 RUN npm run build
+
+EXPOSE 4000
 
 CMD ["node", "dist/src/server.js"]
