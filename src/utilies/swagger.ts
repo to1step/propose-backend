@@ -13,6 +13,12 @@ const options: swaggerJSDoc.OAS3Options = {
 				url: 'http://localhost:4000/v1',
 			},
 		],
+		tags: [
+			{
+				name: 'AuthController',
+				description: '인증 관련 api',
+			},
+		],
 	},
 	// src에 있는
 	apis: ['src/**/*.ts'],

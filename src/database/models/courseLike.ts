@@ -1,23 +1,5 @@
 import { Model, model, Schema } from 'mongoose';
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     CourseLike:
- *       type: object
- *       required:
- *         - user
- *         - course
- *       properties:
- *         user:
- *           type: string
- *           description: 좋아요 누른 유저 식별 uuid
- *         course:
- *           type: string
- *           description: 유저가 좋아요 누른 코스 식별 uuid
- */
-
 interface CourseLikeDAO {
 	user: string;
 	course: string;

@@ -5,20 +5,20 @@ import { EmailVerifyCode } from '../type';
  * @swagger
  * components:
  *    schemas:
- *      emailVerificationDto:
- *       properties:
- *               email:
- *                 type: string
- *                 description: 유저 이메일
- *                 example: aaa@example.com
- *               nickname:
- *                 type: string
- *                 description: 유저 닉네임
- *                 example: minwoo123
- *               password:
- *                 type: string
- *                 description: 유저 비밀번호
- *                 example: password123
+ *      EmailVerificationDto:
+ *        type: object
+ *        required:
+ *          - email
+ *          - code
+ *        properties:
+ *          email:
+ *            type: string
+ *            description: 유저 이메일
+ *            example: aaa@example.com
+ *          code:
+ *            type: string
+ *            description: 해당 이메일로 전송된 8자리 인증번호
+ *            example: 8JS4KF2D
  */
 
 class EmailVerificationDto {
