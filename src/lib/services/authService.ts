@@ -11,6 +11,7 @@ import {
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 import Redis from '../../utilies/redis';
+import AWS from '../../utilies/ses';
 
 const redis = Redis.getInstance().getClient();
 
@@ -138,7 +139,9 @@ class AuthService {
 				.exec();
 		}
 
-		// TODO: AWS SES로 해당 이메일 인증코드 보내기
+		// AWS-SES를 통해 해당 이메일로 인증코드 보내기
+		const aws = new AWS();
+		aws.sendEmail(email, verifyCode);
 	}
 
 	/**
