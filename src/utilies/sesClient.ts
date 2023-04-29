@@ -12,7 +12,7 @@ class SESClient {
 		});
 
 		this.ses = new SES({
-			apiVersion: '2010-12-01',
+			apiVersion: 'latest',
 			credentials: credentials,
 			region: 'ap-northeast-1',
 		});

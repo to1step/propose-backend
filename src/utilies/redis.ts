@@ -20,7 +20,7 @@ class Redis {
 		});
 
 		this.client.on('connect', () => {
-			logger.info('redis connect!!!');
+			logger.info(`Redis Connected`);
 		});
 		this.client.on('error', (err) => logger.error(err));
 	}
@@ -38,7 +38,6 @@ class Redis {
 	 */
 	async connect(): Promise<void> {
 		await this.client.connect();
-		logger.info(`Redis Connected`);
 	}
 
 	getClient(): RedisClientType {
