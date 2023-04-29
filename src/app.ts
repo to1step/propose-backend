@@ -4,8 +4,10 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
 import Redis from './utilies/redis';
 import WinstonLogger from './utilies/logger';
+import swaggerOption from './utilies/swagger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
 
@@ -62,6 +64,8 @@ app.use((req, res, next) => {
 app.get('/', (req, res, next) => {
 	res.json('Server working');
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerOption));
 
 /**
  * 라우터 정의
