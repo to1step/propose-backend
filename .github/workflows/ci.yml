@@ -51,3 +51,6 @@ jobs:
             HASH_SALT_ROUNDS=${{ secrets.HASH_SALT_ROUNDS }}
             KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
             KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
+            AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
+            AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
+            AWS_SES_SENDER=${{ secrets.AWS_SES_SENDER }}
