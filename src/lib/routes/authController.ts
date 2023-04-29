@@ -139,15 +139,4 @@ router.get('/auth/kakao/redirect', async (req, res, next) => {
 });
 //#endregion
 
-router.get('/auth/test', (req, res, next) => {
-	try {
-		res.json({ sucess: true });
-
-		(async () => {
-			throw new Error('test');
-		})();
-	} catch (error) {
-		next(error);
-	}
-});
 export default router;
