@@ -1,7 +1,7 @@
-import { Credentials, SES, config } from 'aws-sdk';
+import { Credentials, SES } from 'aws-sdk';
 
-class AwsClient {
-	private static instance: AwsClient;
+class SESClient {
+	private static instance: SESClient;
 
 	private ses: SES;
 
@@ -11,20 +11,19 @@ class AwsClient {
 			secretAccessKey: `${process.env.AWS_SECRET_KEY}`,
 		});
 
-		config.update({
+		this.ses = new SES({
+			apiVersion: '2010-12-01',
 			credentials: credentials,
 			region: 'ap-northeast-1',
 		});
-
-		this.ses = new SES({ apiVersion: '2010-12-01' });
 	}
 
-	static getInstance(): AwsClient {
-		if (!AwsClient.instance) {
-			AwsClient.instance = new AwsClient();
+	static getInstance(): SESClient {
+		if (!SESClient.instance) {
+			SESClient.instance = new SESClient();
 		}
 
-		return AwsClient.instance;
+		return SESClient.instance;
 	}
 
 	/**
@@ -33,27 +32,23 @@ class AwsClient {
 	 * @param verifyCode
 	 */
 	async sendEmail(email: string, verifyCode: string): Promise<void> {
-		const params = {
+		const params: SES.Types.SendEmailRequest = {
 			Destination: {
-				CcAddresses: [
-					// 발신자 email
-					`${process.env.AWS_SES_SENDER}`,
-				],
 				// 수신자 email
 				ToAddresses: [email],
 			},
 			Message: {
+				Subject: {
+					// email 제목
+					Charset: 'UTF-8',
+					Data: 'to1step email verify code',
+				},
 				Body: {
 					Html: {
 						// email 내용
 						Charset: 'UTF-8',
 						Data: verifyCode,
 					},
-				},
-				Subject: {
-					// email 제목
-					Charset: 'UTF-8',
-					Data: 'to1step email verify code',
 				},
 			},
 			Source: `${process.env.AWS_SES_SENDER}`,
@@ -63,4 +58,4 @@ class AwsClient {
 	}
 }
 
-export default AwsClient;
+export default SESClient;

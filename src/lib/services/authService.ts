@@ -11,10 +11,10 @@ import {
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 import Redis from '../../utilies/redis';
-import AwsClient from '../../utilies/aws-client';
+import SESClient from '../../utilies/sesClient';
 
 const redis = Redis.getInstance().getClient();
-const awsClient = AwsClient.getInstance();
+const awsClient = SESClient.getInstance();
 
 class AuthService {
 	private static instance: AuthService;
