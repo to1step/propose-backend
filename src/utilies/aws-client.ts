@@ -1,6 +1,8 @@
 import { Credentials, SES, config } from 'aws-sdk';
 
-class AWS {
+class AwsClient {
+	private static instance: AwsClient;
+
 	private ses: SES;
 
 	constructor() {
@@ -17,12 +19,20 @@ class AWS {
 		this.ses = new SES({ apiVersion: '2010-12-01' });
 	}
 
+	static getInstance(): AwsClient {
+		if (!AwsClient.instance) {
+			AwsClient.instance = new AwsClient();
+		}
+
+		return AwsClient.instance;
+	}
+
 	/**
 	 * 해당 이메일로 인증코드 보내기
 	 * @param email
 	 * @param verifyCode
 	 */
-	sendEmail(email: string, verifyCode: string): void {
+	async sendEmail(email: string, verifyCode: string): Promise<void> {
 		const params = {
 			Destination: {
 				CcAddresses: [
@@ -49,8 +59,8 @@ class AWS {
 			Source: `${process.env.AWS_SES_SENDER}`,
 		};
 
-		this.ses.sendEmail(params).promise();
+		await this.ses.sendEmail(params).promise();
 	}
 }
 
-export default AWS;
+export default AwsClient;
