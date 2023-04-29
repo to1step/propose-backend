@@ -11,8 +11,10 @@ import {
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 import Redis from '../../utilies/redis';
+import SESClient from '../../utilies/sesClient';
 
 const redis = Redis.getInstance().getClient();
+const sesClient = SESClient.getInstance();
 
 class AuthService {
 	private static instance: AuthService;
@@ -138,7 +140,8 @@ class AuthService {
 				.exec();
 		}
 
-		// TODO: AWS SES로 해당 이메일 인증코드 보내기
+		// AWS-SES를 통해 해당 이메일로 인증코드 보내기
+		sesClient.sendEmail(email, verifyCode);
 	}
 
 	/**
