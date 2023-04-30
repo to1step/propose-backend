@@ -63,10 +63,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: executing remote ssh commands using password
+      - name: access to Server and start script
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AWS_PUBLIC_IP }}
           username: ${{ secrets.AWS_USER_NAME }}
           key: ${{ secrets.AWS_PEM_KEY }}
-          script: ./startServer.txt
+          script: ${{ secrets.START_SCRIPT }}
