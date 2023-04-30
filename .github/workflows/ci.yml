@@ -56,32 +56,17 @@ jobs:
             AWS_SES_SENDER=${{ secrets.AWS_SES_SENDER }}
 
   code-deploy:
+    needs: build-and-push-image
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Stop and remove existing container
-        run: |
-          docker stop ${{ secrets.CONTAINER_NAME }} || true
-          docker rm ${{ secrets.CONTAINER_NAME }} || true
-
-      - name: Remove existing image
-        run: docker rmi ${{ secrets.IMAGE_NAME }}
-
-      - name: Pull latest Docker image
-        run: |
-          docker login --username ${{ secrets.USER }} --password-stdin ${{ secrets.SECRET_TOKEN }}
-          docker pull ${{ secrets.IMAGE_NAME }}:latest
-
-      - name: Run new Docker container
-        run: |
-         docker run -d -p ${{ secrets.OUR_PORT }}:${{ secrets.DOCKER_PORT }} --name ${{ secrets.CONTAINER_NAME }} ${{ secrets.IMAGE_NAME }}
+          host: ${{ secrets.AWS_PUBLIC_IP }}
+          username: ${{ secrets.AWS_USER_NAME }}
+          key: ${{ secrets.AWS_PEM_KEY }}
+          script: echo "Connected to AWS Instance" > ./test.txt
