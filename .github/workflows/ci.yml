@@ -69,4 +69,4 @@ jobs:
           host: ${{ secrets.AWS_PUBLIC_IP }}
           username: ${{ secrets.AWS_USER_NAME }}
           key: ${{ secrets.AWS_PEM_KEY }}
-          script: echo "Connected to AWS Instance" > ./test.txt
+          script: ./startServer.txt
