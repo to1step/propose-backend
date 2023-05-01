@@ -62,7 +62,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: access to Server and start script
+      - name: Access to server and Run container
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AWS_PUBLIC_IP }}
