@@ -82,7 +82,6 @@ jobs:
               echo "no image"
             fi
             
-            echo ${{ secrets.SECRET_TOKEN }} | docker login ghcr.io -u ${{ secrets.DOKCER_USER_NAME }} --password-stdin
             docker pull ${{ secrets.IMAGE_NAME }}:latest 
             docker run -d -p ${{ secrets.HOST_PORT }}:${{ secrets.CONTAINER_PORT }} --name ${{ secrets.CONTAINER_NAME }} ${{ secrets.IMAGE_NAME }}
   
