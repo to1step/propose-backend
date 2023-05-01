@@ -54,3 +54,34 @@ jobs:
             AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
             AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
             AWS_SES_SENDER=${{ secrets.AWS_SES_SENDER }}
+
+  code-deploy:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Access to server and Run container
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_PUBLIC_IP }}
+          username: ${{ secrets.AWS_USER_NAME }}
+          key: ${{ secrets.AWS_PEM_KEY }}
+          script: |
+            if docker ps -a | grep -q ${{ secrets.CONTAINER_NAME }}; then
+              docker stop ${{ secrets.CONTAINER_NAME }} 
+              docker rm ${{ secrets.CONTAINER_NAME }}
+            else
+              echo "no container"
+            fi
+            
+            if docker images | grep -q ${{ secrets.IMAGE_NAME }}; then
+              docker rmi ${{ secrets.IMAGE_NAME }} 
+            else
+              echo "no image"
+            fi
+            
+            docker pull ${{ secrets.IMAGE_NAME }}:latest 
+            docker run -d -p ${{ secrets.HOST_PORT }}:${{ secrets.CONTAINER_PORT }} --name ${{ secrets.CONTAINER_NAME }} ${{ secrets.IMAGE_NAME }}
+  
