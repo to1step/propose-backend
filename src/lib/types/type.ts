@@ -1,6 +1,8 @@
 /**
  * 서비스 단에서 사용되는 파일 타입들 정의
  */
+import jwt from 'jsonwebtoken';
+
 type KakaoTokenResponse = {
 	access_token?: string;
 };
@@ -82,6 +84,25 @@ type Tokens = {
 	refreshToken: string;
 };
 
+type DecodedToken = {
+	userUUID: string;
+};
+
+type VerifiedToken =
+	| {
+			result: true;
+			userUUID: string;
+	  }
+	| {
+			result: false;
+			message: string;
+	  };
+
+type TokenError =
+	| jwt.JsonWebTokenError
+	| jwt.TokenExpiredError
+	| jwt.NotBeforeError;
+
 export type {
 	KakaoTokenResponse,
 	KakaoUserReponse,
@@ -95,4 +116,7 @@ export type {
 	NicknameValidationForm,
 	EmailVerifyCode,
 	Tokens,
+	TokenError,
+	DecodedToken,
+	VerifiedToken,
 };

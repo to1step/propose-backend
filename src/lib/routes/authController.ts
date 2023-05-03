@@ -244,6 +244,46 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 });
 //#endregion
 
+/**
+ * @swagger
+ * /auth/reissue:
+ *   post:
+ *     tags:
+ *       - AuthController
+ *     summary: 토큰 재발급
+ *     description: refreshToken을 header에 담아 요청 토큰이 유효하다면 accessToken 재발급
+ *     parameters:
+ *     - in: header
+ *       name: refreshToken
+ *     responses:
+ *       '200':
+ *         description: accessToken 갱신
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: boolean
+ *                   description: 토큰 재발급 성공
+ *                   example: true
+ */
+router.post('/auth/reissue', (req, res, next) => {
+	try {
+		const refreshToken = req.header('refreshToken');
+
+		if (!refreshToken) {
+			throw new Error('no token in header');
+		}
+
+		const accessToken = authService.reissue(`${refreshToken}`);
+
+		res.cookie('accessToken', accessToken).json({ data: true });
+	} catch (error) {
+		next(error);
+	}
+});
+
 //#region 카카오 로그인
 router.get('/auth/kakao', (req, res, next) => {
 	res.redirect(

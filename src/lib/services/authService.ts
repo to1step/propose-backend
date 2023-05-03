@@ -11,6 +11,9 @@ import {
 	NicknameValidationForm,
 	KakaoUserReponse,
 	KakaoTokenResponse,
+	DecodedToken,
+	VerifiedToken,
+	TokenError,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 import Redis from '../../utilies/redis';
@@ -270,6 +273,53 @@ class AuthService {
 			accessToken,
 			refreshToken,
 		};
+	}
+
+	/**
+	 * 토큰 재발급
+	 * @param refreshToken
+	 */
+	reissue(refreshToken: string): string {
+		const verify = this.verifyToken(refreshToken);
+
+		// 토큰 인증 실패
+		if (!verify.result) {
+			const errorMessage = verify.message;
+
+			throw new Error(`${errorMessage}`);
+		}
+
+		// 토큰 인증 성공 accessToken재 발급
+		return jwt.sign(
+			{ userUUId: verify.userUUID },
+			`${process.env.ACCESS_TOKEN_SECRET_KEY}`,
+			{
+				algorithm: 'HS256',
+				expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE_TIME}`,
+			}
+		);
+	}
+
+	/**
+	 * 토큰 인증
+	 * @param token
+	 */
+	verifyToken(token: string): VerifiedToken {
+		try {
+			const decoded = jwt.verify(
+				token,
+				`${process.env.ACCESS_TOKEN_SECRET_KEY}`
+			) as DecodedToken;
+
+			return { result: true, userUUID: decoded.userUUID };
+		} catch (err) {
+			const jsonWebTokenError = err as TokenError;
+
+			return {
+				result: false,
+				message: jsonWebTokenError.message,
+			};
+		}
 	}
 
 	/**
