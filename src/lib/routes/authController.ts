@@ -202,7 +202,7 @@ router.post('/auth/local/email-code', async (req, res, next) => {
  *       - AuthController
  *     summary: 이메일 인증 및 유저 회원가입
  *     description: redis에 저장된 인증번호와 비교 후 일치 시 유저 회원가입
- *     requestBody:
+ *     headers:
  *       description: EmailVerificationDto
  *       content:
  *         application/json:
@@ -244,6 +244,46 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 });
 //#endregion
 
+/**
+ * @swagger
+ * /auth/reissue:
+ *   post:
+ *     tags:
+ *       - AuthController
+ *     summary: 토큰 재발급
+ *     description: refreshToken을 header에 담아 요청 토큰이 유효하다면 accessToken 재발급
+ *     parameters:
+ *     - in: header
+ *       name: refreshToken
+ *     responses:
+ *       '200':
+ *         description: accessToken 갱신
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: boolean
+ *                   description: 토큰 재발급 성공
+ *                   example: true
+ */
+router.post('/auth/reissue', (req, res, next) => {
+	try {
+		const refreshToken = req.header('refreshToken');
+
+		if (!refreshToken) {
+			throw new Error('no token in header');
+		}
+
+		const accessToken = authService.reissue(`${refreshToken}`);
+
+		res.cookie('accessToken', accessToken).json({ data: true });
+	} catch (error) {
+		next(error);
+	}
+});
+
 //#region 카카오 로그인
 router.get('/auth/kakao', (req, res, next) => {
 	res.redirect(
@@ -256,7 +296,7 @@ router.get('/auth/kakao/redirect', async (req, res, next) => {
 		const code = req.query.code as string;
 
 		if (!code) {
-			throw new Error('Code not found');
+			throw new Error('code not found');
 		}
 
 		const { accessToken, refreshToken } = await authService.kakaoLogin(code);
