@@ -1,7 +1,6 @@
 /**
  * 서비스 단에서 사용되는 파일 타입들 정의
  */
-
 type KakaoTokenResponse = {
 	access_token?: string;
 };
@@ -15,6 +14,9 @@ type KakaoUserReponse = {
 		is_email_valid?: boolean;
 		is_email_verified?: boolean;
 		email?: string;
+		profile?: {
+			nickname?: string;
+		};
 	};
 };
 
@@ -27,6 +29,12 @@ type User = {
 	provider: string;
 };
 
+type UserCreateKey = 'local' | 'kakao' | 'google';
+
+type UserCreateForm<T extends UserCreateKey> = T extends 'local'
+	? LocalUser
+	: SocialUser;
+
 type LocalUser = {
 	email: string;
 	password: string | null;
@@ -36,12 +44,6 @@ type LocalUser = {
 	snsId: null;
 };
 
-type SendMailForm = {
-	email: string;
-	password: string;
-	nickname: string;
-};
-
 type SocialUser = {
 	email: string;
 	// 소셜 로그인인 경우 password null
@@ -49,6 +51,12 @@ type SocialUser = {
 	nickname: string;
 	provider: 'naver' | 'kakao';
 	snsId: string;
+};
+
+type SendMailForm = {
+	email: string;
+	password: string;
+	nickname: string;
 };
 
 type LocalSignInForm = {
@@ -79,6 +87,8 @@ export type {
 	KakaoUserReponse,
 	User,
 	LocalUser,
+	UserCreateKey,
+	UserCreateForm,
 	LocalSignInForm,
 	SendMailForm,
 	EmailValidationForm,

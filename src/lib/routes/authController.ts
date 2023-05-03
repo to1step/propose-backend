@@ -202,7 +202,7 @@ router.post('/auth/local/email-code', async (req, res, next) => {
  *       - AuthController
  *     summary: 이메일 인증 및 유저 회원가입
  *     description: redis에 저장된 인증번호와 비교 후 일치 시 유저 회원가입
- *     requestBody:
+ *     headers:
  *       description: EmailVerificationDto
  *       content:
  *         application/json:
@@ -245,9 +245,9 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 //#endregion
 
 //#region 카카오 로그인
-router.get('/auth/kakao', async (req, res, next) => {
+router.get('/auth/kakao', (req, res, next) => {
 	res.redirect(
-		`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.KAKAO_CLIENT_ID}&redirect_uri=${process.env.KAKAO_REDIRECT_URT}`
+		`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.KAKAO_CLIENT_ID}&redirect_uri=${process.env.KAKAO_REDIRECT_URI}`
 	);
 });
 
@@ -256,10 +256,15 @@ router.get('/auth/kakao/redirect', async (req, res, next) => {
 		const code = req.query.code as string;
 
 		if (!code) {
-			throw new Error('Code not found');
+			throw new Error('code not found');
 		}
 
-		// await authService.kakaoLogin(code);
+		const { accessToken, refreshToken } = await authService.kakaoLogin(code);
+
+		res
+			.cookie('accessToken', accessToken)
+			.cookie('refreshToken', refreshToken)
+			.redirect('http://localhost:4000');
 	} catch (error) {
 		next(error);
 	}
