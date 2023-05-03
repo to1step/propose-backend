@@ -245,9 +245,9 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 //#endregion
 
 //#region 카카오 로그인
-router.get('/auth/kakao', async (req, res, next) => {
+router.get('/auth/kakao', (req, res, next) => {
 	res.redirect(
-		`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.KAKAO_CLIENT_ID}&redirect_uri=${process.env.KAKAO_REDIRECT_URT}`
+		`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.KAKAO_CLIENT_ID}&redirect_uri=${process.env.KAKAO_REDIRECT_URI}`
 	);
 });
 
@@ -259,7 +259,12 @@ router.get('/auth/kakao/redirect', async (req, res, next) => {
 			throw new Error('Code not found');
 		}
 
-		// await authService.kakaoLogin(code);
+		const { accessToken, refreshToken } = await authService.kakaoLogin(code);
+
+		res
+			.cookie('accessToken', accessToken)
+			.cookie('refreshToken', refreshToken)
+			.redirect('http://localhost:4000');
 	} catch (error) {
 		next(error);
 	}
