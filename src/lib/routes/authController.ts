@@ -284,6 +284,22 @@ router.post('/auth/reissue', (req, res, next) => {
 	}
 });
 
+router.post('/auth/logout', async (req, res, next) => {
+	try {
+		const refreshToken = req.header('refreshToken');
+
+		if (!refreshToken) {
+			throw new Error('no token in header');
+		}
+
+		await authService.logout(`${refreshToken}`);
+
+		res.json({ data: true });
+	} catch (error) {
+		next(error);
+	}
+});
+
 //#region 카카오 로그인
 router.get('/auth/kakao', (req, res, next) => {
 	res.redirect(

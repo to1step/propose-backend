@@ -291,13 +291,31 @@ class AuthService {
 
 		// 토큰 인증 성공 accessToken재 발급
 		return jwt.sign(
-			{ userUUId: verify.userUUID },
+			{ userUUID: verify.userUUID },
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`,
 			{
 				algorithm: 'HS256',
 				expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE_TIME}`,
 			}
 		);
+	}
+
+	/**
+	 * 로그아웃 redis에서 유저의 refreshToken삭제
+	 * @param refreshToken
+	 */
+	async logout(refreshToken: string): Promise<void> {
+		const verify = this.verifyToken(refreshToken);
+
+		// 토큰 인증 실패
+		if (!verify.result) {
+			const errorMessage = verify.message;
+
+			throw new Error(`${errorMessage}`);
+		}
+
+		// redis에서 해당 유저의 refreshToken 삭제
+		await redis.del(`${verify.userUUID}`);
 	}
 
 	/**
@@ -322,7 +340,7 @@ class AuthService {
 		}
 	}
 
-	/**
+	/**ㅌ
 	 * refreshToken redis에 저장
 	 * @param userUUID
 	 * @param refreshToken
@@ -340,7 +358,7 @@ class AuthService {
 	 */
 	createTokens(userUUID: string): Tokens {
 		const accessToken = jwt.sign(
-			{ userUUId: userUUID },
+			{ userUUID: userUUID },
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`,
 			{
 				algorithm: 'HS256',
@@ -348,7 +366,7 @@ class AuthService {
 			}
 		);
 		const refreshToken = jwt.sign(
-			{ userUUId: userUUID },
+			{ userUUID: userUUID },
 			`${process.env.REFRESH_TOKEN_SECRET_KEY}`,
 			{
 				algorithm: 'HS256',
