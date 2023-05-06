@@ -289,15 +289,13 @@ class AuthService {
 			throw new Error(`${errorMessage}`);
 		}
 
+		const decodedToken: DecodedToken = { userUUID: verify.userUUID };
+
 		// 토큰 인증 성공 accessToken재 발급
-		return jwt.sign(
-			{ userUUID: verify.userUUID },
-			`${process.env.ACCESS_TOKEN_SECRET_KEY}`,
-			{
-				algorithm: 'HS256',
-				expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE_TIME}`,
-			}
-		);
+		return jwt.sign(decodedToken, `${process.env.ACCESS_TOKEN_SECRET_KEY}`, {
+			algorithm: 'HS256',
+			expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE_TIME}`,
+		});
 	}
 
 	/**
@@ -357,8 +355,10 @@ class AuthService {
 	 * @param userUUID
 	 */
 	createTokens(userUUID: string): Tokens {
+		const decodedToken: DecodedToken = { userUUID: userUUID };
+
 		const accessToken = jwt.sign(
-			{ userUUID: userUUID },
+			decodedToken,
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`,
 			{
 				algorithm: 'HS256',
@@ -366,7 +366,7 @@ class AuthService {
 			}
 		);
 		const refreshToken = jwt.sign(
-			{ userUUID: userUUID },
+			decodedToken,
 			`${process.env.REFRESH_TOKEN_SECRET_KEY}`,
 			{
 				algorithm: 'HS256',
