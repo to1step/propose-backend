@@ -1,9 +1,5 @@
-import * as express from 'express';
-
-declare global {
-	namespace Express {
-		interface Request {
-			uuid?: string;
-		}
+namespace Express {
+	interface Request {
+		userUUID?: string;
 	}
 }

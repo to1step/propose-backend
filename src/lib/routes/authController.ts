@@ -268,23 +268,43 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
  *                   description: 토큰 재발급 성공
  *                   example: true
  */
-router.post('/auth/reissue', (req, res, next) => {
-	try {
-		const refreshToken = req.header('refreshToken');
+router.post('/auth/token', (req, res, next) => {
+	const refreshToken = req.header('refreshToken');
 
-		if (!refreshToken) {
-			throw new Error('no token in header');
-		}
-
-		const accessToken = authService.reissue(`${refreshToken}`);
-
-		res.cookie('accessToken', accessToken).json({ data: true });
-	} catch (error) {
-		next(error);
+	if (!refreshToken) {
+		throw new Error('no token in header');
 	}
+
+	const accessToken = authService.reissue(`${refreshToken}`);
+
+	res.cookie('accessToken', accessToken).json({ data: true });
 });
 
-router.post('/auth/logout', async (req, res, next) => {
+/**
+ * @swagger
+ * /auth/sign-out:
+ *   post:
+ *     tags:
+ *       - AuthController
+ *     summary: 로그아웃
+ *     description: 토큰이 유효한 유저를 로그아웃시킴
+ *     parameters:
+ *     - in: header
+ *       name: refreshToken
+ *     responses:
+ *       '200':
+ *         description: 로그아웃 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: boolean
+ *                   description: 로그아웃 성공
+ *                   example: true
+ */
+router.post('/auth/sign-out', async (req, res, next) => {
 	try {
 		const refreshToken = req.header('refreshToken');
 
@@ -292,7 +312,7 @@ router.post('/auth/logout', async (req, res, next) => {
 			throw new Error('no token in header');
 		}
 
-		await authService.logout(`${refreshToken}`);
+		await authService.signOut(`${refreshToken}`);
 
 		res.json({ data: true });
 	} catch (error) {
@@ -320,7 +340,7 @@ router.get('/auth/kakao/redirect', async (req, res, next) => {
 		res
 			.cookie('accessToken', accessToken)
 			.cookie('refreshToken', refreshToken)
-			.redirect('http://localhost:4000');
+			.redirect('http://localhost:3000');
 	} catch (error) {
 		next(error);
 	}

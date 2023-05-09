@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { decode } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import axios from 'axios';
 import UserService from './userService';
@@ -11,9 +11,6 @@ import {
 	NicknameValidationForm,
 	KakaoUserReponse,
 	KakaoTokenResponse,
-	DecodedToken,
-	VerifiedToken,
-	TokenError,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 import Redis from '../../utilies/redis';
@@ -280,61 +277,59 @@ class AuthService {
 	 * @param refreshToken
 	 */
 	reissue(refreshToken: string): string {
-		const verify = this.verifyToken(refreshToken);
-
-		// 토큰 인증 실패
-		if (!verify.result) {
-			const errorMessage = verify.message;
-
-			throw new Error(`${errorMessage}`);
-		}
-
-		const decodedToken: DecodedToken = { userUUID: verify.userUUID };
+		const userUUID = this.verifyToken(refreshToken);
 
 		// 토큰 인증 성공 accessToken재 발급
-		return jwt.sign(decodedToken, `${process.env.ACCESS_TOKEN_SECRET_KEY}`, {
-			algorithm: 'HS256',
-			expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE_TIME}`,
-		});
+		return jwt.sign(
+			{ userUUID: userUUID },
+			`${process.env.ACCESS_TOKEN_SECRET_KEY}`,
+			{
+				algorithm: 'HS256',
+				expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE_TIME}`,
+			}
+		);
 	}
 
 	/**
 	 * 로그아웃 redis에서 유저의 refreshToken삭제
 	 * @param refreshToken
 	 */
-	async logout(refreshToken: string): Promise<void> {
-		const verify = this.verifyToken(refreshToken);
-
-		// 토큰 인증 실패
-		if (!verify.result) {
-			const errorMessage = verify.message;
-
-			throw new Error(`${errorMessage}`);
-		}
+	async signOut(refreshToken: string): Promise<void> {
+		const userUUID = this.verifyToken(refreshToken);
 
 		// redis에서 해당 유저의 refreshToken 삭제
-		await redis.del(`${verify.userUUID}`);
+		await redis.del(`${userUUID}`);
 	}
 
 	/**
 	 * 토큰 인증
 	 * @param token
 	 */
-	verifyToken(token: string): VerifiedToken {
+	verifyToken(token: string): string {
 		try {
 			const decoded = jwt.verify(
 				token,
 				`${process.env.ACCESS_TOKEN_SECRET_KEY}`
-			) as DecodedToken;
+			);
 
-			return { result: true, userUUID: decoded.userUUID };
-		} catch (err) {
-			const jsonWebTokenError = err as TokenError;
+			if (typeof decoded === 'string' || !decoded.userUUID) {
+				throw new Error('invalid token');
+			}
 
-			return {
-				result: false,
-				message: jsonWebTokenError.message,
-			};
+			//TODO: redis에서 해당 유저의 refreshToken이 있는지 검사
+
+			return decoded.userUUID;
+		} catch (err: any) {
+			//TODO: custom error 적용
+			if (err.name === 'TokenExpiredError') {
+				throw new Error(`${err.message}`);
+			} else if (err.name === 'JsonWebTokenError') {
+				throw new Error(`${err.message}`);
+			} else if (err.name === 'NotBeforeError') {
+				throw new Error(`${err.message}`);
+			}
+
+			throw err;
 		}
 	}
 
@@ -347,7 +342,11 @@ class AuthService {
 		userUUID: string,
 		refreshToken: string
 	): Promise<void> {
-		await redis.set(userUUID, refreshToken);
+		await redis
+			.multi()
+			.set(userUUID, refreshToken)
+			.pExpire(userUUID, 600000)
+			.exec();
 	}
 
 	/**
@@ -355,10 +354,8 @@ class AuthService {
 	 * @param userUUID
 	 */
 	createTokens(userUUID: string): Tokens {
-		const decodedToken: DecodedToken = { userUUID: userUUID };
-
 		const accessToken = jwt.sign(
-			decodedToken,
+			{ userUUID: userUUID },
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`,
 			{
 				algorithm: 'HS256',
@@ -366,7 +363,7 @@ class AuthService {
 			}
 		);
 		const refreshToken = jwt.sign(
-			decodedToken,
+			{ userUUID: userUUID },
 			`${process.env.REFRESH_TOKEN_SECRET_KEY}`,
 			{
 				algorithm: 'HS256',
