@@ -5,8 +5,6 @@ info:
   description: to1step backend api 문서
   contact:
     email: gkqkehs0321@gmail.com
-servers:
-  - url: http://localhost:4000/v1
 tags:
   - name: AuthController
     description: 인증 관련 api
@@ -17,7 +15,7 @@ tags:
   - name: StoreController
     description: 가게 관련 api
 paths:
-  /auth/local/sign-in:
+  /v1/auth/local/sign-in:
     post:
       tags:
         - AuthController
@@ -46,7 +44,7 @@ paths:
                     type: boolean
                     description: 로그인 성공
                     example: true
-  /auth/local/email-validation:
+  /v1/auth/local/email-validation:
     post:
       tags:
         - AuthController
@@ -70,7 +68,7 @@ paths:
                     type: boolean
                     description: 사용중이면 true / 사용중이 아니면 false 반환
                     example: true
-  /auth/local/nickname-validation:
+  /v1/auth/local/nickname-validation:
     post:
       tags:
         - AuthController
@@ -94,7 +92,7 @@ paths:
                     type: boolean
                     description: 사용중이면 true / 사용중이 아니면 false 반환
                     example: true
-  /auth/local/email-code:
+  /v1/auth/local/email-code:
     post:
       tags:
         - AuthController
@@ -118,7 +116,7 @@ paths:
                     type: boolean
                     description: 이메일 전송 성공
                     example: true
-  /auth/local/email-verification:
+  /v1/auth/local/email-verification:
     post:
       tags:
         - AuthController
@@ -142,7 +140,7 @@ paths:
                     type: boolean
                     description: 회원가입 성공
                     example: true
-  /auth/reissue:
+  /v1/auth/reissue:
     post:
       tags:
         - AuthController
@@ -163,7 +161,7 @@ paths:
                     type: boolean
                     description: 토큰 재발급 성공
                     example: true
-  /auth/sign-out:
+  /v1/auth/sign-out:
     post:
       tags:
         - AuthController

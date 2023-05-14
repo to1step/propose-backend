@@ -6,6 +6,7 @@ import EmailVerificationDto from '../types/requestTypes/emailVerification.dto';
 import EmailValidationDto from '../types/requestTypes/emaliValidation.dto';
 import LocalSignInDto from '../types/requestTypes/localSignIn.dto';
 import NicknameValidationDto from '../types/requestTypes/nicknameValidation.dto';
+import RefreshTokenDto from '../types/requestTypes/refreshToken.dto';
 
 const router = express.Router();
 const authService = AuthService.getInstance();
@@ -101,16 +102,20 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 });
 //#endregion
 
-router.post('/auth/token', (req, res, next) => {
-	const refreshToken = req.header('refreshToken');
+router.post('/auth/refresh-token', async (req, res, next) => {
+	try {
+		// TODO 얘 되는지 확인
+		const refreshTokenDto = new RefreshTokenDto(req.body);
 
-	if (!refreshToken) {
-		throw new Error('no token in header');
+		await validateOrReject(refreshTokenDto);
+
+		// TODO: 로직 변경
+		// const accessToken = authService.reissue(refreshToken);
+
+		// res.cookie('accessToken', accessToken).json({ data: true });
+	} catch (e) {
+		next(e);
 	}
-
-	const accessToken = authService.reissue(`${refreshToken}`);
-
-	res.cookie('accessToken', accessToken).json({ data: true });
 });
 
 router.post('/auth/sign-out', async (req, res, next) => {
@@ -138,9 +143,9 @@ router.get('/auth/kakao', (req, res, next) => {
 
 router.get('/auth/kakao/redirect', async (req, res, next) => {
 	try {
-		const code = req.query.code as string;
+		const { code } = req.query;
 
-		if (!code) {
+		if (!code || !(typeof code === 'string')) {
 			throw new Error('code not found');
 		}
 
@@ -149,6 +154,7 @@ router.get('/auth/kakao/redirect', async (req, res, next) => {
 		res
 			.cookie('accessToken', accessToken)
 			.cookie('refreshToken', refreshToken)
+			// TODO: 프론트 redirect 코드
 			.redirect('http://localhost:3000');
 	} catch (error) {
 		next(error);

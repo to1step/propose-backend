@@ -60,7 +60,7 @@ class AuthService {
 		const { accessToken, refreshToken } = this.createTokens(userUUID);
 
 		// refreshToken은 redis에 key: userUUID / value: refreshToken으로 저장
-		await this.saveRefreshToken(userUUID, refreshToken);
+		await this.saveRefreshTokenToRedis(userUUID, refreshToken);
 
 		return {
 			accessToken,
@@ -264,7 +264,7 @@ class AuthService {
 		const { accessToken, refreshToken } = this.createTokens(userUUID);
 
 		// refreshToken은 redis에 key: userUUID / value: refreshToken으로 저장
-		await this.saveRefreshToken(userUUID, refreshToken);
+		await this.saveRefreshTokenToRedis(userUUID, refreshToken);
 
 		return {
 			accessToken,
@@ -277,7 +277,7 @@ class AuthService {
 	 * @param refreshToken
 	 */
 	reissue(refreshToken: string): string {
-		const userUUID = this.verifyToken(refreshToken);
+		const userUUID = this.verifyRefreshToken(refreshToken);
 
 		// 토큰 인증 성공 accessToken재 발급
 		return jwt.sign(
@@ -295,7 +295,7 @@ class AuthService {
 	 * @param refreshToken
 	 */
 	async signOut(refreshToken: string): Promise<void> {
-		const userUUID = this.verifyToken(refreshToken);
+		const userUUID = this.verifyRefreshToken(refreshToken);
 
 		// redis에서 해당 유저의 refreshToken 삭제
 		await redis.del(`${userUUID}`);
@@ -303,20 +303,18 @@ class AuthService {
 
 	/**
 	 * 토큰 인증
-	 * @param token
+	 * @param refreshToken
 	 */
-	verifyToken(token: string): string {
+	verifyRefreshToken(refreshToken: string): string {
 		try {
 			const decoded = jwt.verify(
-				token,
+				refreshToken,
 				`${process.env.ACCESS_TOKEN_SECRET_KEY}`
 			);
 
 			if (typeof decoded === 'string' || !decoded.userUUID) {
 				throw new Error('invalid token');
 			}
-
-			//TODO: redis에서 해당 유저의 refreshToken이 있는지 검사
 
 			return decoded.userUUID;
 		} catch (err: any) {
@@ -338,7 +336,7 @@ class AuthService {
 	 * @param userUUID
 	 * @param refreshToken
 	 */
-	async saveRefreshToken(
+	async saveRefreshTokenToRedis(
 		userUUID: string,
 		refreshToken: string
 	): Promise<void> {
