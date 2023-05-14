@@ -33,6 +33,7 @@ const swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
 		user: process.env.DATABASE_USER,
 		pass: process.env.DATABASE_PASSWORD,
 		dbName: process.env.DATABASE_NAME,
+		heartbeatFrequencyMS: 2000,
 	});
 	logger.info(`DB Connected`);
 })();
