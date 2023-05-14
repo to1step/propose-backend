@@ -5,9 +5,10 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import path from 'path';
 import Redis from './utilies/redis';
 import WinstonLogger from './utilies/logger';
-import swaggerOption from './utilies/swagger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
 
@@ -22,6 +23,9 @@ const redis = Redis.getInstance();
 
 // 로깅용 initialize
 const logger = WinstonLogger.getInstance();
+
+// swagger 문서
+const swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
 
 // Connect to MongoDB
 (async () => {
@@ -65,7 +69,11 @@ app.get('/', (req, res, next) => {
 	res.json('Server working');
 });
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerOption));
+app.use(
+	'/api-docs',
+	swaggerUi.serve,
+	swaggerUi.setup(swaggerSpec, { explorer: true })
+);
 
 /**
  * 라우터 정의
@@ -80,7 +88,7 @@ app.use((req, res) => {
 app.use(((err, req, res, next) => {
 	res.status(err.status ?? 500).json({
 		message: err.message,
-		error: err,
+		error: err.stack,
 	});
 }) as ErrorRequestHandler);
 

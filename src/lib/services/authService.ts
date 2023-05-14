@@ -1,5 +1,6 @@
-import jwt from 'jsonwebtoken';
+import jwt, { decode } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import axios from 'axios';
 import UserService from './userService';
 import {
 	LocalSignInForm,
@@ -8,13 +9,17 @@ import {
 	Tokens,
 	SendMailForm,
 	NicknameValidationForm,
+	KakaoUserReponse,
+	KakaoTokenResponse,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
 import Redis from '../../utilies/redis';
 import SESClient from '../../utilies/sesClient';
+import WinstonLogger from '../../utilies/logger';
 
 const redis = Redis.getInstance().getClient();
 const sesClient = SESClient.getInstance();
+const logger = WinstonLogger.getInstance();
 
 class AuthService {
 	private static instance: AuthService;
@@ -51,8 +56,16 @@ class AuthService {
 			throw new Error('wrong password');
 		}
 
-		// 성공시 토큰 발급
-		return this.createTokens(userUUID);
+		// accessToken, refreshToken 생성
+		const { accessToken, refreshToken } = this.createTokens(userUUID);
+
+		// refreshToken은 redis에 key: userUUID / value: refreshToken으로 저장
+		await this.saveRefreshTokenToRedis(userUUID, refreshToken);
+
+		return {
+			accessToken,
+			refreshToken,
+		};
 	}
 
 	/**
@@ -170,7 +183,7 @@ class AuthService {
 		}
 
 		// 같을시에 DB에 저장
-		const { uuid } = await this.userService.createUser({
+		const { uuid } = await this.userService.createUser<'local'>({
 			email,
 			password,
 			nickname,
@@ -181,135 +194,183 @@ class AuthService {
 		return this.createTokens(uuid);
 	}
 
+	async kakaoLogin(code: string): Promise<Tokens> {
+		const kakaoToken = await axios.post<KakaoTokenResponse>(
+			`https://kauth.kakao.com/oauth/token`,
+			{},
+			{
+				params: {
+					grant_type: 'authorization_code',
+					client_id: `${process.env.KAKAO_CLIENT_ID}`,
+					redirect_uri: `${process.env.KAKAO_REDIRECT_URI}`,
+					code: code,
+				},
+				headers: {
+					'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+				},
+			}
+		);
+
+		const kakaoAccessToken = kakaoToken?.data?.access_token;
+
+		if (!kakaoAccessToken) {
+			throw new Error('Kakao access token get fail');
+		}
+
+		const userKaKaoData = await axios.post<KakaoUserReponse>(
+			`https://kapi.kakao.com/v2/user/me`,
+			{},
+			{
+				headers: {
+					Authorization: `Bearer ${kakaoAccessToken}`,
+				},
+			}
+		);
+
+		const kakaoAccout = userKaKaoData?.data?.kakao_account;
+
+		if (
+			!kakaoAccout ||
+			!kakaoAccout.email ||
+			!kakaoAccout.is_email_valid ||
+			!kakaoAccout.is_email_verified ||
+			!kakaoAccout?.profile?.nickname
+		) {
+			throw new Error('email, nickname is required');
+		}
+
+		const user = await UserModel.findOne({ email: kakaoAccout.email });
+
+		let userUUID: string;
+
+		// 새 유저인 경우
+		if (!user) {
+			const newUser = await this.userService.createUser<'kakao'>({
+				email: kakaoAccout.email,
+				nickname: kakaoAccout.profile.nickname,
+				provider: 'kakao',
+				snsId: userKaKaoData.data.id.toString(),
+				password: null,
+			});
+
+			userUUID = newUser.uuid;
+			logger.info(`${newUser.email} sign-up`);
+		} else {
+			userUUID = user.uuid;
+			logger.info(`${user.email} sign-in`);
+		}
+
+		// accessToken, refreshToken 생성
+		const { accessToken, refreshToken } = this.createTokens(userUUID);
+
+		// refreshToken은 redis에 key: userUUID / value: refreshToken으로 저장
+		await this.saveRefreshTokenToRedis(userUUID, refreshToken);
+
+		return {
+			accessToken,
+			refreshToken,
+		};
+	}
+
+	/**
+	 * 토큰 재발급
+	 * @param refreshToken
+	 */
+	reissue(refreshToken: string): string {
+		const userUUID = this.verifyRefreshToken(refreshToken);
+
+		// 토큰 인증 성공 accessToken재 발급
+		return jwt.sign(
+			{ userUUID: userUUID },
+			`${process.env.ACCESS_TOKEN_SECRET_KEY}`,
+			{
+				algorithm: 'HS256',
+				expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE_TIME}`,
+			}
+		);
+	}
+
+	/**
+	 * 로그아웃 redis에서 유저의 refreshToken삭제
+	 * @param refreshToken
+	 */
+	async signOut(refreshToken: string): Promise<void> {
+		const userUUID = this.verifyRefreshToken(refreshToken);
+
+		// redis에서 해당 유저의 refreshToken 삭제
+		await redis.del(`${userUUID}`);
+	}
+
+	/**
+	 * 토큰 인증
+	 * @param refreshToken
+	 */
+	verifyRefreshToken(refreshToken: string): string {
+		try {
+			const decoded = jwt.verify(
+				refreshToken,
+				`${process.env.ACCESS_TOKEN_SECRET_KEY}`
+			);
+
+			if (typeof decoded === 'string' || !decoded.userUUID) {
+				throw new Error('invalid token');
+			}
+
+			return decoded.userUUID;
+		} catch (err: any) {
+			//TODO: custom error 적용
+			if (err.name === 'TokenExpiredError') {
+				throw new Error(`${err.message}`);
+			} else if (err.name === 'JsonWebTokenError') {
+				throw new Error(`${err.message}`);
+			} else if (err.name === 'NotBeforeError') {
+				throw new Error(`${err.message}`);
+			}
+
+			throw err;
+		}
+	}
+
+	/**
+	 * refreshToken redis에 저장
+	 * @param userUUID
+	 * @param refreshToken
+	 */
+	async saveRefreshTokenToRedis(
+		userUUID: string,
+		refreshToken: string
+	): Promise<void> {
+		await redis
+			.multi()
+			.set(userUUID, refreshToken)
+			.pExpire(userUUID, 600000)
+			.exec();
+	}
+
 	/**
 	 * userUUID로 accessToken, refreshToken 만들기
 	 * @param userUUID
 	 */
 	createTokens(userUUID: string): Tokens {
 		const accessToken = jwt.sign(
-			{ userUUId: userUUID },
+			{ userUUID: userUUID },
 			`${process.env.ACCESS_TOKEN_SECRET_KEY}`,
 			{
 				algorithm: 'HS256',
-				expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME,
+				expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE_TIME}`,
 			}
 		);
 		const refreshToken = jwt.sign(
-			{ userUUId: userUUID },
+			{ userUUID: userUUID },
 			`${process.env.REFRESH_TOKEN_SECRET_KEY}`,
 			{
 				algorithm: 'HS256',
-				expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME,
+				expiresIn: `${process.env.REFRESH_TOKEN_EXPIRE_TIME}`,
 			}
 		);
 
 		return { accessToken, refreshToken };
 	}
-
-	// async kakaoLogin(code: string) {
-	// 	const kakaoResponse = await axios<KakaoTokenResponse>({
-	// 		method: 'post',
-	// 		url: `https://kauth.kakao.com/oauth/token`,
-	// 		params: {
-	// 			grant_type: 'authorization_code',
-	// 			client_id: `${process.env.KAKAO_CLIENT_ID}`,
-	// 			redirect_uri: `${process.env.KAKAO_REDIRECT_URT}`,
-	// 			code: `${code}`,
-	// 		},
-	// 		headers: { 'Content-type': 'application/x-www-form-urlencoded' },
-	// 	});
-	//
-	// 	const kakaoAccessToken = kakaoResponse?.data?.access_token;
-	//
-	// 	if (!kakaoAccessToken) {
-	// 		throw new Error('Kakao access token get fail');
-	// 	}
-	//
-	// 	const userKaKaoData = await axios<KakaoUserReponse>({
-	// 		method: 'post',
-	// 		url: `https://kapi.kakao.com/v2/user/me`,
-	// 		headers: {
-	// 			Authorization: `Bearer ${kakaoAccessToken}`,
-	// 		},
-	// 	});
-	//
-	// 	const kakaoAccout = userKaKaoData?.data?.kakao_account;
-	//
-	// 	if (
-	// 		!kakaoAccout ||
-	// 		!kakaoAccout.email ||
-	// 		!kakaoAccout.is_email_valid ||
-	// 		!kakaoAccout.is_email_verified ||
-	// 		!userKaKaoData?.data?.properties?.nickname
-	// 	) {
-	// 		기
-	// 		throw new Error('axios error');
-	// 	}
-	//
-	// 	const user = await this.userService.getUserWithSnsIDAndProvider(
-	// 		`${userKaKaoData.data.id}`,
-	// 		'kakao'
-	// 	);
-	//
-	// 	//TODO: 수정
-	//
-	// 	// 새 유저인 경우
-	// 	if (!user) {
-	// 		if (
-	// 			userData?.data?.kakao_account?.is_email_verified &&
-	// 			userData?.data?.kakao_account?.is_email_valid
-	// 		) {
-	// 			const newUser = await UserService.createUser(
-	// 				userData.data.kakao_account.email,
-	// 				userData.data.properties.nickname,
-	// 				'kakao',
-	// 				`${userData.data.id}`
-	// 			);
-	//
-	// 			// accessToken, refreshToken발급
-	// 			const accessToken = AuthService.makeAccessToken(newUser.uuid);
-	// 			const refreshToken = AuthService.makeRefreshToken(newUser.uuid);
-	//
-	// 			// [redis에 refreshToken저장코드]
-	//
-	// 			// front cookie에 token저장
-	// 			return res
-	// 				.cookie('AccessToken', accessToken, {
-	// 					expires: new Date(Date.now() + 900000),
-	// 					httpOnly: true,
-	// 				})
-	// 				.cookie('RefreshToken', refreshToken, {
-	// 					expires: new Date(Date.now() + 900000),
-	// 					httpOnly: true,
-	// 				})
-	// 				.redirect(301, `${process.env.FRONT_PORT}`);
-	//
-	// 			// res에서 return을 꼭 해주어야하는가
-	// 		}
-	//
-	// 		return res.json({
-	// 			test: 'test',
-	// 		});
-	// 	}
-	//
-	// 	// accessToken, refreshToken발급
-	// 	const accessToken = AuthService.makeAccessToken(user.uuid);
-	// 	const refreshToken = AuthService.makeRefreshToken(user.uuid);
-	//
-	// 	// [redis에 refreshToken저장코드]
-	//
-	// 	// front cookie에 token저장
-	// 	return res
-	// 		.cookie('AccessToken', accessToken, {
-	// 			expires: new Date(Date.now() + 900000),
-	// 			httpOnly: true,
-	// 		})
-	// 		.cookie('RefreshToken', refreshToken, {
-	// 			expires: new Date(Date.now() + 900000),
-	// 			httpOnly: true,
-	// 		})
-	// 		.redirect(301, `${process.env.FRONT_PORT}`);
-	// }
 
 	public static getInstance(): AuthService {
 		if (!AuthService.instance) {
