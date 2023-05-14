@@ -109,10 +109,9 @@ router.post('/auth/refresh-token', async (req, res, next) => {
 
 		await validateOrReject(refreshTokenDto);
 
-		// TODO: 로직 변경
-		// const accessToken = authService.reissue(refreshToken);
+		const accessToken = authService.reissue(refreshTokenDto.refresh_token);
 
-		// res.cookie('accessToken', accessToken).json({ data: true });
+		res.cookie('accessToken', accessToken).json({ data: true });
 	} catch (e) {
 		next(e);
 	}

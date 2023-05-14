@@ -331,7 +331,7 @@ class AuthService {
 		}
 	}
 
-	/**ㅌ
+	/**
 	 * refreshToken redis에 저장
 	 * @param userUUID
 	 * @param refreshToken
