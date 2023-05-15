@@ -50,6 +50,6 @@ const courseSchema = new Schema<CourseDAO, CourseDAOModel>(
 	}
 );
 
-const Course = model<CourseDAO, CourseDAOModel>('Course', courseSchema);
+const CourseModel = model<CourseDAO, CourseDAOModel>('Course', courseSchema);
 
-export { Course };
+export { CourseModel };

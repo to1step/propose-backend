@@ -19,9 +19,9 @@ const storeReviewSchema = new Schema<StoreReviewDAO, StoreReviewDAOModel>(
 	}
 );
 
-const StoreReview = model<StoreReviewDAO, StoreReviewDAOModel>(
+const StoreReviewModel = model<StoreReviewDAO, StoreReviewDAOModel>(
 	'StoreReview',
 	storeReviewSchema
 );
 
-export { StoreReview };
+export { StoreReviewModel };
