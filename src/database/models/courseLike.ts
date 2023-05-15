@@ -17,9 +17,9 @@ const courseLikeSchema = new Schema<CourseLikeDAO, CourseLikeDAOModel>(
 	}
 );
 
-const CourseLike = model<CourseLikeDAO, CourseLikeDAOModel>(
+const CourseLikeModel = model<CourseLikeDAO, CourseLikeDAOModel>(
 	'CourseLike',
 	courseLikeSchema
 );
 
-export { CourseLike };
+export { CourseLikeModel };

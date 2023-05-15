@@ -19,9 +19,9 @@ const courseReviewSchema = new Schema<CourseReviewDAO, CourseReviewDAOModel>(
 	}
 );
 
-const CourseReview = model<CourseReviewDAO, CourseReviewDAOModel>(
+const CourseReviewModel = model<CourseReviewDAO, CourseReviewDAOModel>(
 	'CourseReview',
 	courseReviewSchema
 );
 
-export { CourseReview };
+export { CourseReviewModel };

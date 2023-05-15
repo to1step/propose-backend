@@ -19,9 +19,9 @@ const storeImageSchema = new Schema<StoreImageDAO, StoreImageDAOModel>(
 	}
 );
 
-const StoreImage = model<StoreImageDAO, StoreImageDAOModel>(
+const StoreImageModel = model<StoreImageDAO, StoreImageDAOModel>(
 	'StoreImage',
 	storeImageSchema
 );
 
-export { StoreImage };
+export { StoreImageModel };

@@ -17,9 +17,9 @@ const storeLikeSchema = new Schema<StoreLikeDAO, StoreLikeDAOModel>(
 	}
 );
 
-const StoreLike = model<StoreLikeDAO, StoreLikeDAOModel>(
+const StoreLikeModel = model<StoreLikeDAO, StoreLikeDAOModel>(
 	'StoreLike',
 	storeLikeSchema
 );
 
-export { StoreLike };
+export { StoreLikeModel };

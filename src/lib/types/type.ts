@@ -82,6 +82,26 @@ type Tokens = {
 	refreshToken: string;
 };
 
+// store
+type CreateStoreForm = {
+	name: string;
+	coordinates: number[];
+	representImage: string | null;
+	tags: string[];
+	startTime: string | null;
+	endTime: string | null;
+};
+
+type UpdateStoreForm = {
+	storeUUID: string;
+	name: string;
+	coordinates: number[];
+	representImage: string | null;
+	tags: string[];
+	startTime: string | null;
+	endTime: string | null;
+};
+
 export type {
 	KakaoTokenResponse,
 	KakaoUserReponse,
@@ -95,4 +115,6 @@ export type {
 	NicknameValidationForm,
 	EmailVerifyCode,
 	Tokens,
+	CreateStoreForm,
+	UpdateStoreForm,
 };
