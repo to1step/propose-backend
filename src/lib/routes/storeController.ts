@@ -4,6 +4,8 @@ import StoreService from '../services/storeService';
 import checkHeaderToken from '../middlewares/checkHeaderToken';
 import CreateStoreDto from '../types/requestTypes/createStore.dto';
 import UpdateStoreDto from '../types/requestTypes/updateStore.dto';
+import LikeStoreDto from '../types/requestTypes/likeStore.dto';
+import UnlikeStoreDto from '../types/requestTypes/unlikeStore.dto';
 
 const router = express.Router();
 const storeService = StoreService.getInstance();
@@ -81,6 +83,45 @@ router.patch('/store', checkHeaderToken, async (req, res, next) => {
 
 		await storeService.updateStore(
 			updateStoreDto.toServiceModel(),
+			req.userUUID
+		);
+
+		res.json({ data: true });
+	} catch (error) {
+		next(error);
+	}
+});
+
+router.post('/store/like', checkHeaderToken, async (req, res, next) => {
+	try {
+		if (!req.userUUID) {
+			throw new Error('invalid user');
+		}
+
+		const likeStoreDto = new LikeStoreDto(req.body);
+
+		await validateOrReject(likeStoreDto);
+
+		await storeService.likeStore(likeStoreDto.toServiceModel(), req.userUUID);
+
+		res.json({ data: true });
+	} catch (error) {
+		next(error);
+	}
+});
+
+router.post('/store/unlike', checkHeaderToken, async (req, res, next) => {
+	try {
+		if (!req.userUUID) {
+			throw new Error('invalid user');
+		}
+
+		const unlikeStoreDto = new UnlikeStoreDto(req.body);
+
+		await validateOrReject(unlikeStoreDto);
+
+		await storeService.unlikeStore(
+			unlikeStoreDto.toServiceModel(),
 			req.userUUID
 		);
 

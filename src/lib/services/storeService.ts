@@ -1,6 +1,12 @@
 import { v4 } from 'uuid';
 import { StoreModel } from '../../database/models/store';
-import { CreateStoreForm, UpdateStoreForm } from '../types/type';
+import {
+	CreateStoreForm,
+	LikeStoreForm,
+	UnlikeStoreForm,
+	UpdateStoreForm,
+} from '../types/type';
+import { StoreLikeModel } from '../../database/models/storeLike';
 
 class StoreService {
 	private static instance: StoreService;
@@ -112,6 +118,60 @@ class StoreService {
 
 		store.deletedAt = new Date();
 		await store.save();
+	}
+
+	/**
+	 * 가게 좋아요
+	 * @param likeStoreForm
+	 * @param userUUID
+	 */
+	async likeStore(
+		likeStoreForm: LikeStoreForm,
+		userUUID: string
+	): Promise<void> {
+		const { storeUUID } = likeStoreForm;
+		const store = await StoreModel.findOne({ uuid: storeUUID });
+
+		if (!store || store.deletedAt) {
+			// 삭제되었거나 없는 가게일 경우
+			throw new Error('store not found');
+		}
+
+		await new StoreLikeModel({
+			user: userUUID,
+			store: storeUUID,
+		}).save();
+	}
+
+	/**
+	 * 가게 좋아요 취소
+	 * @param unlikeStoreForm
+	 * @param userUUID
+	 */
+	async unlikeStore(
+		unlikeStoreForm: UnlikeStoreForm,
+		userUUID: string
+	): Promise<void> {
+		const { storeUUID } = unlikeStoreForm;
+		const store = await StoreModel.findOne({ uuid: storeUUID });
+
+		if (!store || store.deletedAt) {
+			// 삭제되었거나 없는 가게일 경우
+			throw new Error('store not found');
+		}
+
+		const likeHistory = await StoreLikeModel.findOne({
+			user: userUUID,
+			store: storeUUID,
+		});
+
+		if (!likeHistory || likeHistory.deletedAt) {
+			// 좋아요를 하지 않았거나, 이미 취소하였던 좋아요를 좋아요를 취소하는 경우
+			throw new Error('invalid access');
+		}
+
+		likeHistory.deletedAt = new Date();
+		await likeHistory.save();
 	}
 }
 
