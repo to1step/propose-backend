@@ -102,6 +102,14 @@ type UpdateStoreForm = {
 	endTime: string | null;
 };
 
+type LikeStoreForm = {
+	storeUUID: string;
+};
+
+type UnlikeStoreForm = {
+	storeUUID: string;
+};
+
 export type {
 	KakaoTokenResponse,
 	KakaoUserReponse,
@@ -117,4 +125,6 @@ export type {
 	Tokens,
 	CreateStoreForm,
 	UpdateStoreForm,
+	LikeStoreForm,
+	UnlikeStoreForm,
 };
