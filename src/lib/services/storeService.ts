@@ -2,11 +2,14 @@ import { v4 } from 'uuid';
 import { StoreModel } from '../../database/models/store';
 import {
 	CreateStoreForm,
+	CreateStoreReviewForm,
 	LikeStoreForm,
 	UnlikeStoreForm,
 	UpdateStoreForm,
+	UpdateStoreReviewForm,
 } from '../types/type';
 import { StoreLikeModel } from '../../database/models/storeLike';
+import { StoreReviewModel } from '../../database/models/storeReview';
 
 class StoreService {
 	private static instance: StoreService;
@@ -172,6 +175,90 @@ class StoreService {
 
 		likeHistory.deletedAt = new Date();
 		await likeHistory.save();
+	}
+
+	/**
+	 * 가게 리뷰 생성
+	 * @param createStoreReviewForm
+	 * @param userUUID
+	 */
+	async createStoreReview(
+		createStoreReviewForm: CreateStoreReviewForm,
+		userUUID: string
+	): Promise<void> {
+		const { storeUUID, review } = createStoreReviewForm;
+
+		const store = await StoreModel.findOne({ uuid: storeUUID });
+
+		if (!store || store.deletedAt) {
+			// 삭제되었거나 없는 가게일 경우
+			throw new Error('store not found');
+		}
+
+		const newUUID = v4();
+
+		await new StoreReviewModel({
+			uuid: newUUID,
+			user: userUUID,
+			store: storeUUID,
+			review: review,
+		}).save();
+	}
+
+	/**
+	 * 가게 리뷰 수정
+	 * @param updateStoreReviewForm
+	 * @param userUUID
+	 */
+	async updateStoreReview(
+		updateStoreReviewForm: UpdateStoreReviewForm,
+		userUUID: string
+	): Promise<void> {
+		const { storeReviewUUID, review } = updateStoreReviewForm;
+
+		const storeReview = await StoreReviewModel.findOne({
+			uuid: storeReviewUUID,
+		});
+
+		if (!storeReview || storeReview.deletedAt) {
+			// 해당 리뷰가 존재하지 않는 경우
+			throw new Error('review not found');
+		}
+
+		if (storeReview.user !== userUUID) {
+			// 작성자가 아닌 사람이 수정하려 하는 경우
+			throw new Error('only creator can update');
+		}
+
+		storeReview.review = review;
+		await storeReview.save();
+	}
+
+	/**
+	 * 가게 리뷰 삭제
+	 * @param storeReviewUUID
+	 * @param userUUID
+	 */
+	async removeStoreReview(
+		storeReviewUUID: string,
+		userUUID: string
+	): Promise<void> {
+		const storeReview = await StoreReviewModel.findOne({
+			uuid: storeReviewUUID,
+		});
+
+		if (!storeReview || storeReview.deletedAt) {
+			// 해당 리뷰가 존재하지 않는 경우
+			throw new Error('review not found');
+		}
+
+		if (storeReview.user !== userUUID) {
+			// 작성자가 아닌 사람이 삭제하려 하는 경우
+			throw new Error('only creator can delete');
+		}
+
+		storeReview.deletedAt = new Date();
+		await storeReview.save();
 	}
 }
 

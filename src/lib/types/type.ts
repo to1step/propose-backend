@@ -110,6 +110,16 @@ type UnlikeStoreForm = {
 	storeUUID: string;
 };
 
+type CreateStoreReviewForm = {
+	storeUUID: string;
+	review: string;
+};
+
+type UpdateStoreReviewForm = {
+	storeReviewUUID: string;
+	review: string;
+};
+
 export type {
 	KakaoTokenResponse,
 	KakaoUserReponse,
@@ -127,4 +137,6 @@ export type {
 	UpdateStoreForm,
 	LikeStoreForm,
 	UnlikeStoreForm,
+	CreateStoreReviewForm,
+	UpdateStoreReviewForm,
 };
