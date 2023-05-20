@@ -9,6 +9,8 @@ type ErrorMessage =
 export default class HttpError extends Error {
 	public code: ErrorCode;
 
+	public errorCode?: number;
+
 	public data?: [string: string];
 
 	constructor(message: ErrorMessage, code: ErrorCode) {

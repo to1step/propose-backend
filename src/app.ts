@@ -99,13 +99,21 @@ app.use((req, res) => {
 
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
 	if (err instanceof BadRequestError) {
-		res.status(err.code).send({ message: err.message, errors: err.data });
+		res
+			.status(err.code)
+			.send({ message: err.message, code: err.errorCode, errors: err.data });
 	} else if (err instanceof UnauthorizedError) {
-		res.status(err.code).send({ message: err.message, errors: err.data });
+		res
+			.status(err.code)
+			.send({ message: err.message, code: err.errorCode, errors: err.data });
 	} else if (err instanceof ForbiddenError) {
-		res.status(err.code).send({ message: err.message, errors: err.data });
+		res
+			.status(err.code)
+			.send({ message: err.message, code: err.errorCode, errors: err.data });
 	} else if (err instanceof InternalServerError) {
-		res.status(err.code).send({ message: err.message, errors: err.data });
+		res
+			.status(err.code)
+			.send({ message: err.message, code: err.errorCode, errors: err.data });
 	} else if (err instanceof NotFoundError) {
 		res.status(err.code).send();
 	} else {
