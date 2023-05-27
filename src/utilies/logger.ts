@@ -41,11 +41,7 @@ class WinstonLogger {
 
 		const terminalLog = new transports.Console({
 			level: 'debug',
-			format: format.combine(
-				format.colorize(),
-				format.timestamp({ format: Date.now().toString() }),
-				logFormat
-			),
+			format: format.combine(format.colorize(), format.timestamp(), logFormat),
 		});
 
 		let transport;
@@ -62,10 +58,7 @@ class WinstonLogger {
 		}
 
 		this.logger = createLogger({
-			format: format.combine(
-				format.timestamp({ format: Date.now().toString() }),
-				logFormat
-			),
+			format: format.combine(format.timestamp(), logFormat),
 			transports: transport,
 			exceptionHandlers: exceptionHandler,
 		});
