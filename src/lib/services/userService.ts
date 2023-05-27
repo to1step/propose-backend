@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import { UserModel } from '../../database/models/user';
 import ModelConverter from '../../utilies/converter/modelConverter';
-import { User, LocalUser, UserCreateKey, UserCreateForm } from '../types/type';
+import { User, UserCreateKey, UserCreateForm } from '../types/type';
 
 class UserService {
 	private static instance: UserService;

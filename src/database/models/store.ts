@@ -13,7 +13,10 @@ interface StoreDAO {
 	deletedAt: Date | null;
 }
 
-type StoreDAOModel = Model<StoreDAO>;
+interface StoreDAOModel extends Model<StoreDAO> {
+	findStoreByUUID(storeUUID: string): Promise<StoreDAO | null>;
+}
+
 const storeSchema = new Schema<StoreDAO, StoreDAOModel>(
 	{
 		uuid: { type: String, required: true }, // 가게 식별 uuid
@@ -35,6 +38,13 @@ const storeSchema = new Schema<StoreDAO, StoreDAOModel>(
 	}
 );
 
+storeSchema.static(
+	'findStoreByUUID',
+	async function findStoreByUUID(storeUUID: string) {
+		return this.findOne({ uuid: storeUUID, deletedAt: null });
+	}
+);
+
 const StoreModel = model<StoreDAO, StoreDAOModel>('Store', storeSchema);
 
-export { StoreModel };
+export { StoreModel, StoreDAO };

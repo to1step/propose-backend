@@ -1,13 +1,15 @@
 import { v4 } from 'uuid';
-import { StoreModel } from '../../database/models/store';
 import {
 	CreateStoreForm,
 	CreateStoreReviewForm,
+	GetStore,
 	LikeStoreForm,
 	UnlikeStoreForm,
 	UpdateStoreForm,
 	UpdateStoreReviewForm,
 } from '../types/type';
+import ModelConverter from '../../utilies/converter/modelConverter';
+import { StoreModel } from '../../database/models/store';
 import { StoreLikeModel } from '../../database/models/storeLike';
 import { StoreReviewModel } from '../../database/models/storeReview';
 
@@ -69,9 +71,12 @@ class StoreService {
 			endTime,
 		} = updateStoreForm;
 
-		const store = await StoreModel.findOne({ uuid: storeUUID });
+		const store = await StoreModel.findOne({
+			uuid: storeUUID,
+			deletedAt: null,
+		});
 
-		if (!store || store.deletedAt) {
+		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
 			throw new Error('store not found');
 		}
@@ -94,11 +99,44 @@ class StoreService {
 	/**
 	 * 가게 정보 가져오기
 	 * @param storeUUID
+	 * @param userUUID
 	 */
-	async getStore(storeUUID: string): Promise<void> {
-		const store = await StoreModel.findOne({ uuid: storeUUID });
+	async getStore(storeUUID: string, userUUID: string): Promise<GetStore> {
+		const store = await StoreModel.findStoreByUUID(storeUUID);
 
-		// TODO: LIKE, REVIEW 개발 후 적용
+		if (store === null) {
+			throw new Error('store not found');
+		}
+
+		const storeData = ModelConverter.toStore(store);
+
+		const [storeReviews, storeLikes] = await Promise.all([
+			StoreReviewModel.findStoreReviewByStore(storeUUID),
+			StoreLikeModel.find({ store: storeUUID, deletedAt: null }),
+		]);
+
+		const storeReviewData = ModelConverter.toStoreReview(storeReviews);
+
+		const reviewCount = storeReviews.length;
+
+		const likeCount = storeLikes.length;
+
+		let iLike = false;
+
+		for (let i = 0; i < likeCount; i += 1) {
+			if (storeLikes[i].user === userUUID) {
+				iLike = true;
+				break;
+			}
+		}
+
+		return {
+			...storeData,
+			storeReviews: storeReviewData,
+			reviewCount,
+			likeCount,
+			iLike,
+		};
 	}
 
 	/**
@@ -107,9 +145,12 @@ class StoreService {
 	 * @param userUUID
 	 */
 	async removeStore(storeUUID: string, userUUID: string): Promise<void> {
-		const store = await StoreModel.findOne({ uuid: storeUUID });
+		const store = await StoreModel.findOne({
+			uuid: storeUUID,
+			deletedAt: null,
+		});
 
-		if (!store || store.deletedAt) {
+		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
 			throw new Error('store not found');
 		}
@@ -133,9 +174,13 @@ class StoreService {
 		userUUID: string
 	): Promise<void> {
 		const { storeUUID } = likeStoreForm;
-		const store = await StoreModel.findOne({ uuid: storeUUID });
 
-		if (!store || store.deletedAt) {
+		const store = await StoreModel.findOne({
+			uuid: storeUUID,
+			deletedAt: null,
+		});
+
+		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
 			throw new Error('store not found');
 		}
@@ -166,10 +211,11 @@ class StoreService {
 		const likeHistory = await StoreLikeModel.findOne({
 			user: userUUID,
 			store: storeUUID,
+			deletedAt: null,
 		});
 
-		if (!likeHistory || likeHistory.deletedAt) {
-			// 좋아요를 하지 않았거나, 이미 취소하였던 좋아요를 좋아요를 취소하는 경우
+		if (!likeHistory) {
+			// 좋아요를 하지 않았는데 취소하는 경우
 			throw new Error('invalid access');
 		}
 
@@ -218,9 +264,10 @@ class StoreService {
 
 		const storeReview = await StoreReviewModel.findOne({
 			uuid: storeReviewUUID,
+			deletedAt: null,
 		});
 
-		if (!storeReview || storeReview.deletedAt) {
+		if (!storeReview) {
 			// 해당 리뷰가 존재하지 않는 경우
 			throw new Error('review not found');
 		}
@@ -245,9 +292,10 @@ class StoreService {
 	): Promise<void> {
 		const storeReview = await StoreReviewModel.findOne({
 			uuid: storeReviewUUID,
+			deletedAt: null,
 		});
 
-		if (!storeReview || storeReview.deletedAt) {
+		if (!storeReview) {
 			// 해당 리뷰가 존재하지 않는 경우
 			throw new Error('review not found');
 		}
