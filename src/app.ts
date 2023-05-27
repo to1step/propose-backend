@@ -75,7 +75,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-	logger.http(`[${req.method}] ${req.url}`);
+	const start = Date.now();
+	res.on('finish', () => {
+		const duration = Date.now() - start;
+		logger.http(`[${req.method}] ${req.url} ${duration}ms`);
+	});
 	next();
 });
 // health check
