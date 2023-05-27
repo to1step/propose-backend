@@ -127,7 +127,6 @@ type CreateStoreForm = {
 };
 
 type UpdateStoreForm = {
-	storeUUID: string;
 	name: string;
 	coordinates: number[];
 	representImage: string | null;
@@ -145,12 +144,10 @@ type UnlikeStoreForm = {
 };
 
 type CreateStoreReviewForm = {
-	storeUUID: string;
 	review: string;
 };
 
 type UpdateStoreReviewForm = {
-	storeReviewUUID: string;
 	review: string;
 };
 

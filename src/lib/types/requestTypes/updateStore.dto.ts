@@ -10,9 +10,6 @@ import { UpdateStoreForm } from '../type';
 
 class UpdateStoreDto {
 	@IsString()
-	storeUUID: string;
-
-	@IsString()
 	name: string;
 
 	@IsArray()
@@ -39,7 +36,6 @@ class UpdateStoreDto {
 	endTime: string;
 
 	constructor(obj: UpdateStoreDto) {
-		this.storeUUID = obj.storeUUID;
 		this.name = obj.name;
 		this.coordinates = obj.coordinates;
 		this.representImage = obj.representImage;
@@ -50,7 +46,6 @@ class UpdateStoreDto {
 
 	toServiceModel(): UpdateStoreForm {
 		return {
-			storeUUID: this.storeUUID,
 			name: this.name,
 			coordinates: this.coordinates,
 			representImage: this.representImage ?? null,
