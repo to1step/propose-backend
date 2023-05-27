@@ -12,6 +12,8 @@ import ModelConverter from '../../utilies/converter/modelConverter';
 import { StoreModel } from '../../database/models/store';
 import { StoreLikeModel } from '../../database/models/storeLike';
 import { StoreReviewModel } from '../../database/models/storeReview';
+import { BadRequestError } from '../middlewares/errors';
+import ErrorCode from '../types/customTypes/error';
 
 class StoreService {
 	private static instance: StoreService;
@@ -85,7 +87,7 @@ class StoreService {
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
-			throw new Error('store not found');
+			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
 		}
 	}
 
@@ -98,7 +100,7 @@ class StoreService {
 		const store = await StoreModel.findStoreByUUID(storeUUID);
 
 		if (store === null) {
-			throw new Error('store not found');
+			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
 		}
 
 		const storeData = ModelConverter.toStore(store);
@@ -140,17 +142,13 @@ class StoreService {
 	async removeStore(storeUUID: string, userUUID: string): Promise<void> {
 		const store = await StoreModel.findOne({
 			uuid: storeUUID,
+			user: userUUID,
 			deletedAt: null,
 		});
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
-			throw new Error('store not found');
-		}
-
-		if (store.userUUID !== userUUID) {
-			// 생성자와 수정자가 다른 경우
-			throw new Error('only creator can delete');
+			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
 		}
 
 		store.deletedAt = new Date();
@@ -170,7 +168,7 @@ class StoreService {
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
-			throw new Error('store not found');
+			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
 		}
 
 		const likeHistory = await StoreLikeModel.findOne({
@@ -181,7 +179,9 @@ class StoreService {
 
 		if (likeHistory) {
 			// 좋아요를 이미 했는데 다시 좋아요를 누르는 경우
-			throw new Error('invalid access');
+			throw new BadRequestError(ErrorCode.DUPLICATE_STORE_LIKE_ERROR, [
+				'Duplicate store like',
+			]);
 		}
 
 		await new StoreLikeModel({
@@ -203,7 +203,7 @@ class StoreService {
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
-			throw new Error('store not found');
+			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
 		}
 
 		const likeHistory = await StoreLikeModel.findOneAndUpdate(
@@ -218,7 +218,9 @@ class StoreService {
 
 		if (!likeHistory) {
 			// 좋아요를 하지 않았는데 취소하는 경우
-			throw new Error('invalid access');
+			throw new BadRequestError(ErrorCode.STORE_LIKE_NOT_FOUND, [
+				'Like not found',
+			]);
 		}
 	}
 
@@ -242,7 +244,7 @@ class StoreService {
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
-			throw new Error('store not found');
+			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
 		}
 
 		const newUUID = v4();
@@ -283,7 +285,9 @@ class StoreService {
 
 		if (!storeReview) {
 			// 해당 리뷰가 존재하지 않는 경우
-			throw new Error('review not found');
+			throw new BadRequestError(ErrorCode.STORE_REVIEW_NOT_FOUND, [
+				'Store review not found',
+			]);
 		}
 	}
 
@@ -311,7 +315,9 @@ class StoreService {
 
 		if (!storeReview) {
 			// 해당 리뷰가 존재하지 않는 경우
-			throw new Error('review not found');
+			throw new BadRequestError(ErrorCode.STORE_REVIEW_NOT_FOUND, [
+				'Store review not found',
+			]);
 		}
 	}
 }

@@ -7,6 +7,8 @@ import GetStoreDto from '../types/responseTypes/getStore.dto';
 import UpdateStoreDto from '../types/requestTypes/updateStore.dto';
 import CreateStoreReviewDto from '../types/requestTypes/createStoreReview.dto';
 import UpdateStoreReviewDto from '../types/requestTypes/updateStoreReview.dto';
+import { BadRequestError } from '../middlewares/errors';
+import ErrorCode from '../types/customTypes/error';
 
 const router = express.Router();
 const storeService = StoreService.getInstance();
@@ -41,7 +43,9 @@ router.get('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 		const { storeUUID } = req.params;
 
 		if (!storeUUID) {
-			throw new Error('no storeId params');
+			throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
+				'No storeUUID in query',
+			]);
 		}
 
 		const storeData = await storeService.getStore(storeUUID, req.userUUID);
@@ -63,7 +67,9 @@ router.patch('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 		const { storeUUID } = req.params;
 
 		if (!storeUUID) {
-			throw new Error('no storeId params');
+			throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
+				'No storeUUID in params',
+			]);
 		}
 
 		const updateStoreDto = new UpdateStoreDto(req.body);
@@ -94,7 +100,9 @@ router.delete(
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new Error('no storeId params');
+				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
+					'No storeUUID in params',
+				]);
 			}
 
 			await storeService.removeStore(storeUUID, req.userUUID);
@@ -118,7 +126,9 @@ router.post(
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new Error('no storeId params');
+				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
+					'No storeUUID in params',
+				]);
 			}
 
 			await storeService.likeStore(storeUUID, req.userUUID);
@@ -142,7 +152,9 @@ router.delete(
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new Error('no storeId params');
+				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
+					'No storeUUID in params',
+				]);
 			}
 
 			await storeService.unlikeStore(storeUUID, req.userUUID);
@@ -166,7 +178,9 @@ router.post(
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new Error('no storeId params');
+				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
+					'No storeUUID in params',
+				]);
 			}
 
 			const createStoreReviewDto = new CreateStoreReviewDto(req.body);
@@ -198,11 +212,15 @@ router.patch(
 			const { storeUUID, storeReviewUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new Error('no storeId params');
+				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
+					'No storeUUID in params',
+				]);
 			}
 
 			if (!storeReviewUUID) {
-				throw new Error('no storeReviewId params');
+				throw new BadRequestError(ErrorCode.NO_STORE_REVIEW_UUID_IN_QUERY, [
+					'No storeReviewUUID in params',
+				]);
 			}
 
 			const updateStoreReviewDto = new UpdateStoreReviewDto(req.body);
@@ -235,11 +253,15 @@ router.delete(
 			const { storeUUID, storeReviewUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new Error('no storeId params');
+				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
+					'No storeUUID in params',
+				]);
 			}
 
 			if (!storeReviewUUID) {
-				throw new Error('no storeId params');
+				throw new BadRequestError(ErrorCode.NO_STORE_REVIEW_UUID_IN_QUERY, [
+					'No storeReviewUUID in params',
+				]);
 			}
 
 			await storeService.removeStoreReview(

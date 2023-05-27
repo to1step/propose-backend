@@ -7,6 +7,7 @@ enum ErrorCode {
 	KAKAO_USER_DATA_NOT_FOUND = 1004, // 카카오 로그인 시, 유저 정보가 없는 경우
 	EMAIL_SEND_COUNT_EXCEED = 1005, // 인증 메일 전송 횟수 5회 초과
 
+	// 토큰 관련 에러 코드
 	INVALID_TOKEN = 1006, // 토큰 검증시, userUUID가 들어있지 않은 경우
 	INVALID_EMAIL_CODE = 1007, // 인증메일의 코드와 저장된 코드 불일치
 	EXPIRED_REFRESH_TOKEN = 1008, // refresh 토큰 시간 만료
@@ -23,6 +24,11 @@ enum ErrorCode {
 
 	// 가게 관련 에러 코드
 	STORE_NOT_FOUND = 800, // 가게 조회시 없는 가게
+	NO_STORE_UUID_QUERY = 801, // api query에 가게 uuid가 없는 경우
+	NO_STORE_REVIEW_UUID_IN_QUERY = 802, // api query에 가게 리뷰 uuid가 없는 경우
+	DUPLICATE_STORE_LIKE_ERROR = 803, // 좋아요를 눌렀는데 다시 누르는 경우
+	STORE_LIKE_NOT_FOUND = 804, // 좋아요를 누른 기록이 없는데 좋아요를 취소하는 경우
+	STORE_REVIEW_NOT_FOUND = 805, // 가게 리뷰 조회시 없는 리뷰
 
 	// 코스 관련 에러 코드
 	COURSE_NOT_FOUND = 700, // 코스 조회시 없는 코스
