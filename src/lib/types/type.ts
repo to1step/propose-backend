@@ -83,6 +83,40 @@ type Tokens = {
 };
 
 // store
+type Store = {
+	uuid: string;
+	name: string;
+	coordinates: number[];
+	representImage: string | null;
+	tags: string[];
+	startTime: string | null;
+	endTime: string | null;
+};
+
+export type StoreReview = {
+	uuid: string;
+	user: string;
+	review: string;
+};
+
+type StoreReviewText = {
+	review: string;
+};
+
+type GetStore = {
+	uuid: string;
+	name: string;
+	coordinates: number[];
+	representImage: string | null;
+	tags: string[];
+	startTime: string | null;
+	endTime: string | null;
+	storeReviews: StoreReview[];
+	reviewCount: number;
+	likeCount: number;
+	iLike: boolean;
+};
+
 type CreateStoreForm = {
 	name: string;
 	coordinates: number[];
@@ -133,6 +167,9 @@ export type {
 	NicknameValidationForm,
 	EmailVerifyCode,
 	Tokens,
+	Store,
+	StoreReviewText,
+	GetStore,
 	CreateStoreForm,
 	UpdateStoreForm,
 	LikeStoreForm,

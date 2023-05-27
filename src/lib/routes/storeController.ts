@@ -8,6 +8,7 @@ import LikeStoreDto from '../types/requestTypes/likeStore.dto';
 import UnlikeStoreDto from '../types/requestTypes/unlikeStore.dto';
 import CreateStoreReviewDto from '../types/requestTypes/createStoreReview.dto';
 import UpdateStoreReviewDto from '../types/requestTypes/updateStoreReview.dto';
+import GetStoreDto from '../types/responseTypes/getStore.dto';
 
 const router = express.Router();
 const storeService = StoreService.getInstance();
@@ -24,9 +25,11 @@ router.get('/store/:storeUUID', checkHeaderToken, async (req, res, next) => {
 			throw new Error('no storeId params');
 		}
 
-		await storeService.getStore(storeUUID);
+		const storeData = await storeService.getStore(storeUUID, req.userUUID);
 
-		// TODO: LIKE, REVIEW 개발 후 적용
+		const store = new GetStoreDto(storeData);
+
+		res.json({ data: store });
 	} catch (error) {
 		next(error);
 	}

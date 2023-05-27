@@ -8,7 +8,9 @@ interface StoreReviewDAO {
 	deletedAt: Date | null;
 }
 
-type StoreReviewDAOModel = Model<StoreReviewDAO>;
+interface StoreReviewDAOModel extends Model<StoreReviewDAO> {
+	findStoreReviewByStore(storeReviewUUID: string): Promise<StoreReviewDAO[]>;
+}
 
 const storeReviewSchema = new Schema<StoreReviewDAO, StoreReviewDAOModel>(
 	{
@@ -23,9 +25,19 @@ const storeReviewSchema = new Schema<StoreReviewDAO, StoreReviewDAOModel>(
 	}
 );
 
+storeReviewSchema.static(
+	'findStoreReviewByStore',
+	function findStoreReviewByStore(storeUUID: string) {
+		return this.find({
+			store: storeUUID,
+			deletedAt: null,
+		});
+	}
+);
+
 const StoreReviewModel = model<StoreReviewDAO, StoreReviewDAOModel>(
 	'StoreReview',
 	storeReviewSchema
 );
 
-export { StoreReviewModel };
+export { StoreReviewModel, StoreReviewDAO };
