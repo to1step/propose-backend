@@ -15,17 +15,13 @@ const storeService = StoreService.getInstance();
 
 router.post('/store', checkHeaderToken, async (req, res, next) => {
 	try {
-		if (!req.userUUID) {
-			throw new Error('invalid user');
-		}
-
 		const createStoreDto = new CreateStoreDto(req.body);
 
 		await validateOrReject(createStoreDto);
 
 		await storeService.createStore(
-			createStoreDto.toServiceModel(),
-			req.userUUID
+			req.userUUID,
+			createStoreDto.toServiceModel()
 		);
 
 		res.json({ data: true });
@@ -36,19 +32,13 @@ router.post('/store', checkHeaderToken, async (req, res, next) => {
 
 router.get('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 	try {
-		if (!req.userUUID) {
-			throw new Error('invalid user');
-		}
-
 		const { storeUUID } = req.params;
 
 		if (!storeUUID) {
-			throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
-				'No storeUUID in query',
-			]);
+			throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
 		}
 
-		const storeData = await storeService.getStore(storeUUID, req.userUUID);
+		const storeData = await storeService.getStore(req.userUUID, storeUUID);
 
 		const store = new GetStoreDto(storeData);
 
@@ -60,16 +50,10 @@ router.get('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 
 router.patch('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 	try {
-		if (!req.userUUID) {
-			throw new Error('invalid user');
-		}
-
 		const { storeUUID } = req.params;
 
 		if (!storeUUID) {
-			throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
-				'No storeUUID in params',
-			]);
+			throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
 		}
 
 		const updateStoreDto = new UpdateStoreDto(req.body);
@@ -77,9 +61,9 @@ router.patch('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 		await validateOrReject(updateStoreDto);
 
 		await storeService.updateStore(
-			updateStoreDto.toServiceModel(),
+			req.userUUID,
 			storeUUID,
-			req.userUUID
+			updateStoreDto.toServiceModel()
 		);
 
 		res.json({ data: true });
@@ -93,19 +77,13 @@ router.delete(
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
-			if (!req.userUUID) {
-				throw new Error('invalid user');
-			}
-
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
-					'No storeUUID in params',
-				]);
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
 			}
 
-			await storeService.removeStore(storeUUID, req.userUUID);
+			await storeService.removeStore(req.userUUID, storeUUID);
 
 			res.json({ data: true });
 		} catch (error) {
@@ -119,19 +97,13 @@ router.post(
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
-			if (!req.userUUID) {
-				throw new Error('invalid user');
-			}
-
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
-					'No storeUUID in params',
-				]);
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
 			}
 
-			await storeService.likeStore(storeUUID, req.userUUID);
+			await storeService.likeStore(req.userUUID, storeUUID);
 
 			res.json({ data: true });
 		} catch (error) {
@@ -145,19 +117,13 @@ router.delete(
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
-			if (!req.userUUID) {
-				throw new Error('invalid user');
-			}
-
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
-					'No storeUUID in params',
-				]);
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
 			}
 
-			await storeService.unlikeStore(storeUUID, req.userUUID);
+			await storeService.unlikeStore(req.userUUID, storeUUID);
 
 			res.json({ data: true });
 		} catch (error) {
@@ -171,16 +137,10 @@ router.post(
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
-			if (!req.userUUID) {
-				throw new Error('invalid user');
-			}
-
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
-					'No storeUUID in params',
-				]);
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
 			}
 
 			const createStoreReviewDto = new CreateStoreReviewDto(req.body);
@@ -188,9 +148,9 @@ router.post(
 			await validateOrReject(createStoreReviewDto);
 
 			await storeService.createStoreReview(
-				createStoreReviewDto.toServiceModel(),
+				req.userUUID,
 				storeUUID,
-				req.userUUID
+				createStoreReviewDto.toServiceModel()
 			);
 
 			res.json({ data: true });
@@ -205,22 +165,10 @@ router.patch(
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
-			if (!req.userUUID) {
-				throw new Error('invalid user');
-			}
-
 			const { storeUUID, storeReviewUUID } = req.params;
 
-			if (!storeUUID) {
-				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
-					'No storeUUID in params',
-				]);
-			}
-
-			if (!storeReviewUUID) {
-				throw new BadRequestError(ErrorCode.NO_STORE_REVIEW_UUID_IN_QUERY, [
-					'No storeReviewUUID in params',
-				]);
+			if (!storeUUID || !storeReviewUUID) {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
 			}
 
 			const updateStoreReviewDto = new UpdateStoreReviewDto(req.body);
@@ -228,10 +176,10 @@ router.patch(
 			await validateOrReject(updateStoreReviewDto);
 
 			await storeService.updateStoreReview(
-				updateStoreReviewDto.toServiceModel(),
+				req.userUUID,
 				storeUUID,
 				storeReviewUUID,
-				req.userUUID
+				updateStoreReviewDto.toServiceModel()
 			);
 
 			res.json({ data: true });
@@ -246,28 +194,16 @@ router.delete(
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
-			if (!req.userUUID) {
-				throw new Error('invalid user');
-			}
-
 			const { storeUUID, storeReviewUUID } = req.params;
 
-			if (!storeUUID) {
-				throw new BadRequestError(ErrorCode.NO_STORE_UUID_QUERY, [
-					'No storeUUID in params',
-				]);
-			}
-
-			if (!storeReviewUUID) {
-				throw new BadRequestError(ErrorCode.NO_STORE_REVIEW_UUID_IN_QUERY, [
-					'No storeReviewUUID in params',
-				]);
+			if (!storeUUID || !storeReviewUUID) {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
 			}
 
 			await storeService.removeStoreReview(
+				req.userUUID,
 				storeUUID,
-				storeReviewUUID,
-				req.userUUID
+				storeReviewUUID
 			);
 
 			res.json({ data: true });

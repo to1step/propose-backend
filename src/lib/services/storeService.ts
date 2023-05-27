@@ -12,7 +12,7 @@ import ModelConverter from '../../utilies/converter/modelConverter';
 import { StoreModel } from '../../database/models/store';
 import { StoreLikeModel } from '../../database/models/storeLike';
 import { StoreReviewModel } from '../../database/models/storeReview';
-import { BadRequestError } from '../middlewares/errors';
+import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
 
 class StoreService {
@@ -33,8 +33,8 @@ class StoreService {
 	 * @param userUUID
 	 */
 	async createStore(
-		createStoreForm: CreateStoreForm,
-		userUUID: string
+		userUUID: string,
+		createStoreForm: CreateStoreForm
 	): Promise<void> {
 		const { name, coordinates, representImage, tags, startTime, endTime } =
 			createStoreForm;
@@ -55,52 +55,17 @@ class StoreService {
 	}
 
 	/**
-	 * 가게 정보 업데이트
-	 * @param updateStoreForm
-	 * @param storeUUID
-	 * @param userUUID
-	 */
-	async updateStore(
-		updateStoreForm: UpdateStoreForm,
-		storeUUID: string,
-		userUUID: string
-	): Promise<void> {
-		const { name, coordinates, representImage, tags, startTime, endTime } =
-			updateStoreForm;
-
-		const store = await StoreModel.findOneAndUpdate(
-			{
-				uuid: storeUUID,
-				userUUID: userUUID,
-				deletedAt: null,
-			},
-			{
-				name: name,
-				coordinates: coordinates,
-				representImage: representImage,
-				tags: tags,
-				startTime: startTime,
-				endTime: endTime,
-			},
-			{ new: true }
-		);
-
-		if (!store) {
-			// 삭제되었거나 없는 가게일 경우
-			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
-		}
-	}
-
-	/**
 	 * 가게 정보 가져오기
-	 * @param storeUUID
 	 * @param userUUID
+	 * @param storeUUID
 	 */
-	async getStore(storeUUID: string, userUUID: string): Promise<GetStore> {
+	async getStore(userUUID: string, storeUUID: string): Promise<GetStore> {
 		const store = await StoreModel.findStoreByUUID(storeUUID);
 
 		if (store === null) {
-			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
+			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
+				'Store not found',
+			]);
 		}
 
 		const storeData = ModelConverter.toStore(store);
@@ -110,7 +75,9 @@ class StoreService {
 			StoreLikeModel.find({ store: storeUUID, deletedAt: null }),
 		]);
 
-		const storeReviewData = ModelConverter.toStoreReview(storeReviews);
+		const storeReviewData = storeReviews.map((storeReview) =>
+			ModelConverter.toStoreReview(storeReview)
+		);
 
 		const reviewCount = storeReviews.length;
 
@@ -135,32 +102,78 @@ class StoreService {
 	}
 
 	/**
-	 * 가게 삭제
-	 * @param storeUUID
+	 * 가게 정보 업데이트
 	 * @param userUUID
+	 * @param storeUUID
+	 * @param updateStoreForm
 	 */
-	async removeStore(storeUUID: string, userUUID: string): Promise<void> {
-		const store = await StoreModel.findOne({
-			uuid: storeUUID,
-			user: userUUID,
-			deletedAt: null,
-		});
+	async updateStore(
+		userUUID: string,
+		storeUUID: string,
+		updateStoreForm: UpdateStoreForm
+	): Promise<void> {
+		const { name, coordinates, representImage, tags, startTime, endTime } =
+			updateStoreForm;
+
+		const store = await StoreModel.findOneAndUpdate(
+			{
+				uuid: storeUUID,
+				userUUID: userUUID,
+				deletedAt: null,
+			},
+			{
+				name: name,
+				coordinates: coordinates,
+				representImage: representImage,
+				tags: tags,
+				startTime: startTime,
+				endTime: endTime,
+			},
+			{ new: true }
+		);
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
-			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
+			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
+				'Store not found',
+			]);
 		}
+	}
 
-		store.deletedAt = new Date();
-		await store.save();
+	/**
+	 * 가게 삭제
+	 * @param userUUID
+	 * @param storeUUID
+	 */
+	async removeStore(userUUID: string, storeUUID: string): Promise<void> {
+		const store = await StoreModel.findOneAndUpdate(
+			{
+				uuid: storeUUID,
+				user: userUUID,
+				deletedAt: null,
+			},
+			{
+				deletedAt: new Date(),
+			},
+			{
+				new: true,
+			}
+		);
+
+		if (!store) {
+			// 삭제되었거나 없는 가게일 경우
+			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
+				'Store not found',
+			]);
+		}
 	}
 
 	/**
 	 * 가게 좋아요
-	 * @param storeUUID
 	 * @param userUUID
+	 * @param storeUUID
 	 */
-	async likeStore(storeUUID: string, userUUID: string): Promise<void> {
+	async likeStore(userUUID: string, storeUUID: string): Promise<void> {
 		const store = await StoreModel.findOne({
 			uuid: storeUUID,
 			deletedAt: null,
@@ -168,7 +181,9 @@ class StoreService {
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
-			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
+			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
+				'Store not found',
+			]);
 		}
 
 		const likeHistory = await StoreLikeModel.findOne({
@@ -192,10 +207,10 @@ class StoreService {
 
 	/**
 	 * 가게 좋아요 취소
-	 * @param storeUUID
 	 * @param userUUID
+	 * @param storeUUID
 	 */
-	async unlikeStore(storeUUID: string, userUUID: string): Promise<void> {
+	async unlikeStore(userUUID: string, storeUUID: string): Promise<void> {
 		const store = await StoreModel.findOne({
 			uuid: storeUUID,
 			deletedAt: null,
@@ -203,7 +218,9 @@ class StoreService {
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
-			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
+			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
+				'Store not found',
+			]);
 		}
 
 		const likeHistory = await StoreLikeModel.findOneAndUpdate(
@@ -226,14 +243,14 @@ class StoreService {
 
 	/**
 	 * 가게 리뷰 생성
-	 * @param createStoreReviewForm
-	 * @param storeUUID
 	 * @param userUUID
+	 * @param storeUUID
+	 * @param createStoreReviewForm
 	 */
 	async createStoreReview(
-		createStoreReviewForm: CreateStoreReviewForm,
+		userUUID: string,
 		storeUUID: string,
-		userUUID: string
+		createStoreReviewForm: CreateStoreReviewForm
 	): Promise<void> {
 		const { review } = createStoreReviewForm;
 
@@ -244,7 +261,9 @@ class StoreService {
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
-			throw new BadRequestError(ErrorCode.STORE_NOT_FOUND, ['Store not found']);
+			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
+				'Store not found',
+			]);
 		}
 
 		const newUUID = v4();
@@ -259,16 +278,16 @@ class StoreService {
 
 	/**
 	 * 가게 리뷰 수정
-	 * @param updateStoreReviewForm
+	 * @param userUUID
 	 * @param storeUUID
 	 * @param storeReviewUUID
-	 * @param userUUID
+	 * @param updateStoreReviewForm
 	 */
 	async updateStoreReview(
-		updateStoreReviewForm: UpdateStoreReviewForm,
+		userUUID: string,
 		storeUUID: string,
 		storeReviewUUID: string,
-		userUUID: string
+		updateStoreReviewForm: UpdateStoreReviewForm
 	): Promise<void> {
 		const { review } = updateStoreReviewForm;
 
@@ -285,7 +304,7 @@ class StoreService {
 
 		if (!storeReview) {
 			// 해당 리뷰가 존재하지 않는 경우
-			throw new BadRequestError(ErrorCode.STORE_REVIEW_NOT_FOUND, [
+			throw new InternalServerError(ErrorCode.STORE_REVIEW_NOT_FOUND, [
 				'Store review not found',
 			]);
 		}
@@ -293,14 +312,14 @@ class StoreService {
 
 	/**
 	 * 가게 리뷰 삭제
+	 * @param userUUID
 	 * @param storeUUID
 	 * @param storeReviewUUID
-	 * @param userUUID
 	 */
 	async removeStoreReview(
+		userUUID: string,
 		storeUUID: string,
-		storeReviewUUID: string,
-		userUUID: string
+		storeReviewUUID: string
 	): Promise<void> {
 		const storeReview = await StoreReviewModel.findOneAndUpdate(
 			{
@@ -315,7 +334,7 @@ class StoreService {
 
 		if (!storeReview) {
 			// 해당 리뷰가 존재하지 않는 경우
-			throw new BadRequestError(ErrorCode.STORE_REVIEW_NOT_FOUND, [
+			throw new InternalServerError(ErrorCode.STORE_REVIEW_NOT_FOUND, [
 				'Store review not found',
 			]);
 		}

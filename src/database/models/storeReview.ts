@@ -9,7 +9,7 @@ interface StoreReviewDAO {
 }
 
 interface StoreReviewDAOModel extends Model<StoreReviewDAO> {
-	findStoreReviewByStore(storeReviewUUID: string): Promise<StoreReviewDAO[]>;
+	findStoreReviewByStore(storeUUID: string): Promise<StoreReviewDAO[]>;
 }
 
 const storeReviewSchema = new Schema<StoreReviewDAO, StoreReviewDAOModel>(

@@ -27,12 +27,12 @@ class ModelConverter {
 		};
 	}
 
-	static toStoreReview(storeReviews: StoreReviewDAO[]): StoreReview[] {
-		return storeReviews.map((storeReview: StoreReviewDAO) => ({
+	static toStoreReview(storeReview: StoreReviewDAO): StoreReview {
+		return {
 			uuid: storeReview.uuid,
 			user: storeReview.user,
 			review: storeReview.review,
-		}));
+		};
 	}
 }
 
