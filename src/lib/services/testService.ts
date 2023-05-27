@@ -10,7 +10,12 @@ class TestService {
 	}
 
 	async uploadImages(files: Express.Multer.File[]) {
-		await this.s3Service.uploadImages('images', files);
+		const imageLocationList = await this.s3Service.uploadImages(
+			'images',
+			files
+		);
+
+		return imageLocationList;
 	}
 
 	public static getInstance(): TestService {

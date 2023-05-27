@@ -40,13 +40,15 @@ class S3Service {
 				.promise();
 		});
 
-		await Promise.all(promiseList);
+		const result = await Promise.all(promiseList);
 
 		for (let i = 0; i < files.length; i += 1) {
 			fs.unlink(files[i].path, (err) => {
 				if (err) throw err;
 			});
 		}
+
+		return result.map((s3Object) => s3Object.Location);
 	}
 
 	public static getInstance(): S3Service {

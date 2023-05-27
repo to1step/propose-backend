@@ -19,10 +19,12 @@ router.post(
 	async (req, res, next) => {
 		// 이미지 파일을 보내지 않았다면 빈 배열로 초기화
 		const files = (req.files as Express.Multer.File[]) ?? [];
-		await testService.uploadImages(files);
+		const imageLocationList = await testService.uploadImages(files);
 
 		res.json({
-			data: true,
+			data: {
+				imageLocationList,
+			},
 		});
 	}
 );
