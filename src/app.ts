@@ -1,9 +1,4 @@
-import express, {
-	Request,
-	Response,
-	ErrorRequestHandler,
-	NextFunction,
-} from 'express';
+import express from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
@@ -17,13 +12,8 @@ import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
 import v1TestRouter from './lib/routes/testController';
-import {
-	BadRequestError,
-	ForbiddenError,
-	InternalServerError,
-	NotFoundError,
-	UnauthorizedError,
-} from './lib/middlewares/errors';
+import { errorHandler } from './lib/middlewares/errors/errorHandler';
+import { NotFoundError } from './lib/middlewares/errors';
 
 // env
 dotenv.config();
@@ -101,40 +91,9 @@ app.use('/v1', v1UserRouter);
 app.use('/v1', v1TestRouter);
 
 app.use((req, res) => {
-	res.status(404).send({ message: 'page not found' });
+	throw new NotFoundError();
 });
 
-app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
-	if (err instanceof BadRequestError) {
-		res
-			.status(err.code)
-			.send({ message: err.message, code: err.errorCode, errors: err.data });
-	} else if (err instanceof UnauthorizedError) {
-		res
-			.status(err.code)
-			.send({ message: err.message, code: err.errorCode, errors: err.data });
-	} else if (err instanceof ForbiddenError) {
-		res
-			.status(err.code)
-			.send({ message: err.message, code: err.errorCode, errors: err.data });
-	} else if (err instanceof InternalServerError) {
-		res
-			.status(err.code)
-			.send({ message: err.message, code: err.errorCode, errors: err.data });
-	} else if (err instanceof NotFoundError) {
-		res.status(err.code).send();
-	} else {
-		logger.error(err);
-		res.status(500).send({ message: 'INTERNAL_SERVER_ERROR' });
-	}
-});
-
-// error handler
-app.use(((err, req, res, next) => {
-	res.status(err.status ?? 500).json({
-		message: err.message,
-		error: err.stack,
-	});
-}) as ErrorRequestHandler);
+app.use(errorHandler);
 
 export default app;
