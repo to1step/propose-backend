@@ -1,4 +1,9 @@
-import express, { ErrorRequestHandler } from 'express';
+import express, {
+	Request,
+	Response,
+	ErrorRequestHandler,
+	NextFunction,
+} from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
@@ -11,6 +16,13 @@ import Redis from './utilies/redis';
 import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
+import {
+	BadRequestError,
+	ForbiddenError,
+	InternalServerError,
+	NotFoundError,
+	UnauthorizedError,
+} from './lib/middlewares/errors';
 
 // env
 dotenv.config();
@@ -83,6 +95,31 @@ app.use('/v1', v1AuthRouter);
 app.use('/v1', v1UserRouter);
 app.use((req, res) => {
 	res.status(404).send({ message: 'page not found' });
+});
+
+app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
+	if (err instanceof BadRequestError) {
+		res
+			.status(err.code)
+			.send({ message: err.message, code: err.errorCode, errors: err.data });
+	} else if (err instanceof UnauthorizedError) {
+		res
+			.status(err.code)
+			.send({ message: err.message, code: err.errorCode, errors: err.data });
+	} else if (err instanceof ForbiddenError) {
+		res
+			.status(err.code)
+			.send({ message: err.message, code: err.errorCode, errors: err.data });
+	} else if (err instanceof InternalServerError) {
+		res
+			.status(err.code)
+			.send({ message: err.message, code: err.errorCode, errors: err.data });
+	} else if (err instanceof NotFoundError) {
+		res.status(err.code).send();
+	} else {
+		logger.error(err);
+		res.status(500).send({ message: 'INTERNAL_SERVER_ERROR' });
+	}
 });
 
 // error handler

@@ -43,8 +43,8 @@ class AuthService {
 		const userUUID = user.uuid;
 		const userPassword = user.password;
 
-		// 비밀번호가 존재하지 않으면 로컬 유저가 아니므로 에러
-		if (!userPassword) {
+		// 비밀번호가 존재하지 않거나, provider가 local이 아니면 잘못된 로그인 방식
+		if (!userPassword || !(user.provider === 'local')) {
 			throw new Error('invalid user');
 		}
 
