@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import {
 	CreateStoreForm,
 	CreateStoreReviewForm,
-	GetStore,
+	StoreEntireInfo,
 	LikeStoreForm,
 	UnlikeStoreForm,
 	UpdateStoreForm,
@@ -59,7 +59,10 @@ class StoreService {
 	 * @param userUUID
 	 * @param storeUUID
 	 */
-	async getStore(userUUID: string, storeUUID: string): Promise<GetStore> {
+	async getStore(
+		userUUID: string,
+		storeUUID: string
+	): Promise<StoreEntireInfo> {
 		const store = await StoreModel.findStoreByUUID(storeUUID);
 
 		if (store === null) {

@@ -54,6 +54,10 @@ jobs:
             AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
             AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
             AWS_SES_SENDER=${{ secrets.AWS_SES_SENDER }}
+            S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}
+            S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}
+            S3_REGION=${{ secrets.S3_REGION }}
+            S3_BUCKET=${{ secrets.S3_BUCKET }}
 
   code-deploy:
     needs: build-and-push-image

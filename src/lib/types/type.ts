@@ -99,11 +99,7 @@ export type StoreReview = {
 	review: string;
 };
 
-type StoreReviewText = {
-	review: string;
-};
-
-type GetStore = {
+type StoreEntireInfo = {
 	uuid: string;
 	name: string;
 	coordinates: number[];
@@ -165,8 +161,7 @@ export type {
 	EmailVerifyCode,
 	Tokens,
 	Store,
-	StoreReviewText,
-	GetStore,
+	StoreEntireInfo,
 	CreateStoreForm,
 	UpdateStoreForm,
 	LikeStoreForm,
