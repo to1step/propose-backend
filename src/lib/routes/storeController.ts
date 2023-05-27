@@ -35,7 +35,9 @@ router.get('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 		const { storeUUID } = req.params;
 
 		if (!storeUUID) {
-			throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
+			throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+				{ data: 'Invalid query' },
+			]);
 		}
 
 		const storeData = await storeService.getStore(req.userUUID, storeUUID);
@@ -53,7 +55,9 @@ router.patch('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 		const { storeUUID } = req.params;
 
 		if (!storeUUID) {
-			throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
+			throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+				{ data: 'Invalid query' },
+			]);
 		}
 
 		const updateStoreDto = new UpdateStoreDto(req.body);
@@ -80,7 +84,9 @@ router.delete(
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
 			}
 
 			await storeService.removeStore(req.userUUID, storeUUID);
@@ -100,7 +106,9 @@ router.post(
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
 			}
 
 			await storeService.likeStore(req.userUUID, storeUUID);
@@ -120,7 +128,9 @@ router.delete(
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
 			}
 
 			await storeService.unlikeStore(req.userUUID, storeUUID);
@@ -140,7 +150,9 @@ router.post(
 			const { storeUUID } = req.params;
 
 			if (!storeUUID) {
-				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
 			}
 
 			const createStoreReviewDto = new CreateStoreReviewDto(req.body);
@@ -168,7 +180,9 @@ router.patch(
 			const { storeUUID, storeReviewUUID } = req.params;
 
 			if (!storeUUID || !storeReviewUUID) {
-				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
 			}
 
 			const updateStoreReviewDto = new UpdateStoreReviewDto(req.body);
@@ -197,7 +211,9 @@ router.delete(
 			const { storeUUID, storeReviewUUID } = req.params;
 
 			if (!storeUUID || !storeReviewUUID) {
-				throw new BadRequestError(ErrorCode.INVALID_QUERY, ['Invalid query']);
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
 			}
 
 			await storeService.removeStoreReview(

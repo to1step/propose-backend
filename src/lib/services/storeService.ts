@@ -67,7 +67,7 @@ class StoreService {
 
 		if (store === null) {
 			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
-				'Store not found',
+				{ data: 'Store not found' },
 			]);
 		}
 
@@ -138,7 +138,7 @@ class StoreService {
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
 			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
-				'Store not found',
+				{ data: 'Store not found' },
 			]);
 		}
 	}
@@ -166,7 +166,7 @@ class StoreService {
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
 			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
-				'Store not found',
+				{ data: 'Store not found' },
 			]);
 		}
 	}
@@ -185,7 +185,7 @@ class StoreService {
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
 			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
-				'Store not found',
+				{ data: 'Store not found' },
 			]);
 		}
 
@@ -198,7 +198,7 @@ class StoreService {
 		if (likeHistory) {
 			// 좋아요를 이미 했는데 다시 좋아요를 누르는 경우
 			throw new BadRequestError(ErrorCode.DUPLICATE_STORE_LIKE_ERROR, [
-				'Duplicate store like',
+				{ data: 'Duplicate store like' },
 			]);
 		}
 
@@ -222,7 +222,7 @@ class StoreService {
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
 			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
-				'Store not found',
+				{ data: 'Store not found' },
 			]);
 		}
 
@@ -239,7 +239,7 @@ class StoreService {
 		if (!likeHistory) {
 			// 좋아요를 하지 않았는데 취소하는 경우
 			throw new BadRequestError(ErrorCode.STORE_LIKE_NOT_FOUND, [
-				'Like not found',
+				{ data: 'Like not found' },
 			]);
 		}
 	}
@@ -265,7 +265,7 @@ class StoreService {
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
 			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
-				'Store not found',
+				{ data: 'Store not found' },
 			]);
 		}
 
@@ -308,7 +308,7 @@ class StoreService {
 		if (!storeReview) {
 			// 해당 리뷰가 존재하지 않는 경우
 			throw new InternalServerError(ErrorCode.STORE_REVIEW_NOT_FOUND, [
-				'Store review not found',
+				{ data: { data: 'Store review not found' } },
 			]);
 		}
 	}
@@ -338,7 +338,7 @@ class StoreService {
 		if (!storeReview) {
 			// 해당 리뷰가 존재하지 않는 경우
 			throw new InternalServerError(ErrorCode.STORE_REVIEW_NOT_FOUND, [
-				'Store review not found',
+				{ data: 'Store review not found' },
 			]);
 		}
 	}
