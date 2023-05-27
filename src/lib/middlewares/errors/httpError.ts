@@ -11,7 +11,7 @@ export default class HttpError extends Error {
 
 	public errorCode?: number;
 
-	public data?: [string: string];
+	public data?: { [key: string]: any }[];
 
 	constructor(message: ErrorMessage, code: ErrorCode) {
 		super(message);
