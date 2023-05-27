@@ -11,6 +11,7 @@ import Redis from './utilies/redis';
 import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
+import v1StoreRouter from './lib/routes/storeController';
 import v1TestRouter from './lib/routes/testController';
 import { errorHandler } from './lib/middlewares/errors/errorHandler';
 import { NotFoundError } from './lib/middlewares/errors';
@@ -88,6 +89,7 @@ app.use(
  */
 app.use('/v1', v1AuthRouter);
 app.use('/v1', v1UserRouter);
+app.use('/v1', v1StoreRouter);
 app.use('/v1', v1TestRouter);
 
 app.use((req, res) => {

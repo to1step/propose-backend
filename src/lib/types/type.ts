@@ -82,6 +82,71 @@ type Tokens = {
 	refreshToken: string;
 };
 
+// store
+type Store = {
+	uuid: string;
+	name: string;
+	coordinates: number[];
+	representImage: string | null;
+	tags: string[];
+	startTime: string | null;
+	endTime: string | null;
+};
+
+export type StoreReview = {
+	uuid: string;
+	user: string;
+	review: string;
+};
+
+type StoreEntireInfo = {
+	uuid: string;
+	name: string;
+	coordinates: number[];
+	representImage: string | null;
+	tags: string[];
+	startTime: string | null;
+	endTime: string | null;
+	storeReviews: StoreReview[];
+	reviewCount: number;
+	likeCount: number;
+	iLike: boolean;
+};
+
+type CreateStoreForm = {
+	name: string;
+	coordinates: number[];
+	representImage: string | null;
+	tags: string[];
+	startTime: string | null;
+	endTime: string | null;
+};
+
+type UpdateStoreForm = {
+	name: string;
+	coordinates: number[];
+	representImage: string | null;
+	tags: string[];
+	startTime: string | null;
+	endTime: string | null;
+};
+
+type LikeStoreForm = {
+	storeUUID: string;
+};
+
+type UnlikeStoreForm = {
+	storeUUID: string;
+};
+
+type CreateStoreReviewForm = {
+	review: string;
+};
+
+type UpdateStoreReviewForm = {
+	review: string;
+};
+
 export type {
 	KakaoTokenResponse,
 	KakaoUserReponse,
@@ -95,4 +160,12 @@ export type {
 	NicknameValidationForm,
 	EmailVerifyCode,
 	Tokens,
+	Store,
+	StoreEntireInfo,
+	CreateStoreForm,
+	UpdateStoreForm,
+	LikeStoreForm,
+	UnlikeStoreForm,
+	CreateStoreReviewForm,
+	UpdateStoreReviewForm,
 };

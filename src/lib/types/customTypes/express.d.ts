@@ -1,5 +1,5 @@
 namespace Express {
 	interface Request {
-		userUUID?: string;
+		userUUID: string;
 	}
 }
