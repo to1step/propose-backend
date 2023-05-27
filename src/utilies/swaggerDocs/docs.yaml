@@ -1,0 +1,681 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: to1step api docs
+  description: to1step backend api 문서
+  contact:
+    email: gkqkehs0321@gmail.com
+tags:
+  - name: AuthController
+    description: 인증 관련 api
+  - name: UserController
+    description: 유저 관련 api
+  - name: CourseController
+    description: 코스 관련 api
+  - name: StoreController
+    description: 가게 관련 api
+paths:
+  /v1/auth/local/sign-in:
+    post:
+      tags:
+        - AuthController
+      summary: 로컬 로그인
+      description: 로컬 로그인
+      requestBody:
+        description: LocalSignInDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocalSignInDto"
+      responses:
+        '200':
+          description: 로그인 성공
+          headers:
+            Set-Cookie:
+              description: 쿠기 값
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 로그인 성공
+                    example: true
+  /v1/auth/local/email-validation:
+    post:
+      tags:
+        - AuthController
+      summary: 이메일 중복체크
+      description: 이메일 다른 유저가 사용중인지 확인
+      requestBody:
+        description: EmailValidationDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailValidationDto"
+      responses:
+        '200':
+          description: 이메일 사용가능 여부
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 사용중이면 true / 사용중이 아니면 false 반환
+                    example: true
+  /v1/auth/local/nickname-validation:
+    post:
+      tags:
+        - AuthController
+      summary: 닉네임 중복체크
+      description: 닉네임 다른 유저가 사용중인지 확인
+      requestBody:
+        description: NicknameValidationDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NicknameValidationDto"
+      responses:
+        '200':
+          description: 닉네임 사용가능 여부
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 사용중이면 true / 사용중이 아니면 false 반환
+                    example: true
+  /v1/auth/local/email-code:
+    post:
+      tags:
+        - AuthController
+      summary: 인증메일 전송
+      description: 유저정보 redis에 저장, 인증메일 전송
+      requestBody:
+        description: UserDataDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserDataDto"
+      responses:
+        '200':
+          description: 인증 메일 전송 여부
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 이메일 전송 성공
+                    example: true
+  /v1/auth/local/email-verification:
+    post:
+      tags:
+        - AuthController
+      summary: 이메일 인증 및 유저 회원가입
+      description: redis에 저장된 인증번호와 비교 후 일치 시 유저 회원가입
+      requestBody:
+        description: EmailVerificationDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailVerificationDto"
+      responses:
+        '200':
+          description: 회원가입 성공 즉시 로그인
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 회원가입 성공
+                    example: true
+  /v1/auth/refresh-token:
+    post:
+      tags:
+        - AuthController
+      summary: 토큰 재발급
+      description: refreshToken이 유효하다면 accessToken 재발급, grant_type은 refresh_token으로 보내주세요
+      requestBody:
+        description: RefreshTokenDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenDto"
+      responses:
+        '200':
+          description: accessToken 갱신
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 토큰 재발급 성공
+                    example: true
+  /v1/auth/sign-out:
+    post:
+      tags:
+        - AuthController
+      summary: 로그아웃
+      description: 토큰이 유효한 유저를 로그아웃시킴
+      parameters:
+        - in: header
+          name: refreshToken
+      responses:
+        '200':
+          description: 로그아웃 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 로그아웃 성공
+                    example: true
+  /v1/store/:
+    post:
+      tags:
+        - StoreController
+      summary: 가게 생성
+      description: 새로운 가게를 생성하기
+      parameters:
+        - name: accessToken
+          in: header
+      requestBody:
+        description: CreateStoreDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStoreDto"
+      responses:
+        '200':
+          description: 가게 생성 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 가게 생성 성공
+                    example: true
+  /v1/stores/{storeUUID}:
+    get:
+      tags:
+        - StoreController
+      summary: 특정 가게 정보 가져오기
+      description: 가게 정보 가져오기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 가게 UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 가게 정보
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetStoreDto"
+    patch:
+      tags:
+        - StoreController
+      summary: 가게 정보 수정
+      description: 가게 정보 수정하기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 가게 UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: UpdateStoreDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStoreDto"
+      responses:
+        '200':
+          description: 가게 정보 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 가게 정보 수정 성공
+                    example: true
+    delete:
+      tags:
+        - StoreController
+      summary: 가게 삭제하기
+      description: 가게를 삭제하기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 가게 UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 가게 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 가게 삭제 성공
+                    example: true
+  /v1/stores/{storeUUID}/like:
+    post:
+      tags:
+        - StoreController
+      summary: 가게 좋아요
+      description: 특정 가게 좋아요 하기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 가게 UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 가게 좋아요 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 가게 좋아요 성공
+                    example: true
+    delete:
+      tags:
+        - StoreController
+      summary: 가게 좋아요 취소
+      description: 특정 가게 좋아요 취소 하기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 가게 UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 가게 좋아요 취소 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 가게 좋아요 취소 성공
+                    example: true
+  /v1/stores/{storeUUID}/review:
+    post:
+      tags:
+        - StoreController
+      summary: 가게 리뷰 작성
+      description: 가게에 리뷰 작성
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 가게 UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: CreateStoreReviewDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStoreReviewDto"
+      responses:
+        '200':
+          description: 가게 리뷰 작성 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 가게 리뷰 작성 성공
+                    example: true
+  /v1/stores/{storeUUID}/reviews/{storeReviewUUID}:
+    patch:
+      tags:
+        - StoreController
+      summary: 가게 리뷰 수정
+      description: 가게에 리뷰 수정
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 가게 UUID
+          required: true
+          schema:
+            type: string
+        - name: storeReviewUUID
+          in: path
+          description: 가게리뷰 UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: UpdateStoreReviewDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStoreReviewDto"
+      responses:
+        '200':
+          description: 가게 리뷰 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 가게 리뷰 수정 성공
+                    example: true
+    delete:
+      tags:
+        - StoreController
+      summary: 가게 리뷰 삭제
+      description: 가게에 리뷰 삭제
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 가게 UUID
+          required: true
+          schema:
+            type: string
+        - name: storeReviewUUID
+          in: path
+          description: 가게리뷰 UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 가게 리뷰 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 가게 리뷰 삭제 성공
+                    example: true
+components:
+  schemas:
+    EmailVerificationDto:
+      type: object
+      required:
+        - email
+        - code
+      properties:
+        email:
+          type: string
+          description: 유저 이메일
+          example: aaa@example.com
+        code:
+          type: string
+          description: 해당 이메일로 전송된 8자리 인증번호
+          example: 8JS4KF2D
+    EmailValidationDto:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          description: 사용하려는 이메일
+          example: aaa@example.com
+    LocalSignInDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          description: 유저 이메일
+          example: aaa@example.com
+        password:
+          type: string
+          description: 유저 비밀번호
+          example: password123
+    NicknameValidationDto:
+      type: object
+      required:
+        - nickname
+      properties:
+        nickname:
+          type: string
+          description: 사용하려는 닉네임
+          example: minwoo123
+    UserDataDto:
+      type: object
+      required:
+        - email
+        - nickname
+        - password
+      properties:
+        email:
+          type: string
+          description: 유저 이메일
+          example: aaa@example.com
+        password:
+          type: string
+          description: 유저 비밀번호
+          example: password123
+        nickname:
+          type: string
+          description: 유저 닉네임
+          example: minwoo123
+    RefreshTokenDto:
+      type: object
+      required:
+        - grant_type
+        - refresh_token
+      properties:
+        grant_type:
+          type: string
+          description: grant_type
+          example: refresh_token
+        refresh_token:
+          type: string
+          description: 재발급에 사용할 refresh token
+          example: asdifj12e3fijaiwjef
+    CreateStoreDto:
+      type: object
+      required:
+        - name
+        - coordinates
+      properties:
+        name:
+          type: string
+          description: 가게 이름
+          example: 행보칸 카페
+        coordinates:
+          type: array
+          description: 가게 좌표
+          example: [123.45, 12.34]
+        representImage:
+          type: string
+          description: 가게 대표 사진 경로
+          example: storeImage.png
+        tags:
+          type: array
+          description: 생성할 태그
+          example: ['맛집', '인스타감성', '야경']
+        startTime:
+          type: string
+          description: 가게 오픈 시간
+          example: "아침 9시"
+        endTime:
+          type: string
+          description: 가게 마감 시간
+          example: "저녁 10시"
+    GetStoreDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: 가게 UUID
+          example: 1210c3f2-4f68-4e85-94a7-81dc3d764393
+        name:
+          type: string
+          description: 가게 이름
+          example: 행보칸 카페
+        coordinates:
+          type: array
+          description: 가게 좌표
+          example: [ 123.45, 12.34 ]
+        representImage:
+          type: string
+          description: 가게 대표 사진 경로
+          example: storeImage.png
+        tags:
+          type: array
+          description: 생성할 태그
+          example: [ '맛집', '인스타감성', '야경' ]
+        startTime:
+          type: string
+          description: 가게 오픈 시간
+          example: "아침 9시"
+        endTime:
+          type: string
+          description: 가게 마감 시간
+          example: "저녁 10시"
+        storeReviews:
+          type: array
+          description: 가게 리뷰들
+          items:
+            properties:
+              uuid:
+                type: string
+                description: 해당 가게 UUID
+                example: 1210c3f2-4f68-4e85-94a7-81dc3d764393
+              user:
+                type: string
+                description: 작성한 유저 UUID
+                example: 1210c3f2-4f68-4e85-94a7-81dc3d764393
+              review:
+                type: string
+                description: 리뷰 내용
+                example: 정말 맛있어요
+        reviewCount:
+          type: number
+          description: 리뷰 개수
+          example: 12
+        likeCount:
+          type: number
+          description: 좋아요 개수
+          example: 13
+        iLike:
+          type: boolean
+          description: 내가 해당 가게에 좋아요 누른 여부
+          example: true
+
+
+    UpdateStoreDto:
+      type: object
+      required:
+        - name
+        - coordinates
+      properties:
+        name:
+          type: string
+          description: 가게 이름
+          example: 행보칸 카페
+        coordinates:
+          type: array
+          description: 가게 좌표
+          example: [ 123.45, 12.34 ]
+        representImage:
+          type: string
+          description: 가게 대표 사진 경로
+          example: storeImage.png
+        tags:
+          type: array
+          description: 생성할 태그
+          example: [ '맛집', '인스타감성', '야경' ]
+        startTime:
+          type: string
+          description: 가게 오픈 시간
+          example: "아침 9시"
+        endTime:
+          type: string
+          description: 가게 마감 시간
+          example: "저녁 10시"
+    CreateStoreReviewDto:
+      type: object
+      required:
+        - review
+      properties:
+        review:
+          type: string
+          description: 리뷰 내용
+          example: 너무 맛있어요
+    UpdateStoreReviewDto:
+      type: object
+      required:
+        - review
+      properties:
+        review:
+          type: string
+          description: 리뷰 내용
+          example: 너무 맛없어요
+

@@ -6,42 +6,11 @@ import EmailVerificationDto from '../types/requestTypes/emailVerification.dto';
 import EmailValidationDto from '../types/requestTypes/emaliValidation.dto';
 import LocalSignInDto from '../types/requestTypes/localSignIn.dto';
 import NicknameValidationDto from '../types/requestTypes/nicknameValidation.dto';
+import RefreshTokenDto from '../types/requestTypes/refreshToken.dto';
 
 const router = express.Router();
 const authService = AuthService.getInstance();
 
-/**
- * @swagger
- * /auth/local/sign-in:
- *   post:
- *     tags:
- *       - AuthController
- *     summary: 로컬 로그인
- *     description: 로컬 로그인
- *     requestBody:
- *       description: LocalSignInDto
- *       content:
- *         application/json:
- *           schema:
- *             $ref: "#/components/schemas/LocalSignInDto"
- *     responses:
- *       '200':
- *         description: 로그인 성공
- *         header:
- *           Set-Cookie:
- *             description: 쿠기 값
- *             schema:
- *               type: string
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: boolean
- *                   description: 로그인 성공
- *                   example: true
- */
 router.post('/auth/local/sign-in', async (req, res, next) => {
 	try {
 		const localSignInDto = new LocalSignInDto(req.body);
@@ -62,34 +31,6 @@ router.post('/auth/local/sign-in', async (req, res, next) => {
 });
 
 //#region 로컬 회원가입
-
-/**
- * @swagger
- * /auth/local/email-validation:
- *   post:
- *     tags:
- *       - AuthController
- *     summary: 이메일 중복체크
- *     description: 이메일 다른 유저가 사용중인지 확인
- *     requestBody:
- *       description: EmailValidationDto
- *       content:
- *         application/json:
- *           schema:
- *             $ref: "#/components/schemas/EmailValidationDto"
- *     responses:
- *       '200':
- *         description: 이메일 사용가능 여부
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: boolean
- *                   description: 사용중이면 true / 사용중이 아니면 false 반환
- *                   example: true
- */
 router.post('/auth/local/email-validation', async (req, res, next) => {
 	try {
 		const emailValidationDto = new EmailValidationDto(req.body);
@@ -106,35 +47,6 @@ router.post('/auth/local/email-validation', async (req, res, next) => {
 	}
 });
 
-/**
- * @swagger
- * /auth/local/nickname-validation:
- *   post:
- *     tags:
- *       - AuthController
- *     summary: 닉네임 중복체크
- *     description: 닉네임 다른 유저가 사용중인지 확인
- *     produces:
- *     - application/json
- *     requestBody:
- *       description: NicknameValidationDto
- *       content:
- *         application/json:
- *           schema:
- *             $ref: "#/components/schemas/NicknameValidationDto"
- *     responses:
- *       '200':
- *         description: 닉네임 사용가능 여부
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: boolean
- *                   description: 사용중이면 true / 사용중이 아니면 false 반환
- *                   example: true
- */
 router.post('/auth/local/nickname-validation', async (req, res, next) => {
 	try {
 		const nicknameValidationDto = new NicknameValidationDto(req.body);
@@ -151,33 +63,6 @@ router.post('/auth/local/nickname-validation', async (req, res, next) => {
 	}
 });
 
-/**
- * @swagger
- * /auth/local/email-code:
- *   post:
- *     tags:
- *       - AuthController
- *     summary: 인증메일 전송
- *     description: 유저정보 redis에 저장, 인증메일 전송
- *     requestBody:
- *       description: UserDataDto
- *       content:
- *         application/json:
- *           schema:
- *             $ref: "#/components/schemas/UserDataDto"
- *     responses:
- *       '200':
- *         description: 인증 메일 전송 여부
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: boolean
- *                   description: 이메일 전송 성공
- *                   example: true
- */
 router.post('/auth/local/email-code', async (req, res, next) => {
 	try {
 		const userIp = req.ip;
@@ -194,33 +79,6 @@ router.post('/auth/local/email-code', async (req, res, next) => {
 	}
 });
 
-/**
- * @swagger
- * /auth/local/email-verification:
- *   post:
- *     tags:
- *       - AuthController
- *     summary: 이메일 인증 및 유저 회원가입
- *     description: redis에 저장된 인증번호와 비교 후 일치 시 유저 회원가입
- *     requestBody:
- *       description: EmailVerificationDto
- *       content:
- *         application/json:
- *           schema:
- *             $ref: "#/components/schemas/EmailVerificationDto"
- *     responses:
- *       '200':
- *         description: 회원가입 성공 즉시 로그인
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: boolean
- *                   description: 회원가입 성공
- *                   example: true
- */
 router.post('/auth/local/email-verification', async (req, res, next) => {
 	try {
 		const userIp = req.ip;
@@ -244,22 +102,59 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 });
 //#endregion
 
+router.post('/auth/refresh-token', async (req, res, next) => {
+	try {
+		// TODO 얘 되는지 확인
+		const refreshTokenDto = new RefreshTokenDto(req.body);
+
+		await validateOrReject(refreshTokenDto);
+
+		const accessToken = authService.reissue(refreshTokenDto.refresh_token);
+
+		res.cookie('accessToken', accessToken).json({ data: true });
+	} catch (e) {
+		next(e);
+	}
+});
+
+router.post('/auth/sign-out', async (req, res, next) => {
+	try {
+		const refreshToken = req.header('refreshToken');
+
+		if (!refreshToken) {
+			throw new Error('no token in header');
+		}
+
+		await authService.signOut(`${refreshToken}`);
+
+		res.json({ data: true });
+	} catch (error) {
+		next(error);
+	}
+});
+
 //#region 카카오 로그인
-router.get('/auth/kakao', async (req, res, next) => {
+router.get('/auth/kakao', (req, res, next) => {
 	res.redirect(
-		`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.KAKAO_CLIENT_ID}&redirect_uri=${process.env.KAKAO_REDIRECT_URT}`
+		`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.KAKAO_CLIENT_ID}&redirect_uri=${process.env.KAKAO_REDIRECT_URI}`
 	);
 });
 
 router.get('/auth/kakao/redirect', async (req, res, next) => {
 	try {
-		const code = req.query.code as string;
+		const { code } = req.query;
 
-		if (!code) {
-			throw new Error('Code not found');
+		if (!code || !(typeof code === 'string')) {
+			throw new Error('code not found');
 		}
 
-		// await authService.kakaoLogin(code);
+		const { accessToken, refreshToken } = await authService.kakaoLogin(code);
+
+		res
+			.cookie('accessToken', accessToken)
+			.cookie('refreshToken', refreshToken)
+			// TODO: 프론트 redirect 코드
+			.redirect('http://localhost:3000');
 	} catch (error) {
 		next(error);
 	}
