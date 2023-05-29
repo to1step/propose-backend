@@ -12,6 +12,12 @@ class UpdateStoreDto {
 	@IsString()
 	name: string;
 
+	@IsString()
+	description: string;
+
+	@IsString()
+	location: string;
+
 	@IsArray()
 	@ArrayMinSize(2)
 	@ArrayMaxSize(2)
@@ -37,6 +43,8 @@ class UpdateStoreDto {
 
 	constructor(obj: UpdateStoreDto) {
 		this.name = obj.name;
+		this.description = obj.description;
+		this.location = obj.location;
 		this.coordinates = obj.coordinates;
 		this.representImage = obj.representImage;
 		this.tags = obj.tags;
@@ -47,6 +55,8 @@ class UpdateStoreDto {
 	toServiceModel(): UpdateStoreForm {
 		return {
 			name: this.name,
+			description: this.description,
+			location: this.location,
 			coordinates: this.coordinates,
 			representImage: this.representImage ?? null,
 			tags: this.tags ?? [],

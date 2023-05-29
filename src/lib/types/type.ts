@@ -86,6 +86,8 @@ type Tokens = {
 type Store = {
 	uuid: string;
 	name: string;
+	description: string;
+	location: string;
 	coordinates: number[];
 	representImage: string | null;
 	tags: string[];
@@ -102,6 +104,8 @@ export type StoreReview = {
 type StoreEntireInfo = {
 	uuid: string;
 	name: string;
+	description: string;
+	location: string;
 	coordinates: number[];
 	representImage: string | null;
 	tags: string[];
@@ -115,6 +119,8 @@ type StoreEntireInfo = {
 
 type CreateStoreForm = {
 	name: string;
+	description: string;
+	location: string;
 	coordinates: number[];
 	representImage: string | null;
 	tags: string[];
@@ -124,6 +130,8 @@ type CreateStoreForm = {
 
 type UpdateStoreForm = {
 	name: string;
+	description: string;
+	location: string;
 	coordinates: number[];
 	representImage: string | null;
 	tags: string[];
