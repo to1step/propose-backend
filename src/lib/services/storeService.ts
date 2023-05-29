@@ -48,7 +48,7 @@ class StoreService {
 		const newUUID = v4();
 
 		await new StoreModel({
-			userUUID: userUUID,
+			user: userUUID,
 			uuid: newUUID,
 			name: name,
 			description: description,
@@ -137,7 +137,7 @@ class StoreService {
 		const store = await StoreModel.findOneAndUpdate(
 			{
 				uuid: storeUUID,
-				userUUID: userUUID,
+				user: userUUID,
 				deletedAt: null,
 			},
 			{

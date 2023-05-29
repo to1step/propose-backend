@@ -2,7 +2,7 @@ import { Model, model, Schema } from 'mongoose';
 
 interface StoreDAO {
 	uuid: string;
-	userUUID: string;
+	user: string;
 	name: string;
 	description: string;
 	coordinates: number[];
@@ -22,7 +22,7 @@ interface StoreDAOModel extends Model<StoreDAO> {
 const storeSchema = new Schema<StoreDAO, StoreDAOModel>(
 	{
 		uuid: { type: String, required: true }, // 가게 식별 uuid
-		userUUID: { type: String, required: true }, // 생성한 유저 uuid
+		user: { type: String, required: true }, // 생성한 유저 uuid
 		description: { type: String, required: true }, // 가게 설명
 		name: { type: String, required: true }, // 가게 이름
 		coordinates: { type: [Number], required: true }, // 가게 좌표
