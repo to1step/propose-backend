@@ -3,8 +3,6 @@ import {
 	CreateStoreForm,
 	CreateStoreReviewForm,
 	StoreEntireInfo,
-	LikeStoreForm,
-	UnlikeStoreForm,
 	UpdateStoreForm,
 	UpdateStoreReviewForm,
 } from '../types/type';
@@ -36,8 +34,16 @@ class StoreService {
 		userUUID: string,
 		createStoreForm: CreateStoreForm
 	): Promise<void> {
-		const { name, coordinates, representImage, tags, startTime, endTime } =
-			createStoreForm;
+		const {
+			name,
+			description,
+			location,
+			coordinates,
+			representImage,
+			tags,
+			startTime,
+			endTime,
+		} = createStoreForm;
 
 		const newUUID = v4();
 
@@ -45,6 +51,8 @@ class StoreService {
 			userUUID: userUUID,
 			uuid: newUUID,
 			name: name,
+			description: description,
+			location: location,
 			coordinates: coordinates,
 			representImage: representImage,
 			tags: tags,
@@ -115,8 +123,16 @@ class StoreService {
 		storeUUID: string,
 		updateStoreForm: UpdateStoreForm
 	): Promise<void> {
-		const { name, coordinates, representImage, tags, startTime, endTime } =
-			updateStoreForm;
+		const {
+			name,
+			description,
+			location,
+			coordinates,
+			representImage,
+			tags,
+			startTime,
+			endTime,
+		} = updateStoreForm;
 
 		const store = await StoreModel.findOneAndUpdate(
 			{
@@ -126,6 +142,8 @@ class StoreService {
 			},
 			{
 				name: name,
+				description: description,
+				location: location,
 				coordinates: coordinates,
 				representImage: representImage,
 				tags: tags,

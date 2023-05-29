@@ -5,6 +5,10 @@ class GetStoreDto {
 
 	name: string;
 
+	description: string;
+
+	location: string;
+
 	coordinates: number[];
 
 	representImage: string | null;
@@ -26,6 +30,8 @@ class GetStoreDto {
 	constructor(obj: GetStoreDto) {
 		this.uuid = obj.uuid;
 		this.name = obj.name;
+		this.description = obj.description;
+		this.location = obj.location;
 		this.coordinates = obj.coordinates;
 		this.representImage = obj.representImage;
 		this.tags = obj.tags;
