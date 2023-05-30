@@ -32,6 +32,10 @@ enum ErrorCode {
 
 	// 코스 관련 에러 코드
 	COURSE_NOT_FOUND = 1400, // 코스 조회시 없는 코스
+	DUPLICATE_COURSE_LIKE_ERROR = 1401, // 좋아요를 눌렀는데 다시 누르는 경우
+	COURSE_LIKE_NOT_FOUND = 1402, // 좋아요를 누른 기록이 없는데 좋아요를 취소하는 경우
+	COURSE_REVIEW_NOT_FOUND = 1403, // 코스 리뷰 조회시 없는 리뷰
+	PRIVATE_COURSE = 1404, // 비공개인 코스를 가져오려 하는 경우
 
 	// api 요청 에러
 	INVALID_QUERY = 1500,
