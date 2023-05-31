@@ -8,6 +8,7 @@ import {
 	IsString,
 	ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { CreateCourseForm } from '../type';
 import { Transportation } from '../../../database/types/enums';
 
@@ -52,8 +53,10 @@ class CreateCourseDto {
 	@IsBoolean()
 	isPrivate: boolean;
 
-	@ValidateNested({ each: true })
+	@IsArray()
 	@IsObject({ each: true })
+	@ValidateNested({ each: true })
+	@Type(() => TransportDto)
 	transport: TransportDto[];
 
 	@IsOptional()
