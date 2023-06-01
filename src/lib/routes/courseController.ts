@@ -19,10 +19,7 @@ router.post('/course', checkHeaderToken, async (req, res, next) => {
 
 		await validateOrReject(createCourseDto);
 
-		await courseService.createCourse(
-			req.userUUID,
-			createCourseDto.toServiceModel()
-		);
+		await courseService.createCourse(req.userUUID, createCourseDto);
 
 		res.json({ data: true });
 	} catch (error) {
@@ -226,18 +223,6 @@ router.delete(
 				courseReviewUUID
 			);
 
-			res.json({ data: true });
-		} catch (error) {
-			next(error);
-		}
-	}
-);
-
-router.delete(
-	'/courses/:courseUUID/reviews/:courseReviewUUID',
-	checkHeaderToken,
-	async (req, res, next) => {
-		try {
 			res.json({ data: true });
 		} catch (error) {
 			next(error);

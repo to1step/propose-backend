@@ -1,14 +1,11 @@
-// eslint-disable-next-line max-classes-per-file
 import {
 	IsArray,
 	IsBoolean,
 	IsEnum,
-	IsObject,
 	IsOptional,
 	IsString,
 	ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { CreateCourseForm } from '../type';
 import { Transportation } from '../../../database/types/enums';
 
@@ -53,10 +50,7 @@ class CreateCourseDto {
 	@IsBoolean()
 	isPrivate: boolean;
 
-	@IsArray()
-	@IsObject({ each: true })
 	@ValidateNested({ each: true })
-	@Type(() => TransportDto)
 	transport: TransportDto[];
 
 	@IsOptional()
@@ -70,7 +64,7 @@ class CreateCourseDto {
 		this.shortComment = obj.shortComment;
 		this.longComment = obj.longComment;
 		this.isPrivate = obj.isPrivate;
-		this.transport = obj.transport;
+		this.transport = obj.transport.map((t) => new TransportDto(t));
 		this.tags = obj.tags;
 	}
 

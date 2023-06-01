@@ -53,6 +53,7 @@ class CourseService {
 				deletedAt: null,
 			});
 
+			// 하나라도 if문 걸리면 promise.all 종료
 			if (!isExist) {
 				throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
 					{ data: 'Course not found' },
@@ -314,7 +315,7 @@ class CourseService {
 		await new CourseReviewModel({
 			uuid: newUUID,
 			user: userUUID,
-			course: course,
+			course: courseUUID,
 			review: review,
 		}).save();
 	}
