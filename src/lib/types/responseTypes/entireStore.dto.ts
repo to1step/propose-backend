@@ -1,9 +1,12 @@
 import { StoreReview } from '../type';
+import { StoreCategory } from '../../../database/types/enums';
 
-class GetStoreDto {
+class EntireStoreDto {
 	uuid: string;
 
 	name: string;
+
+	category: StoreCategory;
 
 	description: string;
 
@@ -27,9 +30,10 @@ class GetStoreDto {
 
 	iLike: boolean;
 
-	constructor(obj: GetStoreDto) {
+	constructor(obj: EntireStoreDto) {
 		this.uuid = obj.uuid;
 		this.name = obj.name;
+		this.category = obj.category;
 		this.description = obj.description;
 		this.location = obj.location;
 		this.coordinates = obj.coordinates;
@@ -44,4 +48,4 @@ class GetStoreDto {
 	}
 }
 
-export default GetStoreDto;
+export default EntireStoreDto;

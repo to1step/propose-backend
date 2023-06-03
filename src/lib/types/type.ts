@@ -1,3 +1,5 @@
+import { StoreCategory, Transportation } from '../../database/types/enums';
+
 /**
  * 서비스 단에서 사용되는 파일 타입들 정의
  */
@@ -86,6 +88,7 @@ type Tokens = {
 type Store = {
 	uuid: string;
 	name: string;
+	category: StoreCategory;
 	description: string;
 	location: string;
 	coordinates: number[];
@@ -104,6 +107,7 @@ export type StoreReview = {
 type StoreEntireInfo = {
 	uuid: string;
 	name: string;
+	category: StoreCategory;
 	description: string;
 	location: string;
 	coordinates: number[];
@@ -119,6 +123,7 @@ type StoreEntireInfo = {
 
 type CreateStoreForm = {
 	name: string;
+	category: StoreCategory;
 	description: string;
 	location: string;
 	coordinates: number[];
@@ -130,6 +135,7 @@ type CreateStoreForm = {
 
 type UpdateStoreForm = {
 	name: string;
+	category: StoreCategory;
 	description: string;
 	location: string;
 	coordinates: number[];
@@ -139,19 +145,88 @@ type UpdateStoreForm = {
 	endTime: string | null;
 };
 
-type LikeStoreForm = {
-	storeUUID: string;
-};
-
-type UnlikeStoreForm = {
-	storeUUID: string;
-};
-
 type CreateStoreReviewForm = {
 	review: string;
 };
 
 type UpdateStoreReviewForm = {
+	review: string;
+};
+
+// course
+type Course = {
+	uuid: string;
+	user: string;
+	name: string;
+	stores: string[];
+	shortComment: string;
+	longComment: string | null;
+	isPrivate: boolean;
+	transports: Transport[];
+	tags: string[];
+};
+
+type CourseEntireInfo = {
+	uuid: string;
+	user: string;
+	name: string;
+	stores: string[];
+	shortComment: string;
+	longComment: string | null;
+	isPrivate: boolean;
+	transports: Transport[];
+	tags: string[];
+	courseReviews: CourseReview[];
+	reviewCount: number;
+	likeCount: number;
+	iLike: boolean;
+};
+
+type Transport = {
+	startStore: string;
+	endStore: string;
+	comment: string | null;
+	transportation: Transportation | null;
+};
+
+type CreateTransportForm = {
+	startStore: string;
+	endStore: string;
+	comment: string | null;
+	transportation: Transportation | null;
+};
+
+type CreateCourseForm = {
+	name: string;
+	stores: string[];
+	shortComment: string;
+	longComment: string | null;
+	isPrivate: boolean;
+	transports: Transport[];
+	tags: string[];
+};
+
+type UpdateCourseForm = {
+	name: string;
+	stores: string[];
+	shortComment: string;
+	longComment: string | null;
+	isPrivate: boolean;
+	transports: Transport[];
+	tags: string[];
+};
+
+type CourseReview = {
+	uuid: string;
+	user: string;
+	review: string;
+};
+
+type CreateCourseReviewForm = {
+	review: string;
+};
+
+type UpdateCourseReviewForm = {
 	review: string;
 };
 
@@ -172,8 +247,15 @@ export type {
 	StoreEntireInfo,
 	CreateStoreForm,
 	UpdateStoreForm,
-	LikeStoreForm,
-	UnlikeStoreForm,
 	CreateStoreReviewForm,
 	UpdateStoreReviewForm,
+	Course,
+	CourseEntireInfo,
+	Transport,
+	CreateTransportForm,
+	CreateCourseForm,
+	UpdateCourseForm,
+	CourseReview,
+	CreateCourseReviewForm,
+	UpdateCourseReviewForm,
 };

@@ -4,24 +4,27 @@ import { Transportation } from '../types/enums';
 interface TransportDAO {
 	startStore: string;
 	endStore: string;
-	comment: string;
-	transportation: Transportation;
+	comment: string | null;
+	transportation: Transportation | null;
 }
 
 interface CourseDAO {
 	uuid: string;
-	name: string;
-	shortComment: string;
-	longComment?: string;
-	private: boolean;
-	storesUUID: string[];
-	transport: TransportDAO[];
-	tags: string[];
 	user: string;
+	name: string;
+	stores: string[];
+	shortComment: string;
+	longComment: string | null;
+	isPrivate: boolean;
+	transports: TransportDAO[];
+	tags: string[];
+	deletedAt: Date | null;
 }
 
 type TransportDAOModel = Model<TransportDAO>;
-type CourseDAOModel = Model<CourseDAO>;
+interface CourseDAOModel extends Model<CourseDAO> {
+	findCourseByUUID(courseUUID: string): Promise<CourseDAO | null>;
+}
 
 const transportSchema = new Schema<TransportDAO, TransportDAOModel>(
 	{
@@ -36,20 +39,28 @@ const transportSchema = new Schema<TransportDAO, TransportDAOModel>(
 const courseSchema = new Schema<CourseDAO, CourseDAOModel>(
 	{
 		uuid: { type: String, required: true }, // 코스 식별 uuid
+		user: { type: String, required: true }, // 코스를 만든 유저 식별 uuid
+		stores: { type: [String], required: true }, // 코스에 들어가는 가게들
 		name: { type: String, required: true }, // 코스 이름
 		shortComment: { type: String, required: true }, // 코스에 대한 짧은 소개
 		longComment: { type: String }, // 코스에 대한 긴 설명
-		private: { type: Boolean, required: true }, // 공개 여부
-		transport: { type: [transportSchema], required: true }, // 이동 수단
-		storesUUID: { type: [String], required: true }, // 코스에 들어가는 가게들
-		tags: { type: [String], required: true }, // 태그
-		user: { type: String, required: true }, // 코스를 만든 유저 식별 uuid
+		isPrivate: { type: Boolean, required: true }, // 공개 여부
+		transports: { type: [transportSchema], required: true }, // 이동 수단
+		tags: { type: [String] }, // 태그
+		deletedAt: { type: Date, default: null },
 	},
 	{
 		timestamps: true,
 	}
 );
 
+courseSchema.static(
+	'findCourseByUUID',
+	async function findCourseByUUID(courseUUID: string) {
+		return this.findOne({ uuid: courseUUID, deletedAt: null });
+	}
+);
+
 const CourseModel = model<CourseDAO, CourseDAOModel>('Course', courseSchema);
 
-export { CourseModel };
+export { CourseModel, CourseDAO };

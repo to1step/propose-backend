@@ -10,10 +10,10 @@ tags:
     description: 인증 관련 api
   - name: UserController
     description: 유저 관련 api
-  - name: CourseController
-    description: 코스 관련 api
   - name: StoreController
     description: 가게 관련 api
+  - name: CourseController
+    description: 코스 관련 api
 paths:
   /v1/auth/local/sign-in:
     post:
@@ -234,7 +234,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetStoreDto"
+                $ref: "#/components/schemas/EntireStoreDto"
     patch:
       tags:
         - StoreController
@@ -457,6 +457,278 @@ paths:
                     type: boolean
                     description: 가게 리뷰 삭제 성공
                     example: true
+  /v1/course/:
+    post:
+      tags:
+        - CourseController
+      summary: 코스 생성
+      description: 새로운 코스를 생성하기
+      parameters:
+        - name: accessToken
+          in: header
+      requestBody:
+        description: CreateCourseDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseDto"
+      responses:
+        '200':
+          description: 코스 생성 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 코스 생성 성공
+                    example: true
+  /v1/courses/{courseUUID}:
+    get:
+      tags:
+        - CourseController
+      summary: 특정 코스 정보 가져오기
+      description: 코스 정보 가져오기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: courseUUID
+          in: path
+          description: 코스 UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 코스 정보
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntireCourseDto"
+    patch:
+      tags:
+        - CourseController
+      summary: 코스 정보 수정
+      description: 코스 정보 수정하기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 코스 UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: UpdateCourseDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCourseDto"
+      responses:
+        '200':
+          description: 코스 정보 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 코스 정보 수정 성공
+                    example: true
+    delete:
+      tags:
+        - CourseController
+      summary: 코스 삭제하기
+      description: 내가 생성한 코스를 삭제하기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: courseUUID
+          in: path
+          description: 코스 UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 코스 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 코스 삭제 성공
+                    example: true
+  /v1/courses/{courseUUID}/like:
+    post:
+      tags:
+        - CourseController
+      summary: 코스 좋아요
+      description: 특정 코스 좋아요 하기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 코스 UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 코스 좋아요 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 코스 좋아요 성공
+                    example: true
+    delete:
+      tags:
+        - CourseController
+      summary: 코스 좋아요 취소
+      description: 특정 코스 좋아요 취소 하기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: courseUUID
+          in: path
+          description: 코스 UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 코스 좋아요 취소 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 코스 좋아요 취소 성공
+                    example: true
+  /v1/courses/{courseUUID}/review:
+    post:
+      tags:
+        - CourseController
+      summary: 코스 리뷰 작성
+      description: 코스에 리뷰 작성
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: courseUUID
+          in: path
+          description: 코스 UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: CreateCourseReviewDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseReviewDto"
+      responses:
+        '200':
+          description: 코스 리뷰 작성 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 코스 리뷰 작성 성공
+                    example: true
+  /v1/courses/{courseUUID}/reviews/{courseReviewUUID}:
+    patch:
+      tags:
+        - CourseController
+      summary: 코스 리뷰 수정
+      description: 코스에 대한 리뷰 수정
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: courseUUID
+          in: path
+          description: 코스 UUID
+          required: true
+          schema:
+            type: string
+        - name: courseReviewUUID
+          in: path
+          description: 코스 리뷰 UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: UpdateCourseReviewDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCourseReviewDto"
+      responses:
+        '200':
+          description: 코스 리뷰 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 코스 리뷰 수정 성공
+                    example: true
+    delete:
+      tags:
+        - CourseController
+      summary: 코스 리뷰 삭제
+      description: 코스에 대한 리뷰 삭제
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: courseUUID
+          in: path
+          description: 코스 UUID
+          required: true
+          schema:
+            type: string
+        - name: courseReviewUUID
+          in: path
+          description: 코스 리뷰 UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 코스 리뷰 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 코스 리뷰 삭제 성공
+                    example: true
 components:
   schemas:
     EmailVerificationDto:
@@ -542,12 +814,19 @@ components:
       type: object
       required:
         - name
+        - category
+        - description
+        - location
         - coordinates
       properties:
         name:
           type: string
           description: 가게 이름
           example: 행보칸 카페
+        category:
+          type: number
+          description: 가게 카테고리 0 카페 / 1 식당 / 2 공원
+          example: 0
         description:
           type: string
           description: 가게에 대한 설명
@@ -576,7 +855,7 @@ components:
           type: string
           description: 가게 마감 시간
           example: "저녁 10시"
-    GetStoreDto:
+    EntireStoreDto:
       type: object
       properties:
         uuid:
@@ -587,6 +866,10 @@ components:
           type: string
           description: 가게 이름
           example: 행보칸 카페
+        category:
+          type: number
+          description: 가게 카테고리 0 카페 / 1 식당 / 2 공원
+          example: 0
         description:
           type: string
           description: 가게에 대한 설명
@@ -648,12 +931,19 @@ components:
       type: object
       required:
         - name
+        - category
+        - description
+        - location
         - coordinates
       properties:
         name:
           type: string
           description: 가게 이름
           example: 행보칸 카페
+        category:
+          type: number
+          description: 가게 카테고리 0 카페 / 1 식당 / 2 공원
+          example: 0
         description:
           type: string
           description: 가게에 대한 설명
@@ -700,4 +990,213 @@ components:
           type: string
           description: 리뷰 내용
           example: 너무 맛없어요
+    CreateCourseDto:
+      type: object
+      required:
+        - name
+        - stores
+        - shortComment
+        - isPrivate
+        - transport
+      properties:
+        name:
+          type: string
+          description: 코스 이름
+          example: 개 쩌는 코스
+        stores:
+          type: array
+          description: 경유 가게들 uuid 순서대로
+          example: ["9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46"]
+        shortComment:
+          type: string
+          description: 코스에 대한 짧은 설명
+          example: 정말 멋진 코스에요!
+        longComment:
+          type: string
+          description: 코스에 대한 긴 설명
+          example: 정말 멋진 코스에요!
+        isPrivate:
+          type: boolean
+          description: 코스 공개 여부
+          example: true
+        transport:
+          type: array
+          description: 경유 가게들마다의 이동 수단. 경유 가게 순서대로 작성
+          required:
+            - startStore
+            - endStore
+          items:
+            type: object
+            properties:
+              startStore:
+                type: string
+                description: 경유 가게 uuid
+                example: 9ddfe694-d960-4492-98a0-eb24ed98dd46
+              endStore:
+                type: string
+                description: 경유 가게 uuid
+                example: 9ddfe694-d960-4492-98a0-eb24ed98dd46
+              comment:
+                type: string
+                description: 가게 사이의 이동 수단에 대한 짧은 설명
+                example: 그냥 걸어가세요
+              transportation:
+                type: number
+                description: 이동 수단 0,1,2 값 중 하나 0 = 버스 / 1 = 지하철 / 2 = 도보 / 3 = 기타
+        tags:
+          type: array
+          description: 코스에 대한 태그 배열
+          example: [ '맛집', '인스타감성', '야경' ]
+    EntireCourseDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 코스 이름
+          example: 개 쩌는 코스
+        stores:
+          type: array
+          description: 경유 가게들 uuid 순서대로
+          example: [ "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46"]
+        shortComment:
+          type: string
+          description: 코스에 대한 짧은 설명
+          example: 정말 멋진 코스에요!
+        longComment:
+          type: string
+          description: 코스에 대한 긴 설명
+          example: 정말 멋진 코스에요!
+        isPrivate:
+          type: boolean
+          description: 코스 공개 여부
+          example: true
+        transport:
+          type: array
+          description: 경유 가게들마다의 이동 수단. 경유 가게 순서대로 작성
+          items:
+            type: object
+            properties:
+              startStore:
+                type: string
+                description: 경유 가게 uuid
+                example: 9ddfe694-d960-4492-98a0-eb24ed98dd46
+              endStore:
+                type: string
+                description: 경유 가게 uuid
+                example: 9ddfe694-d960-4492-98a0-eb24ed98dd46
+              comment:
+                type: string
+                description: 가게 사이의 이동 수단에 대한 짧은 설명
+                example: 그냥 걸어가세요
+              transportation:
+                type: number
+                description: 이동 수단 0,1,2 값 중 하나 0 = 버스 / 1 = 지하철 / 2 = 도보 / 3 = 기타
+        tags:
+          type: array
+          description: 코스에 대한 태그 배열
+          example: [ '맛집', '인스타감성', '야경' ]
+        courseReviews:
+          type: array
+          description: 코스 리뷰들
+          items:
+            properties:
+              uuid:
+                type: string
+                description: 리뷰 UUID
+                example: 1210c3f2-4f68-4e85-94a7-81dc3d764393
+              user:
+                type: string
+                description: 작성한 유저 UUID
+                example: 1210c3f2-4f68-4e85-94a7-81dc3d764393
+              review:
+                type: string
+                description: 리뷰 내용
+                example: 정말 쩌네요
+        reviewCount:
+          type: number
+          description: 리뷰 개수
+          example: 12
+        likeCount:
+          type: number
+          description: 좋아요 개수
+          example: 13
+        iLike:
+          type: boolean
+          description: 내가 해당 코스에 좋아요 누른 여부
+          example: true
+    UpdateCourseDto:
+      type: object
+      required:
+        - name
+        - stores
+        - shortComment
+        - isPriavte
+        - transport
+      properties:
+        name:
+          type: string
+          description: 코스 이름
+          example: 개 쩌는 코스
+        stores:
+          type: array
+          description: 경유 가게들 uuid 순서대로
+          example: [ "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46" ]
+        shortComment:
+          type: string
+          description: 코스에 대한 짧은 설명
+          example: 정말 멋진 코스에요!
+        longComment:
+          type: string
+          description: 코스에 대한 긴 설명
+          example: 정말 멋진 코스에요!
+        isPrivate:
+          type: boolean
+          description: 코스 공개 여부
+          example: true
+        transport:
+          type: array
+          description: 경유 가게들마다의 이동 수단. 경유 가게 순서대로 작성
+          items:
+            type: object
+            required:
+              - startStore
+              - endStore
+            properties:
+              startStore:
+                type: string
+                description: 경유 가게 uuid
+                example: 9ddfe694-d960-4492-98a0-eb24ed98dd46
+              endStore:
+                type: string
+                description: 경유 가게 uuid
+                example: 9ddfe694-d960-4492-98a0-eb24ed98dd46
+              comment:
+                type: string
+                description: 가게 사이의 이동 수단에 대한 짧은 설명
+                example: 그냥 걸어가세요
+              transportation:
+                type: number
+                description: 이동 수단 0,1,2 값 중 하나 0 = 버스 / 1 = 지하철 / 2 = 도보 / 3 = 기타
+        tags:
+          type: array
+          description: 코스에 대한 태그 배열
+          example: [ '맛집', '인스타감성', '야경' ]
+    CreateCourseReviewDto:
+      type: object
+      required:
+        - review
+      properties:
+        review:
+          type: string
+          description: 리뷰 내용
+          example: 코스 개쩌네요
+    UpdateCourseReviewDto:
+      type: object
+      required:
+        - review
+      properties:
+        review:
+          type: string
+          description: 리뷰 내용
+          example: 코스 별로네요. 내가 더 잘만들듯?
 

@@ -47,7 +47,7 @@ const errorHandler = (
 	} else if (err instanceof NotFoundError) {
 		res.status(err.code).send({ message: 'NOT_FOUND' });
 	} else {
-		logger.error(err);
+		logger.error(JSON.stringify(err));
 		res.status(500).send({ message: 'INTERNAL_SERVER_ERROR' });
 	}
 };
