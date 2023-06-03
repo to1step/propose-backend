@@ -11,6 +11,23 @@ import WinstonLogger from '../../../utilies/logger';
 
 const logger = WinstonLogger.getInstance();
 
+const validationErrorMessages = (err: ValidationError[]): string[] => {
+	const messages: string[] = [];
+
+	// eslint-disable-next-line no-restricted-syntax
+	for (const e of err) {
+		if (e.constraints) {
+			messages.push(...Object.values(e.constraints));
+		}
+
+		if (e.children) {
+			messages.push(...validationErrorMessages(e.children));
+		}
+	}
+
+	return messages;
+};
+
 const errorHandler = (
 	err: any,
 	req: Request,
@@ -19,10 +36,7 @@ const errorHandler = (
 ): void => {
 	// validationError를 위한 코드
 	if (Array.isArray(err) && err.every((e) => e instanceof ValidationError)) {
-		const errorMessages = err.map((e: ValidationError) => {
-			const { constraints } = e;
-			return Object.values(constraints!).join(', ');
-		});
+		const errorMessages = validationErrorMessages(err);
 		res.status(400).send({
 			message: 'VALIDATION_ERROR',
 			code: 400,
