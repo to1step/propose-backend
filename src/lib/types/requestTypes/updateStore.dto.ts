@@ -2,11 +2,13 @@ import {
 	ArrayMaxSize,
 	ArrayMinSize,
 	IsArray,
+	IsEnum,
 	IsNumber,
 	IsOptional,
 	IsString,
 } from 'class-validator';
 import { UpdateStoreForm } from '../type';
+import { StoreCategory } from '../../../database/types/enums';
 
 class UpdateStoreDto {
 	@IsString()
@@ -14,6 +16,9 @@ class UpdateStoreDto {
 
 	@IsString()
 	description: string;
+
+	@IsEnum(StoreCategory)
+	category: StoreCategory;
 
 	@IsString()
 	location: string;
@@ -31,7 +36,7 @@ class UpdateStoreDto {
 	@IsOptional()
 	@IsArray()
 	@IsString({ each: true })
-	tags: string[];
+	tags: string[] | null;
 
 	@IsOptional()
 	@IsString()
@@ -44,6 +49,7 @@ class UpdateStoreDto {
 	constructor(obj: UpdateStoreDto) {
 		this.name = obj.name;
 		this.description = obj.description;
+		this.category = obj.category;
 		this.location = obj.location;
 		this.coordinates = obj.coordinates;
 		this.representImage = obj.representImage;
@@ -55,6 +61,7 @@ class UpdateStoreDto {
 	toServiceModel(): UpdateStoreForm {
 		return {
 			name: this.name,
+			category: this.category,
 			description: this.description,
 			location: this.location,
 			coordinates: this.coordinates,

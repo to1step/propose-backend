@@ -1,5 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { Transportation } from '../../database/types/enums';
+import { StoreCategory, Transportation } from '../../database/types/enums';
 
 /**
  * 서비스 단에서 사용되는 파일 타입들 정의
@@ -89,6 +88,7 @@ type Tokens = {
 type Store = {
 	uuid: string;
 	name: string;
+	category: StoreCategory;
 	description: string;
 	location: string;
 	coordinates: number[];
@@ -107,6 +107,7 @@ export type StoreReview = {
 type StoreEntireInfo = {
 	uuid: string;
 	name: string;
+	category: StoreCategory;
 	description: string;
 	location: string;
 	coordinates: number[];
@@ -122,6 +123,7 @@ type StoreEntireInfo = {
 
 type CreateStoreForm = {
 	name: string;
+	category: StoreCategory;
 	description: string;
 	location: string;
 	coordinates: number[];
@@ -133,6 +135,7 @@ type CreateStoreForm = {
 
 type UpdateStoreForm = {
 	name: string;
+	category: StoreCategory;
 	description: string;
 	location: string;
 	coordinates: number[];

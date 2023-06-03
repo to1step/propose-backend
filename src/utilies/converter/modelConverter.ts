@@ -27,6 +27,7 @@ class ModelConverter {
 		return {
 			uuid: store.uuid,
 			name: store.name,
+			category: store.category,
 			description: store.description,
 			location: store.location,
 			coordinates: store.coordinates,

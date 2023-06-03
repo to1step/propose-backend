@@ -3,7 +3,7 @@ import { validateOrReject } from 'class-validator';
 import StoreService from '../services/storeService';
 import checkHeaderToken from '../middlewares/checkHeaderToken';
 import CreateStoreDto from '../types/requestTypes/createStore.dto';
-import GetStoreDto from '../types/responseTypes/getStore.dto';
+import EntireStoreDto from '../types/responseTypes/entireStore.dto';
 import UpdateStoreDto from '../types/requestTypes/updateStore.dto';
 import CreateStoreReviewDto from '../types/requestTypes/createStoreReview.dto';
 import UpdateStoreReviewDto from '../types/requestTypes/updateStoreReview.dto';
@@ -42,7 +42,7 @@ router.get('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 
 		const storeData = await storeService.getStore(req.userUUID, storeUUID);
 
-		const store = new GetStoreDto(storeData);
+		const store = new EntireStoreDto(storeData);
 
 		res.json({ data: store });
 	} catch (error) {
