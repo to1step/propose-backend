@@ -3,8 +3,9 @@
  */
 enum Transportation {
 	BUS = 0,
-	WALK = 1,
-	SUBWAY = 2,
+	SUBWAY = 1,
+	WALK = 2,
+	ELSE = 3,
 }
 
 export { Transportation };
