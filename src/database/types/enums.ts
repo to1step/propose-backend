@@ -8,4 +8,10 @@ enum Transportation {
 	ELSE = 3,
 }
 
-export { Transportation };
+enum StoreCategory {
+	CAFE = 0,
+	RESTAURANT = 1,
+	PARK = 2,
+}
+
+export { Transportation, StoreCategory };

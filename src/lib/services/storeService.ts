@@ -36,6 +36,7 @@ class StoreService {
 	): Promise<void> {
 		const {
 			name,
+			category,
 			description,
 			location,
 			coordinates,
@@ -51,6 +52,7 @@ class StoreService {
 			user: userUUID,
 			uuid: newUUID,
 			name: name,
+			category: category,
 			description: description,
 			location: location,
 			coordinates: coordinates,
@@ -125,6 +127,7 @@ class StoreService {
 	): Promise<void> {
 		const {
 			name,
+			category,
 			description,
 			location,
 			coordinates,
@@ -142,6 +145,7 @@ class StoreService {
 			},
 			{
 				name: name,
+				category: category,
 				description: description,
 				location: location,
 				coordinates: coordinates,
