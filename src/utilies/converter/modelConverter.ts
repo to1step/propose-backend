@@ -54,7 +54,7 @@ class ModelConverter {
 			shortComment: course.shortComment,
 			longComment: course.longComment,
 			isPrivate: course.isPrivate,
-			transport: course.transport,
+			transports: course.transports,
 			tags: course.tags,
 		};
 	}

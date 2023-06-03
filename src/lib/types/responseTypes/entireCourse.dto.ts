@@ -1,6 +1,6 @@
 import { CourseReview, Transport } from '../type';
 
-class GetCourseDto {
+class EntireCourseDto {
 	uuid: string;
 
 	name: string;
@@ -13,7 +13,7 @@ class GetCourseDto {
 
 	isPrivate: boolean;
 
-	transport: Transport[];
+	transports: Transport[];
 
 	tags: string[];
 
@@ -25,14 +25,14 @@ class GetCourseDto {
 
 	iLike: boolean;
 
-	constructor(obj: GetCourseDto) {
+	constructor(obj: EntireCourseDto) {
 		this.uuid = obj.uuid;
 		this.name = obj.name;
 		this.stores = obj.stores;
 		this.shortComment = obj.shortComment;
 		this.longComment = obj.longComment;
 		this.isPrivate = obj.isPrivate;
-		this.transport = obj.transport;
+		this.transports = obj.transports;
 		this.tags = obj.tags;
 		this.courseReviews = obj.courseReviews;
 		this.reviewCount = obj.reviewCount;
@@ -41,4 +41,4 @@ class GetCourseDto {
 	}
 }
 
-export default GetCourseDto;
+export default EntireCourseDto;

@@ -1,14 +1,12 @@
-// eslint-disable-next-line max-classes-per-file
 import {
 	IsArray,
 	IsBoolean,
 	IsEnum,
-	IsObject,
 	IsOptional,
 	IsString,
 	ValidateNested,
 } from 'class-validator';
-import { UpdateCourseForm } from '../type';
+import { CreateTransportForm, UpdateCourseForm } from '../type';
 import { Transportation } from '../../../database/types/enums';
 
 class TransportDto {
@@ -32,6 +30,15 @@ class TransportDto {
 		this.comment = obj.comment ?? null;
 		this.transportation = obj.transportation ?? null;
 	}
+
+	toServiceModel(): CreateTransportForm {
+		return {
+			startStore: this.startStore,
+			endStore: this.endStore,
+			comment: this.comment ?? null,
+			transportation: this.transportation ?? null,
+		};
+	}
 }
 
 class UpdateCourseDto {
@@ -47,19 +54,18 @@ class UpdateCourseDto {
 
 	@IsOptional()
 	@IsString()
-	longComment: string;
+	longComment: string | null;
 
 	@IsBoolean()
 	isPrivate: boolean;
 
 	@ValidateNested({ each: true })
-	@IsObject({ each: true })
-	transport: TransportDto[];
+	transports: TransportDto[];
 
 	@IsOptional()
 	@IsArray()
 	@IsString({ each: true })
-	tags: string[];
+	tags: string[] | null;
 
 	constructor(obj: UpdateCourseDto) {
 		this.name = obj.name;
@@ -67,7 +73,9 @@ class UpdateCourseDto {
 		this.shortComment = obj.shortComment;
 		this.longComment = obj.longComment;
 		this.isPrivate = obj.isPrivate;
-		this.transport = obj.transport;
+		this.transports = obj.transports.map(
+			(transport) => new TransportDto(transport)
+		);
 		this.tags = obj.tags;
 	}
 
@@ -78,7 +86,9 @@ class UpdateCourseDto {
 			shortComment: this.shortComment,
 			longComment: this.longComment ?? null,
 			isPrivate: this.isPrivate,
-			transport: this.transport,
+			transports: this.transports.map((transport) => {
+				return transport.toServiceModel();
+			}),
 			tags: this.tags ?? [],
 		};
 	}

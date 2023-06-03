@@ -8,7 +8,7 @@ import { BadRequestError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
 import UpdateCourseReviewDto from '../types/requestTypes/updateCourseReview.dto';
 import CreateCourseReviewDto from '../types/requestTypes/createCourseReview.dto';
-import GetCourseDto from '../types/responseTypes/getCourse.dto';
+import EntireCourseDto from '../types/responseTypes/entireCourse.dto';
 
 const router = express.Router();
 const courseService = CourseService.getInstance();
@@ -19,7 +19,10 @@ router.post('/course', checkHeaderToken, async (req, res, next) => {
 
 		await validateOrReject(createCourseDto);
 
-		await courseService.createCourse(req.userUUID, createCourseDto);
+		await courseService.createCourse(
+			req.userUUID,
+			createCourseDto.toServiceModel()
+		);
 
 		res.json({ data: true });
 	} catch (error) {
@@ -39,7 +42,7 @@ router.get('/courses/:courseUUID', checkHeaderToken, async (req, res, next) => {
 
 		const courseData = await courseService.getCourse(req.userUUID, courseUUID);
 
-		const course = new GetCourseDto(courseData);
+		const course = new EntireCourseDto(courseData);
 
 		res.json({ data: course });
 	} catch (error) {

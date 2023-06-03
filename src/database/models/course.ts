@@ -16,7 +16,7 @@ interface CourseDAO {
 	shortComment: string;
 	longComment: string | null;
 	isPrivate: boolean;
-	transport: TransportDAO[];
+	transports: TransportDAO[];
 	tags: string[];
 	deletedAt: Date | null;
 }
@@ -45,7 +45,7 @@ const courseSchema = new Schema<CourseDAO, CourseDAOModel>(
 		shortComment: { type: String, required: true }, // 코스에 대한 짧은 소개
 		longComment: { type: String }, // 코스에 대한 긴 설명
 		isPrivate: { type: Boolean, required: true }, // 공개 여부
-		transport: { type: [transportSchema], required: true }, // 이동 수단
+		transports: { type: [transportSchema], required: true }, // 이동 수단
 		tags: { type: [String] }, // 태그
 		deletedAt: { type: Date, default: null },
 	},

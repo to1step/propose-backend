@@ -1,3 +1,4 @@
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { Transportation } from '../../database/types/enums';
 
 /**
@@ -158,7 +159,7 @@ type Course = {
 	shortComment: string;
 	longComment: string | null;
 	isPrivate: boolean;
-	transport: Transport[];
+	transports: Transport[];
 	tags: string[];
 };
 
@@ -170,7 +171,7 @@ type CourseEntireInfo = {
 	shortComment: string;
 	longComment: string | null;
 	isPrivate: boolean;
-	transport: Transport[];
+	transports: Transport[];
 	tags: string[];
 	courseReviews: CourseReview[];
 	reviewCount: number;
@@ -185,13 +186,20 @@ type Transport = {
 	transportation: Transportation | null;
 };
 
+type CreateTransportForm = {
+	startStore: string;
+	endStore: string;
+	comment: string | null;
+	transportation: Transportation | null;
+};
+
 type CreateCourseForm = {
 	name: string;
 	stores: string[];
 	shortComment: string;
 	longComment: string | null;
 	isPrivate: boolean;
-	transport: Transport[];
+	transports: Transport[];
 	tags: string[];
 };
 
@@ -201,7 +209,7 @@ type UpdateCourseForm = {
 	shortComment: string;
 	longComment: string | null;
 	isPrivate: boolean;
-	transport: Transport[];
+	transports: Transport[];
 	tags: string[];
 };
 
@@ -241,6 +249,7 @@ export type {
 	Course,
 	CourseEntireInfo,
 	Transport,
+	CreateTransportForm,
 	CreateCourseForm,
 	UpdateCourseForm,
 	CourseReview,

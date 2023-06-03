@@ -2,11 +2,12 @@ import {
 	IsArray,
 	IsBoolean,
 	IsEnum,
+	IsObject,
 	IsOptional,
 	IsString,
 	ValidateNested,
 } from 'class-validator';
-import { CreateCourseForm } from '../type';
+import { CreateCourseForm, CreateTransportForm } from '../type';
 import { Transportation } from '../../../database/types/enums';
 
 class TransportDto {
@@ -30,6 +31,15 @@ class TransportDto {
 		this.comment = obj.comment ?? null;
 		this.transportation = obj.transportation ?? null;
 	}
+
+	toServiceModel(): CreateTransportForm {
+		return {
+			startStore: this.startStore,
+			endStore: this.endStore,
+			comment: this.comment ?? null,
+			transportation: this.transportation ?? null,
+		};
+	}
 }
 
 class CreateCourseDto {
@@ -45,18 +55,18 @@ class CreateCourseDto {
 
 	@IsOptional()
 	@IsString()
-	longComment: string;
+	longComment: string | null;
 
 	@IsBoolean()
 	isPrivate: boolean;
 
 	@ValidateNested({ each: true })
-	transport: TransportDto[];
+	transports: TransportDto[];
 
 	@IsOptional()
 	@IsArray()
 	@IsString({ each: true })
-	tags: string[];
+	tags: string[] | null;
 
 	constructor(obj: CreateCourseDto) {
 		this.name = obj.name;
@@ -64,7 +74,9 @@ class CreateCourseDto {
 		this.shortComment = obj.shortComment;
 		this.longComment = obj.longComment;
 		this.isPrivate = obj.isPrivate;
-		this.transport = obj.transport.map((t) => new TransportDto(t));
+		this.transports = obj.transports.map(
+			(transport) => new TransportDto(transport)
+		);
 		this.tags = obj.tags;
 	}
 
@@ -75,7 +87,9 @@ class CreateCourseDto {
 			shortComment: this.shortComment,
 			longComment: this.longComment ?? null,
 			isPrivate: this.isPrivate,
-			transport: this.transport,
+			transports: this.transports.map((transport) => {
+				return transport.toServiceModel();
+			}),
 			tags: this.tags ?? [],
 		};
 	}

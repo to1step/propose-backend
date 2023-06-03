@@ -5,12 +5,12 @@ import {
 	CreateCourseReviewForm,
 	UpdateCourseReviewForm,
 } from '../types/type';
-import { CourseModel } from '../../database/models/course';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
+import ModelConverter from '../../utilies/converter/modelConverter';
+import { CourseModel } from '../../database/models/course';
 import { CourseLikeModel } from '../../database/models/courseLike';
 import { CourseReviewModel } from '../../database/models/courseReview';
-import ModelConverter from '../../utilies/converter/modelConverter';
 import { StoreModel } from '../../database/models/store';
 
 class CourseService {
@@ -40,28 +40,17 @@ class CourseService {
 			shortComment,
 			longComment,
 			isPrivate,
-			transport,
+			transports,
 			tags,
 		} = createCourseForm;
 
-		const newUUID = v4();
-
-		// 가게들을 promise.all()로 병렬처리하여, 실제로 있는 가게인지 확인
-		const promises = stores.map(async (storeUUID) => {
-			const isExist = await StoreModel.exists({
-				uuid: storeUUID,
-				deletedAt: null,
-			});
-
-			// 하나라도 if문 걸리면 promise.all 종료
-			if (!isExist) {
-				throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
-					{ data: 'Course not found' },
-				]);
-			}
+		// 실제로 있는 가게인지 확인
+		const isExist = await StoreModel.find({
+			store: { $in: stores },
+			deletedAt: null,
 		});
 
-		await Promise.all(promises);
+		const newUUID = v4();
 
 		await new CourseModel({
 			uuid: newUUID,
@@ -71,7 +60,7 @@ class CourseService {
 			shortComment: shortComment,
 			longComment: longComment,
 			isPrivate: isPrivate,
-			transport: transport,
+			transports: transports,
 			tags: tags,
 		}).save();
 	}
@@ -126,8 +115,6 @@ class CourseService {
 			}
 		}
 
-		// TODO: course작성자의 닉네임을 넣어줘야 하는가?
-		// TODO: 그렇다면 create할때 넣어줘야 하는가 get할때 넣어줘야 하는가?
 		return {
 			...courseData,
 			courseReviews: courseReviewData,
@@ -154,7 +141,7 @@ class CourseService {
 			shortComment,
 			longComment,
 			isPrivate,
-			transport,
+			transports,
 			tags,
 		} = createCourseForm;
 
@@ -170,7 +157,7 @@ class CourseService {
 				shortComment: shortComment,
 				longComment: longComment,
 				isPrivate: isPrivate,
-				transport: transport,
+				transports: transports,
 				tags: tags,
 			},
 			{ new: true }
