@@ -234,7 +234,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetStoreDto"
+                $ref: "#/components/schemas/EntireStoreDto"
     patch:
       tags:
         - StoreController
@@ -506,7 +506,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetCourseDto"
+                $ref: "#/components/schemas/EntireCourseDto"
     patch:
       tags:
         - CourseController
@@ -814,12 +814,19 @@ components:
       type: object
       required:
         - name
+        - category
+        - description
+        - location
         - coordinates
       properties:
         name:
           type: string
           description: 가게 이름
           example: 행보칸 카페
+        category:
+          type: number
+          description: 가게 카테고리 0 카페 / 1 식당 / 2 공원
+          example: 0
         description:
           type: string
           description: 가게에 대한 설명
@@ -848,7 +855,7 @@ components:
           type: string
           description: 가게 마감 시간
           example: "저녁 10시"
-    GetStoreDto:
+    EntireStoreDto:
       type: object
       properties:
         uuid:
@@ -859,6 +866,10 @@ components:
           type: string
           description: 가게 이름
           example: 행보칸 카페
+        category:
+          type: number
+          description: 가게 카테고리 0 카페 / 1 식당 / 2 공원
+          example: 0
         description:
           type: string
           description: 가게에 대한 설명
@@ -920,12 +931,19 @@ components:
       type: object
       required:
         - name
+        - category
+        - description
+        - location
         - coordinates
       properties:
         name:
           type: string
           description: 가게 이름
           example: 행보칸 카페
+        category:
+          type: number
+          description: 가게 카테고리 0 카페 / 1 식당 / 2 공원
+          example: 0
         description:
           type: string
           description: 가게에 대한 설명
@@ -978,7 +996,7 @@ components:
         - name
         - stores
         - shortComment
-        - isPriavte
+        - isPrivate
         - transport
       properties:
         name:
@@ -1004,6 +1022,9 @@ components:
         transport:
           type: array
           description: 경유 가게들마다의 이동 수단. 경유 가게 순서대로 작성
+          required:
+            - startStore
+            - endStore
           items:
             type: object
             properties:
@@ -1026,7 +1047,7 @@ components:
           type: array
           description: 코스에 대한 태그 배열
           example: [ '맛집', '인스타감성', '야경' ]
-    GetCourseDto:
+    EntireCourseDto:
       type: object
       properties:
         name:
@@ -1137,6 +1158,9 @@ components:
           description: 경유 가게들마다의 이동 수단. 경유 가게 순서대로 작성
           items:
             type: object
+            required:
+              - startStore
+              - endStore
             properties:
               startStore:
                 type: string
