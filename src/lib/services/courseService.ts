@@ -151,6 +151,18 @@ class CourseService {
 			tags,
 		} = createCourseForm;
 
+		// 실제로 있는 가게인지 확인
+		const isExist = await StoreModel.find({
+			uuid: { $in: stores },
+			deletedAt: null,
+		});
+
+		if (isExist.length !== stores.length) {
+			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
+				{ data: 'Store not found' },
+			]);
+		}
+
 		const course = await CourseModel.findOneAndUpdate(
 			{
 				uuid: courseUUID,
