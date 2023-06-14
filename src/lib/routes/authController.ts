@@ -7,6 +7,8 @@ import EmailValidationDto from '../types/requestTypes/emaliValidation.dto';
 import LocalSignInDto from '../types/requestTypes/localSignIn.dto';
 import NicknameValidationDto from '../types/requestTypes/nicknameValidation.dto';
 import RefreshTokenDto from '../types/requestTypes/refreshToken.dto';
+import { BadRequestError } from '../middlewares/errors';
+import ErrorCode from '../types/customTypes/error';
 
 const router = express.Router();
 const authService = AuthService.getInstance();
@@ -104,7 +106,6 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 
 router.post('/auth/refresh-token', async (req, res, next) => {
 	try {
-		// TODO 얘 되는지 확인
 		const refreshTokenDto = new RefreshTokenDto(req.body);
 
 		await validateOrReject(refreshTokenDto);
@@ -122,7 +123,9 @@ router.post('/auth/sign-out', async (req, res, next) => {
 		const refreshToken = req.header('refreshToken');
 
 		if (!refreshToken) {
-			throw new Error('no token in header');
+			throw new BadRequestError(ErrorCode.NO_REFRESH_TOKEN_IN_HEADER, [
+				{ data: 'No token in header' },
+			]);
 		}
 
 		await authService.signOut(`${refreshToken}`);
@@ -145,7 +148,9 @@ router.get('/auth/kakao/redirect', async (req, res, next) => {
 		const { code } = req.query;
 
 		if (!code || !(typeof code === 'string')) {
-			throw new Error('code not found');
+			throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+				{ data: 'No code in query' },
+			]);
 		}
 
 		const { accessToken, refreshToken } = await authService.kakaoLogin(code);

@@ -16,6 +16,8 @@ import { UserModel } from '../../database/models/user';
 import Redis from '../../utilies/redis';
 import SESClient from '../../utilies/sesClient';
 import WinstonLogger from '../../utilies/logger';
+import { BadRequestError, InternalServerError } from '../middlewares/errors';
+import ErrorCode from '../types/customTypes/error';
 
 const redis = Redis.getInstance().getClient();
 const sesClient = SESClient.getInstance();
@@ -45,7 +47,9 @@ class AuthService {
 
 		// 비밀번호가 존재하지 않거나, provider가 local이 아니면 잘못된 로그인 방식
 		if (!userPassword || !(user.provider === 'local')) {
-			throw new Error('invalid user');
+			throw new BadRequestError(ErrorCode.INVALID_LOGIN, [
+				{ data: 'Invalid login' },
+			]);
 		}
 
 		// DB의 비밀번호와 유저가 보낸 비밀번호 비교
@@ -53,7 +57,9 @@ class AuthService {
 
 		// 틀릴시 에러
 		if (!compare) {
-			throw new Error('wrong password');
+			throw new BadRequestError(ErrorCode.WRONG_PASSWORD, [
+				{ data: 'Wrong password' },
+			]);
 		}
 
 		// accessToken, refreshToken 생성
@@ -142,7 +148,10 @@ class AuthService {
 			// 요청 5회 초과시 에러
 			if (6 <= countNum) {
 				await redis.del(redisKey);
-				throw new Error('email send count exceeded 5 times');
+
+				throw new BadRequestError(ErrorCode.EMAIL_SEND_EXCEED, [
+					{ data: 'Email send exceeded 5 times' },
+				]);
 			}
 
 			// key가 같다면 덮어쓰므로 count와 인증코드만 재조정
@@ -174,12 +183,16 @@ class AuthService {
 
 		// 값 없는지 check
 		if (!email || !password || !nickname || !verifyCode) {
-			throw new Error('invalid value in redis');
+			throw new BadRequestError(ErrorCode.EMAIL_SEND_EXCEED, [
+				{ data: 'Email send exceeded 5 times' },
+			]);
 		}
 
 		// redis에 저장된 verifyCode와 유저가 보낸 code가 같은지 확인
 		if (verifyCode !== emailVerifyCode.code) {
-			throw new Error('invalid code');
+			throw new BadRequestError(ErrorCode.WRONG_VERIFY_CODE, [
+				{ data: 'Wrong verify code' },
+			]);
 		}
 
 		// 같을시에 DB에 저장
@@ -214,7 +227,9 @@ class AuthService {
 		const kakaoAccessToken = kakaoToken?.data?.access_token;
 
 		if (!kakaoAccessToken) {
-			throw new Error('Kakao access token get fail');
+			throw new InternalServerError(ErrorCode.KAKAO_LOGIN_ERROR, [
+				{ data: 'Kakao access token get fail' },
+			]);
 		}
 
 		const userKaKaoData = await axios.post<KakaoUserReponse>(
@@ -236,7 +251,9 @@ class AuthService {
 			!kakaoAccout.is_email_verified ||
 			!kakaoAccout?.profile?.nickname
 		) {
-			throw new Error('email, nickname is required');
+			throw new BadRequestError(ErrorCode.KAKAO_LOGIN_ERROR, [
+				{ data: 'email, nickname is required' },
+			]);
 		}
 
 		const user = await UserModel.findOne({ email: kakaoAccout.email });
@@ -313,20 +330,26 @@ class AuthService {
 			);
 
 			if (typeof decoded === 'string' || !decoded.userUUID) {
-				throw new Error('invalid token');
+				throw new BadRequestError(ErrorCode.INVALID_REFRESH_TOKEN, [
+					{ data: 'Invalid refresh token' },
+				]);
 			}
 
 			return decoded.userUUID;
 		} catch (err: any) {
-			//TODO: custom error 적용
 			if (err.name === 'TokenExpiredError') {
-				throw new Error(`${err.message}`);
+				throw new BadRequestError(ErrorCode.EXPIRED_REFRESH_TOKEN, [
+					{ data: 'Refresh Token expired, Login again' },
+				]);
 			} else if (err.name === 'JsonWebTokenError') {
-				throw new Error(`${err.message}`);
+				throw new BadRequestError(ErrorCode.INVALID_REFRESH_TOKEN, [
+					{ data: 'Invalid token' },
+				]);
 			} else if (err.name === 'NotBeforeError') {
-				throw new Error(`${err.message}`);
+				throw new BadRequestError(ErrorCode.INVALID_REFRESH_TOKEN, [
+					{ data: 'Invalid token' },
+				]);
 			}
-
 			throw err;
 		}
 	}
