@@ -3,6 +3,8 @@ import { StoreCategory, Transportation } from '../../database/types/enums';
 /**
  * 서비스 단에서 사용되는 파일 타입들 정의
  */
+
+// user
 type KakaoTokenResponse = {
 	access_token?: string;
 };
@@ -27,8 +29,11 @@ type User = {
 	email: string;
 	password: string | null;
 	nickname: string;
-	snsId: string | null;
 	provider: string;
+	snsId: string | null;
+	profileImage: string;
+	commentAlarm: boolean;
+	updateAlarm: boolean;
 };
 
 type UserCreateKey = 'local' | 'kakao' | 'google';
@@ -82,6 +87,14 @@ type EmailVerifyCode = {
 type Tokens = {
 	accessToken: string;
 	refreshToken: string;
+};
+
+type ChangeNicknameForm = {
+	nickname: string;
+};
+
+type ChangeProfileImageForm = {
+	imageSrc: string;
 };
 
 // store
@@ -243,6 +256,8 @@ export type {
 	NicknameValidationForm,
 	EmailVerifyCode,
 	Tokens,
+	ChangeNicknameForm,
+	ChangeProfileImageForm,
 	Store,
 	StoreEntireInfo,
 	CreateStoreForm,

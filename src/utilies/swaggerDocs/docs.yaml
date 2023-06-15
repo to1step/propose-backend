@@ -185,6 +185,201 @@ paths:
                     type: boolean
                     description: 로그아웃 성공
                     example: true
+  /v1/users/me:
+    get:
+      tags:
+        - UserController
+      summary: 내 정보 모두 가져오기
+      description: 비밀번호를 제외한 나의 정보 모두 가져오기
+      parameters:
+        - name: accessToken
+          in: header
+      responses:
+        '200':
+          description: 내 정보
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserWithoutPasswordDto"
+  /v1/users/nickname:
+    patch:
+      tags:
+        - UserController
+      summary: 닉네임 변경
+      description: 낙네임 변경하기
+      parameters:
+        - name: accessToken
+          in: header
+      requestBody:
+        description: ChangeNicknameDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeNicknameDto"
+      responses:
+        '200':
+          description: 닉네임 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 닉네임 변경 성공
+                    example: true
+  /v1/users/profileImage:
+    patch:
+      tags:
+        - UserController
+      summary: 프로필 이미지 변경
+      description: 프로필 이미지 변경하기
+      parameters:
+        - name: accessToken
+          in: header
+      requestBody:
+        description: ChangeProfileImageDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeProfileImageDto"
+      responses:
+        '200':
+          description: 프로필 이미지 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 프로필 이미지 변경 성공
+                    example: true
+    delete:
+      tags:
+        - UserController
+      summary: 프로필 이미지 삭제
+      description: 프로필 이미지 기본 이미지로 변경하기
+      parameters:
+        - name: accessToken
+          in: header
+      responses:
+        '200':
+          description: 프로필 이미지 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 프로필 이미지 삭제 성공
+                    example: true
+  /v1/users/commentAlarm/on:
+    patch:
+      tags:
+        - UserController
+      summary: 댓글 알림 수신 on
+      description: 댓글 알림 수신 받기 여부 on으로 변경
+      parameters:
+        - name: accessToken
+          in: header
+      responses:
+        '200':
+          description: 댓글 알림 수신 여부 on으로 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 댓글 알림 수신 여부 on으로 변경 성공
+                    example: true
+  /v1/users/commentAlarm/off:
+    patch:
+      tags:
+        - UserController
+      summary: 댓글 알림 수신 off
+      description: 댓글 알림 수신 받기 여부 off으로 변경
+      parameters:
+        - name: accessToken
+          in: header
+      responses:
+        '200':
+          description: 댓글 알림 수신 여부 off으로 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 댓글 알림 수신 여부 off으로 변경 성공
+                    example: true
+  /v1/users/updateAlarm/on:
+    patch:
+      tags:
+        - UserController
+      summary: 업데이트 알림 수신 on
+      description: 업데이트 알림 수신 받기 여부 on으로 변경
+      parameters:
+        - name: accessToken
+          in: header
+      responses:
+        '200':
+          description: 업데이트 알림 수신 여부 on으로 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 업데이트 알림 수신 여부 on으로 변경 성공
+                    example: true
+  /v1/users/updateAlarm/off:
+    patch:
+      tags:
+        - UserController
+      summary: 업데이트 알림 수신 off
+      description: 업데이트 알림 수신 받기 여부 on으로 변경
+      parameters:
+        - name: accessToken
+          in: header
+      responses:
+        '200':
+          description: 업데이트 알림 수신 여부 off으로 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 업데이트 알림 수신 여부 off으로 변경 성공
+                    example: true
+  /v1/users:
+    delete:
+      tags:
+        - UserController
+      summary: 회원탈퇴
+      description: 회원탈퇴하기
+      parameters:
+        - name: accessToken
+          in: header
+      responses:
+        '200':
+          description: 회원탈퇴 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 회원탈퇴 성공
+                    example: true
   /v1/store/:
     post:
       tags:
@@ -810,6 +1005,45 @@ components:
           type: string
           description: 재발급에 사용할 refresh token
           example: asdifj12e3fijaiwjef
+    UserWithoutPasswordDto:
+      type: object
+      properties:
+        email:
+          type: string
+          description: 유저 이메일
+        nickname:
+          type: string
+          description: 유저 닉네임
+        provider:
+          type: string
+          description: 로그인 경로
+        profileImage:
+          type: string
+          description: 유저 프로필 이미지 주소
+        commentAlarm:
+          type: boolean
+          description: 댓글 알림 수신 여부
+        updateAlarm:
+          type: boolean
+          description: 업데이트 알림 수신 여부
+    ChangeNicknameDto:
+      type: object
+      required:
+        - nickname
+      properties:
+        nickname:
+          type: string
+          description: 새로운 닉네임
+          example: 미누몬
+    ChangeProfileImageDto:
+      type: object
+      required:
+        - imageSrc
+      properties:
+        imageSrc:
+          type: string
+          description: 새로운 이미지 주소
+          example: "image.png"
     CreateStoreDto:
       type: object
       required:
