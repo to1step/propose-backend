@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import { UserModel } from '../../database/models/user';
 import ModelConverter from '../../utilies/converter/modelConverter';
 import { User, UserCreateKey, UserCreateForm } from '../types/type';
+import { BadRequestError } from '../middlewares/errors';
+import ErrorCode from '../types/customTypes/error';
 
 class UserService {
 	private static instance: UserService;
@@ -24,7 +26,9 @@ class UserService {
 		const user = await UserModel.findOne({ email: userEmail });
 
 		if (!user) {
-			throw new Error('cannot find user');
+			throw new BadRequestError(ErrorCode.USER_NOT_FOUND, [
+				{ data: 'User not found' },
+			]);
 		}
 
 		return ModelConverter.toUser(user);
