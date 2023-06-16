@@ -42,7 +42,7 @@ router.patch('/users/nickname', checkHeaderToken, async (req, res, next) => {
 
 // 프로필 이미지 수정
 router.patch(
-	'/users/profileImage',
+	'/users/profile-image',
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
@@ -64,7 +64,7 @@ router.patch(
 
 // 프로필 이미지 삭제
 router.delete(
-	'/users/profileImage',
+	'/users/profile-image',
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
@@ -79,7 +79,7 @@ router.delete(
 
 // 댓글 알림 수신 on
 router.patch(
-	'/users/commentAlarm/on',
+	'/users/comment-alarm/on',
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
@@ -94,7 +94,7 @@ router.patch(
 
 // 댓글 알림 수신 off
 router.patch(
-	'/users/commentAlarm/off',
+	'/users/comment-alarm/off',
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
@@ -109,7 +109,7 @@ router.patch(
 
 // 업데이트 알림 수신 on
 router.patch(
-	'/users/updateAlarm/on',
+	'/users/update-alarm/on',
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
@@ -124,7 +124,7 @@ router.patch(
 
 // 업데이트 알림 수신 off
 router.patch(
-	'/users/updateAlarm/off',
+	'/users/update-alarm/off',
 	checkHeaderToken,
 	async (req, res, next) => {
 		try {
