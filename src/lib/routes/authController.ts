@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { CookieOptions } from 'express';
 import { validateOrReject } from 'class-validator';
 import AuthService from '../services/authService';
 import UserDataDto from '../types/requestTypes/userData.dto';
@@ -23,9 +23,16 @@ router.post('/auth/local/sign-in', async (req, res, next) => {
 			localSignInDto
 		);
 
+		const cookie: CookieOptions = {
+			httpOnly: true,
+			sameSite: 'none',
+			secure: true,
+			path: '/',
+		};
+
 		res
-			.cookie('accessToken', accessToken)
-			.cookie('refreshToken', refreshToken)
+			.cookie('accessToken', accessToken, cookie)
+			.cookie('refreshToken', refreshToken, cookie)
 			.json({ data: true });
 	} catch (error) {
 		next(error);
