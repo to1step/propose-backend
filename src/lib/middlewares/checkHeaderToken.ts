@@ -1,12 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { BadRequestError } from './errors';
+import ErrorCode from '../types/customTypes/error';
 
 const checkHeaderToken = (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const accessToken = req.header('accessToken');
 
 		if (!accessToken) {
-			throw new Error('no token in header');
+			throw new BadRequestError(ErrorCode.NO_ACCESS_TOKEN_IN_HEADER, [
+				{ data: 'No token in header' },
+			]);
 		}
 
 		const decoded = jwt.verify(
@@ -15,19 +19,26 @@ const checkHeaderToken = (req: Request, res: Response, next: NextFunction) => {
 		);
 
 		if (typeof decoded === 'string' || !decoded.userUUID) {
-			throw new Error('invalid user');
+			throw new BadRequestError(ErrorCode.INVALID_ACCESS_TOKEN, [
+				{ data: 'Invalid access token' },
+			]);
 		}
 
 		req.userUUID = decoded.userUUID;
 		next();
 	} catch (err: any) {
-		//TODO: custom error 적용
 		if (err.name === 'TokenExpiredError') {
-			throw new Error(`${err.message}`);
+			throw new BadRequestError(ErrorCode.EXPIRED_ACCESS_TOKEN, [
+				{ data: 'Expired token' },
+			]);
 		} else if (err.name === 'JsonWebTokenError') {
-			throw new Error(`${err.message}`);
+			throw new BadRequestError(ErrorCode.INVALID_ACCESS_TOKEN, [
+				{ data: 'Invalid token' },
+			]);
 		} else if (err.name === 'NotBeforeError') {
-			throw new Error(`${err.message}`);
+			throw new BadRequestError(ErrorCode.INVALID_ACCESS_TOKEN, [
+				{ data: 'Invalid token' },
+			]);
 		}
 
 		throw err;
