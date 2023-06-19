@@ -3,7 +3,7 @@ import { validateOrReject } from 'class-validator';
 import UserService from '../services/userService';
 import checkHeaderToken from '../middlewares/checkHeaderToken';
 import UpdateUserDto from '../types/requestTypes/UpdateUser.dto';
-import GetUserDataDto from '../types/responseTypes/getUserData.dto';
+import UserDataDto from '../types/responseTypes/userData.dto';
 
 const router = express.Router();
 const userService = UserService.getInstance();
@@ -13,7 +13,7 @@ router.get('/users/me', checkHeaderToken, async (req, res, next) => {
 	try {
 		const myProfile = await userService.getProfile(req.userUUID);
 
-		const userData = new GetUserDataDto(myProfile);
+		const userData = new UserDataDto(myProfile);
 
 		res.json({ data: userData });
 	} catch (error) {

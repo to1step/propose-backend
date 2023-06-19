@@ -99,7 +99,7 @@ paths:
       summary: 인증메일 전송
       description: 유저정보 redis에 저장, 인증메일 전송
       requestBody:
-        description: UserDataDto
+        description: SendMailDto
         content:
           application/json:
             schema:

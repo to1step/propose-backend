@@ -23,7 +23,7 @@ const userSchema = new Schema<UserDAO, UserDAOModel>(
 		nickname: { type: String, required: true }, // 유저 nickname
 		provider: { type: String, required: true }, // 소셜 로그인 종류 kakao/naver/google/local
 		snsId: { type: String }, // 소셜 로그인 아이디
-		profileImage: { type: String, required: true }, // 프로필 이미지
+		profileImage: { type: String, default: null }, // 프로필 이미지
 		commentAlarm: { type: Boolean, required: true, default: true }, // 댓글 알림 수신 여부
 		updateAlarm: { type: Boolean, required: true, default: true }, // 업데이트 알림 수신 여부
 		deletedAt: { type: Date, default: null },

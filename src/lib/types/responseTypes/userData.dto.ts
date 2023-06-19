@@ -1,4 +1,4 @@
-class GetUserDataDto {
+class UserDataDto {
 	email: string;
 
 	nickname: string;
@@ -11,7 +11,7 @@ class GetUserDataDto {
 
 	updateAlarm: boolean;
 
-	constructor(obj: GetUserDataDto) {
+	constructor(obj: UserDataDto) {
 		this.email = obj.email;
 		this.nickname = obj.nickname;
 		this.provider = obj.provider;
@@ -21,4 +21,4 @@ class GetUserDataDto {
 	}
 }
 
-export default GetUserDataDto;
+export default UserDataDto;

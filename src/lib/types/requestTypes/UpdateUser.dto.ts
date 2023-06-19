@@ -25,7 +25,7 @@ class UpdateUserDto {
 	toServiceModel(): ChangeProfileForm {
 		return {
 			nickname: this.nickname,
-			profileImage: this.profileImage,
+			profileImage: this.profileImage ?? null,
 			commentAlarm: this.commentAlarm,
 			updateAlarm: this.updateAlarm,
 		};

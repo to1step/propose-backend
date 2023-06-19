@@ -1,9 +1,5 @@
 import { StoreCategory, Transportation } from '../../database/types/enums';
 
-/**
- * 서비스 단에서 사용되는 파일 타입들 정의
- */
-
 // user
 type KakaoTokenResponse = {
 	access_token?: string;

@@ -1,7 +1,7 @@
 import express from 'express';
 import { validateOrReject } from 'class-validator';
 import AuthService from '../services/authService';
-import UserDataDto from '../types/requestTypes/userData.dto';
+import SendMailDto from '../types/requestTypes/sendMail.dto';
 import EmailVerificationDto from '../types/requestTypes/emailVerification.dto';
 import EmailValidationDto from '../types/requestTypes/emaliValidation.dto';
 import LocalSignInDto from '../types/requestTypes/localSignIn.dto';
@@ -69,11 +69,11 @@ router.post('/auth/local/email-code', async (req, res, next) => {
 	try {
 		const userIp = req.ip;
 
-		const userDataDto = new UserDataDto(req.body);
+		const sendMailDto = new SendMailDto(req.body);
 
-		await validateOrReject(userDataDto);
+		await validateOrReject(sendMailDto);
 
-		await authService.sendEmail(userDataDto.toServiceModel(), userIp);
+		await authService.sendEmail(sendMailDto.toServiceModel(), userIp);
 
 		res.json({ data: true });
 	} catch (error) {
