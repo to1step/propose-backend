@@ -1,17 +1,17 @@
-class UserWithoutPasswordDto {
+class GetUserDataDto {
 	email: string;
 
 	nickname: string;
 
 	provider: string;
 
-	profileImage: string;
+	profileImage: string | null;
 
 	commentAlarm: boolean;
 
 	updateAlarm: boolean;
 
-	constructor(obj: UserWithoutPasswordDto) {
+	constructor(obj: GetUserDataDto) {
 		this.email = obj.email;
 		this.nickname = obj.nickname;
 		this.provider = obj.provider;
@@ -21,4 +21,4 @@ class UserWithoutPasswordDto {
 	}
 }
 
-export default UserWithoutPasswordDto;
+export default GetUserDataDto;

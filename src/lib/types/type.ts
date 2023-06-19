@@ -31,7 +31,7 @@ type User = {
 	nickname: string;
 	provider: string;
 	snsId: string | null;
-	profileImage: string;
+	profileImage: string | null;
 	commentAlarm: boolean;
 	updateAlarm: boolean;
 };
@@ -89,12 +89,14 @@ type Tokens = {
 	refreshToken: string;
 };
 
-type ChangeNicknameForm = {
+type ChangeProfileForm = {
 	nickname: string;
-};
 
-type ChangeProfileImageForm = {
-	imageSrc: string;
+	profileImage: string | null;
+
+	commentAlarm: boolean;
+
+	updateAlarm: boolean;
 };
 
 // store
@@ -256,8 +258,7 @@ export type {
 	NicknameValidationForm,
 	EmailVerifyCode,
 	Tokens,
-	ChangeNicknameForm,
-	ChangeProfileImageForm,
+	ChangeProfileForm,
 	Store,
 	StoreEntireInfo,
 	CreateStoreForm,

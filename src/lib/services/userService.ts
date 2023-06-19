@@ -3,8 +3,7 @@ import bcrypt from 'bcrypt';
 import { UserModel } from '../../database/models/user';
 import ModelConverter from '../../utilies/converter/modelConverter';
 import {
-	ChangeNicknameForm,
-	ChangeProfileImageForm,
+	ChangeProfileForm,
 	User,
 	UserCreateForm,
 	UserCreateKey,
@@ -88,15 +87,17 @@ class UserService {
 	}
 
 	/**
-	 * 닉네임 변경하기
-	 * @param changeNicknameForm
+	 * 개인정보 변경하기
+	 * @param changeProfileForm
 	 * @param userUUID
 	 */
-	async changeNickname(
-		changeNicknameForm: ChangeNicknameForm,
+	async changeProfile(
+		changeProfileForm: ChangeProfileForm,
 		userUUID: string
 	): Promise<void> {
-		const { nickname } = changeNicknameForm;
+		const { nickname, profileImage, commentAlarm, updateAlarm } =
+			changeProfileForm;
+
 		const user = await UserModel.findOneAndUpdate(
 			{
 				uuid: userUUID,
@@ -104,150 +105,9 @@ class UserService {
 			},
 			{
 				nickname: nickname,
-			},
-			{ new: true }
-		);
-
-		if (!user) {
-			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
-				{ data: 'User not found' },
-			]);
-		}
-	}
-
-	/**
-	 * 프로필 사진 변경하기
-	 * @param changeProfileImageForm
-	 * @param userUUID
-	 */
-	async changeProfileImage(
-		changeProfileImageForm: ChangeProfileImageForm,
-		userUUID: string
-	): Promise<void> {
-		const { imageSrc } = changeProfileImageForm;
-		const user = await UserModel.findOneAndUpdate(
-			{
-				uuid: userUUID,
-				deletedAt: null,
-			},
-			{
-				profileImage: imageSrc,
-			},
-			{ new: true }
-		);
-
-		if (!user) {
-			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
-				{ data: 'User not found' },
-			]);
-		}
-	}
-
-	/**
-	 * 프로필 사진 기본이미지로 변경하기
-	 * @param userUUID
-	 */
-	async deleteProfileImage(userUUID: string): Promise<void> {
-		const user = await UserModel.findOneAndUpdate(
-			{
-				uuid: userUUID,
-				deletedAt: null,
-			},
-			{
-				// TODO: 기본 이미지 s3에 저장한다음 이 부분 수정
-				profileImage: 'basic.png',
-			},
-			{ new: true }
-		);
-
-		if (!user) {
-			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
-				{ data: 'User not found' },
-			]);
-		}
-	}
-
-	/**
-	 * 댓글 알림 off
-	 * @param userUUID
-	 */
-	async commentAlarmOff(userUUID: string): Promise<void> {
-		const user = await UserModel.findOneAndUpdate(
-			{
-				uuid: userUUID,
-				deletedAt: null,
-			},
-			{
-				commentAlarm: false,
-			},
-			{ new: true }
-		);
-
-		if (!user) {
-			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
-				{ data: 'User not found' },
-			]);
-		}
-	}
-
-	/**
-	 * 댓글 알림 on
-	 * @param userUUID
-	 */
-	async commentAlarmOn(userUUID: string): Promise<void> {
-		const user = await UserModel.findOneAndUpdate(
-			{
-				uuid: userUUID,
-				deletedAt: null,
-			},
-			{
-				commentAlarm: true,
-			},
-			{ new: true }
-		);
-
-		if (!user) {
-			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
-				{ data: 'User not found' },
-			]);
-		}
-	}
-
-	/**
-	 * 업데이트 알림 off
-	 * @param userUUID
-	 */
-	async updateAlarmOff(userUUID: string): Promise<void> {
-		const user = await UserModel.findOneAndUpdate(
-			{
-				uuid: userUUID,
-				deletedAt: null,
-			},
-			{
-				updateAlarm: false,
-			},
-			{ new: true }
-		);
-
-		if (!user) {
-			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
-				{ data: 'User not found' },
-			]);
-		}
-	}
-
-	/**
-	 * 업데이트 알림 on
-	 * @param userUUID
-	 */
-	async updateAlarmOn(userUUID: string): Promise<void> {
-		const user = await UserModel.findOneAndUpdate(
-			{
-				uuid: userUUID,
-				deletedAt: null,
-			},
-			{
-				updateAlarm: true,
+				profileImage: profileImage,
+				commentAlarm: commentAlarm,
+				updateAlarm: updateAlarm,
 			},
 			{ new: true }
 		);
