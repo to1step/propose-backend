@@ -99,7 +99,7 @@ paths:
       summary: 인증메일 전송
       description: 유저정보 redis에 저장, 인증메일 전송
       requestBody:
-        description: UserDataDto
+        description: SendMailDto
         content:
           application/json:
             schema:
@@ -184,6 +184,68 @@ paths:
                   data:
                     type: boolean
                     description: 로그아웃 성공
+                    example: true
+  /v1/users/me:
+    get:
+      tags:
+        - UserController
+      summary: 내 정보 모두 가져오기
+      description: 비밀번호를 제외한 나의 정보 모두 가져오기
+      parameters:
+        - name: accessToken
+          in: header
+      responses:
+        '200':
+          description: 내 정보
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserDataDto"
+    patch:
+      tags:
+        - UserController
+      summary: 유저 정보 변경
+      description: 유저 정보 변경하기
+      parameters:
+        - name: accessToken
+          in: header
+      requestBody:
+        description: UpdateUserDto
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDto"
+      responses:
+        '200':
+          description: 닉네임 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 닉네임 변경 성공
+                    example: true
+    delete:
+      tags:
+        - UserController
+      summary: 회원탈퇴
+      description: 회원탈퇴하기
+      parameters:
+        - name: accessToken
+          in: header
+      responses:
+        '200':
+          description: 회원탈퇴 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 회원탈퇴 성공
                     example: true
   /v1/store/:
     post:
@@ -810,6 +872,51 @@ components:
           type: string
           description: 재발급에 사용할 refresh token
           example: asdifj12e3fijaiwjef
+    GetUserDataDto:
+      type: object
+      properties:
+        email:
+          type: string
+          description: 유저 이메일
+        nickname:
+          type: string
+          description: 유저 닉네임
+        provider:
+          type: string
+          description: 로그인 경로
+        profileImage:
+          type: string
+          description: 유저 프로필 이미지 주소
+        commentAlarm:
+          type: boolean
+          description: 댓글 알림 수신 여부
+        updateAlarm:
+          type: boolean
+          description: 업데이트 알림 수신 여부
+    UpdateUserDto:
+      type: object
+      required:
+        - nickname
+        - profileImage
+        - commentAlarm
+        - updateAlarm
+      properties:
+        nickname:
+          type: string
+          description: 바꿀 닉네임
+          example: 김미누
+        profileImage:
+          type: string
+          description: 삭제시 null로 보내주세요
+          example: profile.png
+        commentAlarm:
+          type: boolean
+          description: 댓글 알림 수신여부
+          example: true
+        updateAlarm:
+          type: boolean
+          description: 업데이트 알림 수신 여부
+          example: true
     CreateStoreDto:
       type: object
       required:

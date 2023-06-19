@@ -20,6 +20,9 @@ class ModelConverter {
 			nickname: user.nickname,
 			snsId: user.snsId,
 			provider: user.provider,
+			profileImage: user.profileImage,
+			commentAlarm: user.commentAlarm,
+			updateAlarm: user.updateAlarm,
 		};
 	}
 

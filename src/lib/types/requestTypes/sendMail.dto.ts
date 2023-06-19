@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { SendMailForm } from '../type';
 
-class UserDataDto {
+class SendMailDto {
 	@IsString()
 	@IsNotEmpty()
 	email: string;
@@ -14,7 +14,7 @@ class UserDataDto {
 	@IsNotEmpty()
 	password: string;
 
-	constructor(obj: UserDataDto) {
+	constructor(obj: SendMailDto) {
 		this.email = obj.email;
 		this.nickname = obj.nickname;
 		this.password = obj.password;
@@ -29,4 +29,4 @@ class UserDataDto {
 	}
 }
 
-export default UserDataDto;
+export default SendMailDto;
