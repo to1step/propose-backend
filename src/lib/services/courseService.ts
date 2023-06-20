@@ -163,23 +163,11 @@ class CourseService {
 			]);
 		}
 
-		const course = await CourseModel.findOneAndUpdate(
-			{
-				uuid: courseUUID,
-				user: userUUID,
-				deletedAt: null,
-			},
-			{
-				name: name,
-				stores: stores,
-				shortComment: shortComment,
-				longComment: longComment,
-				isPrivate: isPrivate,
-				transports: transports,
-				tags: tags,
-			},
-			{ new: true }
-		);
+		const course = await CourseModel.findOne({
+			uuid: courseUUID,
+			user: userUUID,
+			deletedAt: null,
+		});
 
 		if (!course) {
 			// 삭제되었거나 없는 가게일 경우
@@ -187,6 +175,16 @@ class CourseService {
 				{ data: 'Course not found' },
 			]);
 		}
+
+		course.name = name;
+		course.stores = stores;
+		course.shortComment = shortComment;
+		course.longComment = longComment;
+		course.isPrivate = isPrivate;
+		course.transports = transports;
+		course.tags = tags;
+
+		await course.save();
 	}
 
 	/**
@@ -195,19 +193,11 @@ class CourseService {
 	 * @param courseUUID
 	 */
 	async removeCourse(userUUID: string, courseUUID: string): Promise<void> {
-		const course = await CourseModel.findOneAndUpdate(
-			{
-				uuid: courseUUID,
-				user: userUUID,
-				deletedAt: null,
-			},
-			{
-				deletedAt: new Date(),
-			},
-			{
-				new: true,
-			}
-		);
+		const course = await CourseModel.findOne({
+			uuid: courseUUID,
+			user: userUUID,
+			deletedAt: null,
+		});
 
 		if (!course) {
 			// 삭제되었거나 없는 가게일 경우
@@ -215,6 +205,9 @@ class CourseService {
 				{ data: 'Course not found' },
 			]);
 		}
+
+		course.deletedAt = new Date();
+		await course.save();
 	}
 
 	/**
@@ -272,15 +265,11 @@ class CourseService {
 			]);
 		}
 
-		const likeHistory = await CourseLikeModel.findOneAndUpdate(
-			{
-				user: userUUID,
-				course: courseUUID,
-				deletedAt: null,
-			},
-			{ deletedAt: new Date() },
-			{ new: true }
-		);
+		const likeHistory = await CourseLikeModel.findOne({
+			user: userUUID,
+			course: courseUUID,
+			deletedAt: null,
+		});
 
 		if (!likeHistory) {
 			// 좋아요를 하지 않았는데 취소하는 경우
@@ -288,6 +277,9 @@ class CourseService {
 				{ data: 'Like not found' },
 			]);
 		}
+
+		likeHistory.deletedAt = new Date();
+		await likeHistory.save();
 	}
 
 	/**
@@ -340,16 +332,12 @@ class CourseService {
 	): Promise<void> {
 		const { review } = updateCourseReviewForm;
 
-		const courseReview = await CourseReviewModel.findOneAndUpdate(
-			{
-				uuid: courseReviewUUID,
-				course: courseUUID,
-				user: userUUID,
-				deletedAt: null,
-			},
-			{ review: review },
-			{ new: true }
-		);
+		const courseReview = await CourseReviewModel.findOne({
+			uuid: courseReviewUUID,
+			course: courseUUID,
+			user: userUUID,
+			deletedAt: null,
+		});
 
 		if (!courseReview) {
 			// 해당 리뷰가 존재하지 않는 경우
@@ -357,6 +345,9 @@ class CourseService {
 				{ data: { data: 'Course review not found' } },
 			]);
 		}
+
+		courseReview.review = review;
+		await courseReview.save();
 	}
 
 	async removeCourseReview(
@@ -364,16 +355,12 @@ class CourseService {
 		courseUUID: string,
 		courseReviewUUID: string
 	): Promise<void> {
-		const courseReview = await CourseReviewModel.findOneAndUpdate(
-			{
-				uuid: courseReviewUUID,
-				course: courseUUID,
-				user: userUUID,
-				deletedAt: null,
-			},
-			{ deletedAt: new Date() },
-			{ new: true }
-		);
+		const courseReview = await CourseReviewModel.findOne({
+			uuid: courseReviewUUID,
+			course: courseUUID,
+			user: userUUID,
+			deletedAt: null,
+		});
 
 		if (!courseReview) {
 			// 해당 리뷰가 존재하지 않는 경우
@@ -381,6 +368,9 @@ class CourseService {
 				{ data: 'Course review not found' },
 			]);
 		}
+
+		courseReview.deletedAt = new Date();
+		await courseReview.save();
 	}
 }
 

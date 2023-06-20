@@ -137,25 +137,11 @@ class StoreService {
 			endTime,
 		} = updateStoreForm;
 
-		const store = await StoreModel.findOneAndUpdate(
-			{
-				uuid: storeUUID,
-				user: userUUID,
-				deletedAt: null,
-			},
-			{
-				name: name,
-				category: category,
-				description: description,
-				location: location,
-				coordinates: coordinates,
-				representImage: representImage,
-				tags: tags,
-				startTime: startTime,
-				endTime: endTime,
-			},
-			{ new: true }
-		);
+		const store = await StoreModel.findOne({
+			uuid: storeUUID,
+			user: userUUID,
+			deletedAt: null,
+		});
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
@@ -163,6 +149,18 @@ class StoreService {
 				{ data: 'Store not found' },
 			]);
 		}
+
+		store.name = name;
+		store.category = category;
+		store.description = description;
+		store.location = location;
+		store.coordinates = coordinates;
+		store.representImage = representImage;
+		store.tags = tags;
+		store.startTime = startTime;
+		store.endTime = endTime;
+
+		await store.save();
 	}
 
 	/**
@@ -171,19 +169,11 @@ class StoreService {
 	 * @param storeUUID
 	 */
 	async removeStore(userUUID: string, storeUUID: string): Promise<void> {
-		const store = await StoreModel.findOneAndUpdate(
-			{
-				uuid: storeUUID,
-				user: userUUID,
-				deletedAt: null,
-			},
-			{
-				deletedAt: new Date(),
-			},
-			{
-				new: true,
-			}
-		);
+		const store = await StoreModel.findOne({
+			uuid: storeUUID,
+			user: userUUID,
+			deletedAt: null,
+		});
 
 		if (!store) {
 			// 삭제되었거나 없는 가게일 경우
@@ -191,6 +181,9 @@ class StoreService {
 				{ data: 'Store not found' },
 			]);
 		}
+
+		store.deletedAt = new Date();
+		await store.save();
 	}
 
 	/**
@@ -248,15 +241,11 @@ class StoreService {
 			]);
 		}
 
-		const likeHistory = await StoreLikeModel.findOneAndUpdate(
-			{
-				user: userUUID,
-				store: storeUUID,
-				deletedAt: null,
-			},
-			{ deletedAt: new Date() },
-			{ new: true }
-		);
+		const likeHistory = await StoreLikeModel.findOne({
+			user: userUUID,
+			store: storeUUID,
+			deletedAt: null,
+		});
 
 		if (!likeHistory) {
 			// 좋아요를 하지 않았는데 취소하는 경우
@@ -264,6 +253,9 @@ class StoreService {
 				{ data: 'Like not found' },
 			]);
 		}
+
+		likeHistory.deletedAt = new Date();
+		await likeHistory.save();
 	}
 
 	/**
@@ -316,16 +308,12 @@ class StoreService {
 	): Promise<void> {
 		const { review } = updateStoreReviewForm;
 
-		const storeReview = await StoreReviewModel.findOneAndUpdate(
-			{
-				uuid: storeReviewUUID,
-				store: storeUUID,
-				user: userUUID,
-				deletedAt: null,
-			},
-			{ review: review },
-			{ new: true }
-		);
+		const storeReview = await StoreReviewModel.findOne({
+			uuid: storeReviewUUID,
+			store: storeUUID,
+			user: userUUID,
+			deletedAt: null,
+		});
 
 		if (!storeReview) {
 			// 해당 리뷰가 존재하지 않는 경우
@@ -333,6 +321,9 @@ class StoreService {
 				{ data: { data: 'Store review not found' } },
 			]);
 		}
+
+		storeReview.review = review;
+		await storeReview.save();
 	}
 
 	/**
@@ -346,16 +337,12 @@ class StoreService {
 		storeUUID: string,
 		storeReviewUUID: string
 	): Promise<void> {
-		const storeReview = await StoreReviewModel.findOneAndUpdate(
-			{
-				uuid: storeReviewUUID,
-				store: storeUUID,
-				user: userUUID,
-				deletedAt: null,
-			},
-			{ deletedAt: new Date() },
-			{ new: true }
-		);
+		const storeReview = await StoreReviewModel.findOne({
+			uuid: storeReviewUUID,
+			store: storeUUID,
+			user: userUUID,
+			deletedAt: null,
+		});
 
 		if (!storeReview) {
 			// 해당 리뷰가 존재하지 않는 경우
@@ -363,6 +350,9 @@ class StoreService {
 				{ data: 'Store review not found' },
 			]);
 		}
+
+		storeReview.deletedAt = new Date();
+		await storeReview.save();
 	}
 }
 
