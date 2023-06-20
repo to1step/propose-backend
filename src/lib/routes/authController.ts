@@ -1,4 +1,4 @@
-import express from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
 import AuthService from '../services/authService';
 import SendMailDto from '../types/requestTypes/sendMail.dto';
@@ -11,104 +11,119 @@ import ErrorCode from '../types/customTypes/error';
 import { cookieOptions } from '../../utilies/cookieOptions';
 import checkRefreshToken from '../middlewares/checkRefreshToken';
 
-const router = express.Router();
+const router = Router();
 const authService = AuthService.getInstance();
 
-router.post('/auth/local/sign-in', async (req, res, next) => {
-	try {
-		const localSignInDto = new LocalSignInDto(req.body);
+router.post(
+	'/auth/local/sign-in',
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const localSignInDto = new LocalSignInDto(req.body);
 
-		await validateOrReject(localSignInDto);
+			await validateOrReject(localSignInDto);
 
-		const { accessToken, refreshToken } = await authService.localSignIn(
-			localSignInDto
-		);
+			const { accessToken, refreshToken } = await authService.localSignIn(
+				localSignInDto
+			);
 
-		res
-			.cookie('Authorization', accessToken, cookieOptions)
-			.cookie('refresh_token', refreshToken, cookieOptions)
-			.json({ data: true });
-	} catch (error) {
-		next(error);
+			res
+				.cookie('Authorization', accessToken, cookieOptions)
+				.cookie('refresh_token', refreshToken, cookieOptions)
+				.json({ data: true });
+		} catch (error) {
+			next(error);
+		}
 	}
-});
+);
 
 //#region 로컬 회원가입
-router.post('/auth/local/email-validation', async (req, res, next) => {
-	try {
-		const emailValidationDto = new EmailValidationDto(req.body);
+router.post(
+	'/auth/local/email-validation',
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const emailValidationDto = new EmailValidationDto(req.body);
 
-		await validateOrReject(emailValidationDto);
+			await validateOrReject(emailValidationDto);
 
-		const emailValidation = await authService.validateEmail(
-			emailValidationDto.toServiceModel()
-		);
+			const emailValidation = await authService.validateEmail(
+				emailValidationDto.toServiceModel()
+			);
 
-		res.json({ data: emailValidation });
-	} catch (error) {
-		next(error);
+			res.json({ data: emailValidation });
+		} catch (error) {
+			next(error);
+		}
 	}
-});
+);
 
-router.post('/auth/local/nickname-validation', async (req, res, next) => {
-	try {
-		const nicknameValidationDto = new NicknameValidationDto(req.body);
+router.post(
+	'/auth/local/nickname-validation',
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const nicknameValidationDto = new NicknameValidationDto(req.body);
 
-		await validateOrReject(nicknameValidationDto);
+			await validateOrReject(nicknameValidationDto);
 
-		const nicknameValidation = await authService.validateNickname(
-			nicknameValidationDto.toServiceModel()
-		);
+			const nicknameValidation = await authService.validateNickname(
+				nicknameValidationDto.toServiceModel()
+			);
 
-		res.json({ data: nicknameValidation });
-	} catch (error) {
-		next(error);
+			res.json({ data: nicknameValidation });
+		} catch (error) {
+			next(error);
+		}
 	}
-});
+);
 
-router.post('/auth/local/email-code', async (req, res, next) => {
-	try {
-		const userIp = req.ip;
+router.post(
+	'/auth/local/email-code',
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const userIp = req.ip;
 
-		const sendMailDto = new SendMailDto(req.body);
+			const sendMailDto = new SendMailDto(req.body);
 
-		await validateOrReject(sendMailDto);
+			await validateOrReject(sendMailDto);
 
-		await authService.sendEmail(sendMailDto.toServiceModel(), userIp);
+			await authService.sendEmail(sendMailDto.toServiceModel(), userIp);
 
-		res.json({ data: true });
-	} catch (error) {
-		next(error);
+			res.json({ data: true });
+		} catch (error) {
+			next(error);
+		}
 	}
-});
+);
 
-router.post('/auth/local/email-verification', async (req, res, next) => {
-	try {
-		const userIp = req.ip;
+router.post(
+	'/auth/local/email-verification',
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const userIp = req.ip;
 
-		const emailVerificationDto = new EmailVerificationDto(req.body);
+			const emailVerificationDto = new EmailVerificationDto(req.body);
 
-		await validateOrReject(emailVerificationDto);
+			await validateOrReject(emailVerificationDto);
 
-		const { accessToken, refreshToken } = await authService.verifyEmail(
-			emailVerificationDto.toServiceModel(),
-			userIp
-		);
+			const { accessToken, refreshToken } = await authService.verifyEmail(
+				emailVerificationDto.toServiceModel(),
+				userIp
+			);
 
-		res
-			.cookie('Authorization', accessToken, cookieOptions)
-			.cookie('refresh_token', refreshToken, cookieOptions)
-			.json({ data: true });
-	} catch (error) {
-		next(error);
+			res
+				.cookie('Authorization', accessToken, cookieOptions)
+				.cookie('refresh_token', refreshToken, cookieOptions)
+				.json({ data: true });
+		} catch (error) {
+			next(error);
+		}
 	}
-});
+);
 //#endregion
 
 router.post(
 	'/auth/refresh-token',
 	checkRefreshToken,
-	async (req, res, next) => {
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const accessToken = authService.reissue(req.userUUID);
 
@@ -121,43 +136,50 @@ router.post(
 	}
 );
 
-router.post('/auth/sign-out', checkRefreshToken, async (req, res, next) => {
-	try {
-		await authService.signOut(req.userUUID);
+router.post(
+	'/auth/sign-out',
+	checkRefreshToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			await authService.signOut(req.userUUID);
 
-		res.json({ data: true });
-	} catch (error) {
-		next(error);
+			res.json({ data: true });
+		} catch (error) {
+			next(error);
+		}
 	}
-});
+);
 
 //#region 카카오 로그인
-router.get('/auth/kakao', (req, res, next) => {
+router.get('/auth/kakao', (req: Request, res: Response, next: NextFunction) => {
 	res.redirect(
 		`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.KAKAO_CLIENT_ID}&redirect_uri=${process.env.KAKAO_REDIRECT_URI}`
 	);
 });
 
-router.get('/auth/kakao/redirect', async (req, res, next) => {
-	try {
-		const { code } = req.query;
+router.get(
+	'/auth/kakao/redirect',
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { code } = req.query;
 
-		if (!code || !(typeof code === 'string')) {
-			throw new BadRequestError(ErrorCode.INVALID_QUERY, [
-				{ data: 'No code in query' },
-			]);
+			if (!code || !(typeof code === 'string')) {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'No code in query' },
+				]);
+			}
+
+			const { accessToken, refreshToken } = await authService.kakaoLogin(code);
+
+			res
+				.cookie('Authorization', accessToken, cookieOptions)
+				.cookie('refresh_token', refreshToken, cookieOptions)
+				.redirect('http://localhost:5173');
+		} catch (error) {
+			next(error);
 		}
-
-		const { accessToken, refreshToken } = await authService.kakaoLogin(code);
-
-		res
-			.cookie('Authorization', accessToken, cookieOptions)
-			.cookie('refresh_token', refreshToken, cookieOptions)
-			.redirect('http://localhost:5173');
-	} catch (error) {
-		next(error);
 	}
-});
+);
 //#endregion
 
 export default router;

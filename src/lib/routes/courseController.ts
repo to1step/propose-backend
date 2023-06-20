@@ -1,4 +1,4 @@
-import express from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
 import CourseService from '../services/courseService';
 import checkAccessToken from '../middlewares/checkAccessToken';
@@ -10,50 +10,61 @@ import UpdateCourseReviewDto from '../types/requestTypes/updateCourseReview.dto'
 import CreateCourseReviewDto from '../types/requestTypes/createCourseReview.dto';
 import EntireCourseDto from '../types/responseTypes/entireCourse.dto';
 
-const router = express.Router();
+const router = Router();
 const courseService = CourseService.getInstance();
 
-router.post('/course', checkAccessToken, async (req, res, next) => {
-	try {
-		const createCourseDto = new CreateCourseDto(req.body);
+router.post(
+	'/course',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const createCourseDto = new CreateCourseDto(req.body);
 
-		await validateOrReject(createCourseDto);
+			await validateOrReject(createCourseDto);
 
-		await courseService.createCourse(
-			req.userUUID,
-			createCourseDto.toServiceModel()
-		);
+			await courseService.createCourse(
+				req.userUUID,
+				createCourseDto.toServiceModel()
+			);
 
-		res.json({ data: true });
-	} catch (error) {
-		next(error);
-	}
-});
-
-router.get('/courses/:courseUUID', checkAccessToken, async (req, res, next) => {
-	try {
-		const { courseUUID } = req.params;
-
-		if (!courseUUID) {
-			throw new BadRequestError(ErrorCode.INVALID_QUERY, [
-				{ data: 'Invalid query' },
-			]);
+			res.json({ data: true });
+		} catch (error) {
+			next(error);
 		}
-
-		const courseData = await courseService.getCourse(req.userUUID, courseUUID);
-
-		const course = new EntireCourseDto(courseData);
-
-		res.json({ data: course });
-	} catch (error) {
-		next(error);
 	}
-});
+);
+
+router.get(
+	'/courses/:courseUUID',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { courseUUID } = req.params;
+
+			if (!courseUUID) {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
+			}
+
+			const courseData = await courseService.getCourse(
+				req.userUUID,
+				courseUUID
+			);
+
+			const course = new EntireCourseDto(courseData);
+
+			res.json({ data: course });
+		} catch (error) {
+			next(error);
+		}
+	}
+);
 
 router.patch(
 	'/courses/:courseUUID',
 	checkAccessToken,
-	async (req, res, next) => {
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { courseUUID } = req.params;
 
@@ -83,7 +94,7 @@ router.patch(
 router.delete(
 	'/courses/:courseUUID',
 	checkAccessToken,
-	async (req, res, next) => {
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { courseUUID } = req.params;
 
@@ -105,7 +116,7 @@ router.delete(
 router.post(
 	'/courses/:courseUUID/like',
 	checkAccessToken,
-	async (req, res, next) => {
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { courseUUID } = req.params;
 
@@ -127,7 +138,7 @@ router.post(
 router.delete(
 	'/courses/:courseUUID/like',
 	checkAccessToken,
-	async (req, res, next) => {
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { courseUUID } = req.params;
 
@@ -149,7 +160,7 @@ router.delete(
 router.post(
 	'/courses/:courseUUID/review',
 	checkAccessToken,
-	async (req, res, next) => {
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { courseUUID } = req.params;
 
@@ -179,7 +190,7 @@ router.post(
 router.patch(
 	'/courses/:courseUUID/reviews/:courseReviewUUID',
 	checkAccessToken,
-	async (req, res, next) => {
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { courseUUID, courseReviewUUID } = req.params;
 
@@ -210,7 +221,7 @@ router.patch(
 router.delete(
 	'/courses/:courseUUID/reviews/:courseReviewUUID',
 	checkAccessToken,
-	async (req, res, next) => {
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { courseUUID, courseReviewUUID } = req.params;
 

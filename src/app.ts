@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
@@ -55,7 +55,7 @@ app.use(
 		credentials: true,
 	})
 );
-app.all('/*', (req, res, next) => {
+app.all('/*', (req: Request, res: Response, next: NextFunction) => {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Headers', 'X-Requested-With');
 	next();
@@ -66,7 +66,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
 	const start = Date.now();
 	res.on('finish', () => {
 		const duration = Date.now() - start;
@@ -75,7 +75,7 @@ app.use((req, res, next) => {
 	next();
 });
 // health check
-app.get('/', (req, res, next) => {
+app.get('/', (req: Request, res: Response, next: NextFunction) => {
 	res.json('Server working');
 });
 
