@@ -1,5 +1,46 @@
+# Dependencies
 /node_modules
-/.idea
+/.pnp
+.pnp.js
+
+# Build output
 /dist
+/.next
+/out
+/.nuxt
+/.build
+/.cache
+/.sass-cache
+
+# Environment files
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor/IDE specific files
+.vscode
+.idea
+*.iml
+*.ipr
+*.iws
+
+# Logs and debugging
 /logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency-specific files
+/.yarn-integrity
+.npmrc
+yarn.lock
+package-lock.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+**/swagger.yaml
