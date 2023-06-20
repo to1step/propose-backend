@@ -64,7 +64,9 @@
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.2",
+    "nodemon": "^2.0.22",
     "prettier": "^2.8.4",
-    "typescript": "5.0.2"
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.2"
   }
 }
