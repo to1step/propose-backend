@@ -20,7 +20,6 @@
 .env.production.local
 
 # Editor/IDE specific files
-.vscode
 .idea
 *.iml
 *.ipr
