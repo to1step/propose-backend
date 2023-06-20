@@ -98,25 +98,20 @@ class UserService {
 		const { nickname, profileImage, commentAlarm, updateAlarm } =
 			changeProfileForm;
 
-		const user = await UserModel.findOneAndUpdate(
-			{
-				uuid: userUUID,
-				deletedAt: null,
-			},
-			{
-				nickname: nickname,
-				profileImage: profileImage,
-				commentAlarm: commentAlarm,
-				updateAlarm: updateAlarm,
-			},
-			{ new: true }
-		);
+		const user = await UserModel.findOne({ uuid: userUUID, deletedAt: null });
 
 		if (!user) {
 			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
 				{ data: 'User not found' },
 			]);
 		}
+
+		user.nickname = nickname;
+		user.profileImage = profileImage;
+		user.commentAlarm = commentAlarm;
+		user.updateAlarm = updateAlarm;
+
+		await user.save();
 	}
 
 	/**
@@ -124,22 +119,19 @@ class UserService {
 	 * @param userUUID
 	 */
 	async deleteUser(userUUID: string): Promise<void> {
-		const user = await UserModel.findOneAndUpdate(
-			{
-				uuid: userUUID,
-				deletedAt: null,
-			},
-			{
-				deletedAt: new Date(),
-			},
-			{ new: true }
-		);
+		const user = await UserModel.findOne({
+			uuid: userUUID,
+			deletedAt: null,
+		});
 
 		if (!user) {
 			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
 				{ data: 'User not found' },
 			]);
 		}
+
+		user.deletedAt = new Date();
+		await user.save();
 	}
 }
 
