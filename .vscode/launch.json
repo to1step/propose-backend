@@ -1,20 +1,18 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "type": "node",
-        "request": "launch",
-        "name": "Debug Local",
-        "program": "${workspaceFolder}/node_modules/nodemon/bin/nodemon.js",
-        "cwd": "${workspaceFolder}",
-        "args": ["run", "start_local"],
-        "env": {
-          "NODE_ENV": "local"
-        },
-        "runtimeArgs": [
-          "--inspect-brk"
-        ]
-      }
-    ]
-  }
-  
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "name": "Debug Express",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/index.js",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "restart": true,
+      "runtimeExecutable": "nodemon"
+    }
+  ]
+}
