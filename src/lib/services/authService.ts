@@ -1,4 +1,4 @@
-import jwt, { decode } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import axios from 'axios';
 import UserService from './userService';
@@ -291,11 +291,9 @@ class AuthService {
 
 	/**
 	 * 토큰 재발급
-	 * @param refreshToken
+	 * @param userUUID
 	 */
-	reissue(refreshToken: string): string {
-		const userUUID = this.verifyRefreshToken(refreshToken);
-
+	reissue(userUUID: string): string {
 		// 토큰 인증 성공 accessToken재 발급
 		return jwt.sign(
 			{ userUUID: userUUID },
@@ -309,49 +307,11 @@ class AuthService {
 
 	/**
 	 * 로그아웃 redis에서 유저의 refreshToken삭제
-	 * @param refreshToken
+	 * @param userUUID
 	 */
-	async signOut(refreshToken: string): Promise<void> {
-		const userUUID = this.verifyRefreshToken(refreshToken);
-
+	async signOut(userUUID: string): Promise<void> {
 		// redis에서 해당 유저의 refreshToken 삭제
 		await redis.del(`${userUUID}`);
-	}
-
-	/**
-	 * 토큰 인증
-	 * @param refreshToken
-	 */
-	verifyRefreshToken(refreshToken: string): string {
-		try {
-			const decoded = jwt.verify(
-				refreshToken,
-				`${process.env.ACCESS_TOKEN_SECRET_KEY}`
-			);
-
-			if (typeof decoded === 'string' || !decoded.userUUID) {
-				throw new BadRequestError(ErrorCode.INVALID_REFRESH_TOKEN, [
-					{ data: 'Invalid refresh token' },
-				]);
-			}
-
-			return decoded.userUUID;
-		} catch (err: any) {
-			if (err.name === 'TokenExpiredError') {
-				throw new BadRequestError(ErrorCode.EXPIRED_REFRESH_TOKEN, [
-					{ data: 'Refresh Token expired, Login again' },
-				]);
-			} else if (err.name === 'JsonWebTokenError') {
-				throw new BadRequestError(ErrorCode.INVALID_REFRESH_TOKEN, [
-					{ data: 'Invalid token' },
-				]);
-			} else if (err.name === 'NotBeforeError') {
-				throw new BadRequestError(ErrorCode.INVALID_REFRESH_TOKEN, [
-					{ data: 'Invalid token' },
-				]);
-			}
-			throw err;
-		}
 	}
 
 	/**
@@ -366,7 +326,7 @@ class AuthService {
 		await redis
 			.multi()
 			.set(userUUID, refreshToken)
-			.pExpire(userUUID, 600000)
+			.pExpire(userUUID, 86400000)
 			.exec();
 	}
 

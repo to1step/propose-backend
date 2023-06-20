@@ -1,7 +1,7 @@
 import express from 'express';
 import { validateOrReject } from 'class-validator';
 import CourseService from '../services/courseService';
-import checkHeaderToken from '../middlewares/checkHeaderToken';
+import checkAccessToken from '../middlewares/checkAccessToken';
 import CreateCourseDto from '../types/requestTypes/createCoures.dto';
 import UpdateCourseDto from '../types/requestTypes/updateCourse.dto';
 import { BadRequestError } from '../middlewares/errors';
@@ -13,7 +13,7 @@ import EntireCourseDto from '../types/responseTypes/entireCourse.dto';
 const router = express.Router();
 const courseService = CourseService.getInstance();
 
-router.post('/course', checkHeaderToken, async (req, res, next) => {
+router.post('/course', checkAccessToken, async (req, res, next) => {
 	try {
 		const createCourseDto = new CreateCourseDto(req.body);
 
@@ -30,7 +30,7 @@ router.post('/course', checkHeaderToken, async (req, res, next) => {
 	}
 });
 
-router.get('/courses/:courseUUID', checkHeaderToken, async (req, res, next) => {
+router.get('/courses/:courseUUID', checkAccessToken, async (req, res, next) => {
 	try {
 		const { courseUUID } = req.params;
 
@@ -52,7 +52,7 @@ router.get('/courses/:courseUUID', checkHeaderToken, async (req, res, next) => {
 
 router.patch(
 	'/courses/:courseUUID',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { courseUUID } = req.params;
@@ -82,7 +82,7 @@ router.patch(
 
 router.delete(
 	'/courses/:courseUUID',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { courseUUID } = req.params;
@@ -104,7 +104,7 @@ router.delete(
 
 router.post(
 	'/courses/:courseUUID/like',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { courseUUID } = req.params;
@@ -126,7 +126,7 @@ router.post(
 
 router.delete(
 	'/courses/:courseUUID/like',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { courseUUID } = req.params;
@@ -148,7 +148,7 @@ router.delete(
 
 router.post(
 	'/courses/:courseUUID/review',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { courseUUID } = req.params;
@@ -178,7 +178,7 @@ router.post(
 
 router.patch(
 	'/courses/:courseUUID/reviews/:courseReviewUUID',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { courseUUID, courseReviewUUID } = req.params;
@@ -209,7 +209,7 @@ router.patch(
 
 router.delete(
 	'/courses/:courseUUID/reviews/:courseReviewUUID',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { courseUUID, courseReviewUUID } = req.params;

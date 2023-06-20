@@ -75,7 +75,6 @@ class CreateCourseDto {
 		this.longComment = obj.longComment;
 		this.isPrivate = obj.isPrivate;
 		this.transports = obj.transports.map(
-			// TODO: 여기서 transport라고 보내면 에러가 생김 수정하기
 			(transport) => new TransportDto(transport)
 		);
 		this.tags = obj.tags;

@@ -1,7 +1,7 @@
 import express from 'express';
 import { validateOrReject } from 'class-validator';
 import StoreService from '../services/storeService';
-import checkHeaderToken from '../middlewares/checkHeaderToken';
+import checkAccessToken from '../middlewares/checkAccessToken';
 import CreateStoreDto from '../types/requestTypes/createStore.dto';
 import EntireStoreDto from '../types/responseTypes/entireStore.dto';
 import UpdateStoreDto from '../types/requestTypes/updateStore.dto';
@@ -13,7 +13,7 @@ import ErrorCode from '../types/customTypes/error';
 const router = express.Router();
 const storeService = StoreService.getInstance();
 
-router.post('/store', checkHeaderToken, async (req, res, next) => {
+router.post('/store', checkAccessToken, async (req, res, next) => {
 	try {
 		const createStoreDto = new CreateStoreDto(req.body);
 
@@ -30,7 +30,7 @@ router.post('/store', checkHeaderToken, async (req, res, next) => {
 	}
 });
 
-router.get('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
+router.get('/stores/:storeUUID', checkAccessToken, async (req, res, next) => {
 	try {
 		const { storeUUID } = req.params;
 
@@ -50,7 +50,7 @@ router.get('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 	}
 });
 
-router.patch('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
+router.patch('/stores/:storeUUID', checkAccessToken, async (req, res, next) => {
 	try {
 		const { storeUUID } = req.params;
 
@@ -78,7 +78,7 @@ router.patch('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
 
 router.delete(
 	'/stores/:storeUUID',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { storeUUID } = req.params;
@@ -100,7 +100,7 @@ router.delete(
 
 router.post(
 	'/stores/:storeUUID/like',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { storeUUID } = req.params;
@@ -122,7 +122,7 @@ router.post(
 
 router.delete(
 	'/stores/:storeUUID/like',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { storeUUID } = req.params;
@@ -144,7 +144,7 @@ router.delete(
 
 router.post(
 	'/stores/:storeUUID/review',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { storeUUID } = req.params;
@@ -174,7 +174,7 @@ router.post(
 
 router.patch(
 	'/stores/:storeUUID/reviews/:storeReviewUUID',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { storeUUID, storeReviewUUID } = req.params;
@@ -205,7 +205,7 @@ router.patch(
 
 router.delete(
 	'/stores/:storeUUID/reviews/:storeReviewUUID',
-	checkHeaderToken,
+	checkAccessToken,
 	async (req, res, next) => {
 		try {
 			const { storeUUID, storeReviewUUID } = req.params;
