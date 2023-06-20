@@ -6,9 +6,10 @@ import EmailVerificationDto from '../types/requestTypes/emailVerification.dto';
 import EmailValidationDto from '../types/requestTypes/emaliValidation.dto';
 import LocalSignInDto from '../types/requestTypes/localSignIn.dto';
 import NicknameValidationDto from '../types/requestTypes/nicknameValidation.dto';
-import RefreshTokenDto from '../types/requestTypes/refreshToken.dto';
 import { BadRequestError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
+import { cookieOptions } from '../../utilies/cookieOptions';
+import checkRefreshToken from '../middlewares/checkRefreshToken';
 
 const router = express.Router();
 const authService = AuthService.getInstance();
@@ -24,8 +25,8 @@ router.post('/auth/local/sign-in', async (req, res, next) => {
 		);
 
 		res
-			.cookie('accessToken', accessToken)
-			.cookie('refreshToken', refreshToken)
+			.cookie('Authorization', accessToken, cookieOptions)
+			.cookie('refresh_token', refreshToken, cookieOptions)
 			.json({ data: true });
 	} catch (error) {
 		next(error);
@@ -95,8 +96,8 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 		);
 
 		res
-			.cookie('accessToken', accessToken)
-			.cookie('refreshToken', refreshToken)
+			.cookie('Authorization', accessToken, cookieOptions)
+			.cookie('refresh_token', refreshToken, cookieOptions)
 			.json({ data: true });
 	} catch (error) {
 		next(error);
@@ -104,31 +105,25 @@ router.post('/auth/local/email-verification', async (req, res, next) => {
 });
 //#endregion
 
-router.post('/auth/refresh-token', async (req, res, next) => {
-	try {
-		const refreshTokenDto = new RefreshTokenDto(req.body);
+router.post(
+	'/auth/refresh-token',
+	checkRefreshToken,
+	async (req, res, next) => {
+		try {
+			const accessToken = authService.reissue(req.userUUID);
 
-		await validateOrReject(refreshTokenDto);
-
-		const accessToken = authService.reissue(refreshTokenDto.refresh_token);
-
-		res.cookie('accessToken', accessToken).json({ data: true });
-	} catch (e) {
-		next(e);
-	}
-});
-
-router.post('/auth/sign-out', async (req, res, next) => {
-	try {
-		const refreshToken = req.header('refreshToken');
-
-		if (!refreshToken) {
-			throw new BadRequestError(ErrorCode.NO_REFRESH_TOKEN_IN_HEADER, [
-				{ data: 'No token in header' },
-			]);
+			res
+				.cookie('Authorization', accessToken, cookieOptions)
+				.json({ data: true });
+		} catch (e) {
+			next(e);
 		}
+	}
+);
 
-		await authService.signOut(`${refreshToken}`);
+router.post('/auth/sign-out', checkRefreshToken, async (req, res, next) => {
+	try {
+		await authService.signOut(req.userUUID);
 
 		res.json({ data: true });
 	} catch (error) {
@@ -156,10 +151,9 @@ router.get('/auth/kakao/redirect', async (req, res, next) => {
 		const { accessToken, refreshToken } = await authService.kakaoLogin(code);
 
 		res
-			.cookie('accessToken', accessToken)
-			.cookie('refreshToken', refreshToken)
-			// TODO: 프론트 redirect 코드
-			.redirect('http://localhost:3000');
+			.cookie('Authorization', accessToken, cookieOptions)
+			.cookie('refresh_token', refreshToken, cookieOptions)
+			.redirect('http://localhost:5173');
 	} catch (error) {
 		next(error);
 	}
