@@ -16,6 +16,7 @@ import v1CourseRouter from './lib/routes/courseController';
 import v1TestRouter from './lib/routes/testController';
 import { errorHandler } from './lib/middlewares/errors/errorHandler';
 import { NotFoundError } from './lib/middlewares/errors';
+import ErrorBot from './utilies/errorBot';
 
 // env
 dotenv.config();
@@ -28,6 +29,9 @@ const redis = Redis.getInstance();
 
 // 로깅용 initialize
 const logger = WinstonLogger.getInstance();
+
+// discord errorBot
+const errorBot = ErrorBot.getInstance();
 
 // swagger 문서
 const swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
@@ -46,6 +50,11 @@ const swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
 //Connect to Redis
 (async () => {
 	await redis.connect();
+})();
+
+//Connect to ErrorBot
+(async () => {
+	await errorBot.connect();
 })();
 
 // Express 설정
