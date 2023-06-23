@@ -72,7 +72,7 @@ class ErrorBot {
 				);
 			} else {
 				channels = await this.errorBot.channels.fetch(
-					`${process.env.DISCORD_PROD_CHANNEL_ID}`
+					`${process.env.DISCORD_DEV_CHANNEL_ID}`
 				);
 			}
 
