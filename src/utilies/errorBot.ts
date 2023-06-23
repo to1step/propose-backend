@@ -14,6 +14,17 @@ const logger = WinstonLogger.getInstance();
 
 dotenv.config();
 
+type Embed = {
+	color: number;
+	title: string;
+	description: string;
+	fields: {
+		name: string;
+		value: string;
+		inline?: boolean;
+	}[];
+};
+
 class ErrorBot {
 	private static instance: ErrorBot;
 
@@ -45,7 +56,13 @@ class ErrorBot {
 		await this.errorBot.login(process.env.DISCORD_BOT_TOKEN);
 	}
 
-	async sendMessage(message: string): Promise<void> {
+	async sendMessage(
+		type: 'error' | 'latency',
+		message: string,
+		userUUID: string,
+		userIp: string,
+		duration?: number
+	): Promise<void> {
 		try {
 			let channels: Channel | null;
 
@@ -63,14 +80,32 @@ class ErrorBot {
 				throw new Error('Discord error');
 			}
 
-			const embed = new EmbedBuilder()
-				.setColor(0x0099ff)
-				.setTitle('에러 발생 비상 비상!')
-				.setDescription(`${message}`);
+			const exampleEmbed: Embed = {
+				color: 0x0099ff,
+				title: type === 'error' ? 'Error occured' : 'Api latency',
+				description:
+					type === 'error' ? `${message}` : `${message} ${duration}ms`,
+				fields: [
+					{
+						name: 'Ip',
+						value: `${userIp ?? 'null'}`,
+						inline: true,
+					},
+					{
+						name: 'UserId',
+						value: `${userUUID ?? 'null'}`,
+						inline: true,
+					},
+					{
+						name: 'Time',
+						value: `${new Date()}`,
+						inline: true,
+					},
+				],
+			};
 
-			await channels.send({ embeds: [embed] });
+			await channels.send({ embeds: [exampleEmbed] });
 		} catch (error: any) {
-			// TODO: 에러메세지를 보내는 애가 에러가 났을때는 어떻게 할까에 대한 논의
 			logger.error(error.message);
 		}
 	}

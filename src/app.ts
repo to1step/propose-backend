@@ -80,9 +80,21 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 	res.on('finish', () => {
 		const duration = Date.now() - start;
 		logger.http(`[${req.method}] ${req.url} ${duration}ms`);
+
+		// 2초이상 걸리는 api 로깅
+		if (duration > 2000) {
+			errorBot.sendMessage(
+				'latency',
+				`[${req.method}] ${req.url}`,
+				req.userUUID ?? null,
+				req.ip,
+				duration
+			);
+		}
 	});
 	next();
 });
+
 // health check
 app.get('/', (req: Request, res: Response, next: NextFunction) => {
 	res.json('Server working');

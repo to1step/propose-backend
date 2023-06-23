@@ -66,7 +66,7 @@ const errorHandler = (
 	} else {
 		const errorMessage = err.stack.toString();
 
-		errorBot.sendMessage(errorMessage);
+		errorBot.sendMessage('error', errorMessage, req.userUUID ?? null, req.ip);
 
 		logger.error(errorMessage);
 		res.status(500).send({ message: 'INTERNAL_SERVER_ERROR' });
