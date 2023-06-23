@@ -12,6 +12,7 @@ import { StoreLikeModel } from '../../database/models/storeLike';
 import { StoreReviewModel } from '../../database/models/storeReview';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
+import { StoreScoreModel } from '../../database/models/storeScore';
 
 class StoreService {
 	private static instance: StoreService;
@@ -209,18 +210,21 @@ class StoreService {
 			store: storeUUID,
 			deletedAt: null,
 		});
+		//
+		// if (likeHistory) {
+		// 	// 좋아요를 이미 했는데 다시 좋아요를 누르는 경우
+		// 	throw new BadRequestError(ErrorCode.DUPLICATE_STORE_LIKE_ERROR, [
+		// 		{ data: 'Duplicate store like' },
+		// 	]);
+		// }
 
-		if (likeHistory) {
-			// 좋아요를 이미 했는데 다시 좋아요를 누르는 경우
-			throw new BadRequestError(ErrorCode.DUPLICATE_STORE_LIKE_ERROR, [
-				{ data: 'Duplicate store like' },
-			]);
-		}
-
-		await new StoreLikeModel({
-			user: userUUID,
-			store: storeUUID,
-		}).save();
+		await Promise.all([
+			await new StoreLikeModel({
+				user: userUUID,
+				store: storeUUID,
+			}).save(),
+			await this.scoreToStore(userUUID, storeUUID, store.location, 'add'),
+		]);
 	}
 
 	/**
@@ -255,7 +259,10 @@ class StoreService {
 		}
 
 		likeHistory.deletedAt = new Date();
-		await likeHistory.save();
+		await Promise.all([
+			await likeHistory.save(),
+			await this.scoreToStore(userUUID, storeUUID, store.location, 'sub'),
+		]);
 	}
 
 	/**
@@ -353,6 +360,59 @@ class StoreService {
 
 		storeReview.deletedAt = new Date();
 		await storeReview.save();
+	}
+
+	/**
+	 * 가게에 점수 부여하기
+	 * @param userUUID
+	 * @param storeUUID
+	 * @param location
+	 * @param type
+	 */
+	async scoreToStore(
+		userUUID: string,
+		storeUUID: string,
+		location: string,
+		type: 'add' | 'sub'
+	): Promise<void> {
+		const today = new Date();
+		const day = today.getDay();
+		const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+		const monday = new Date(today.setDate(diff));
+		monday.setHours(0, 0, 0, 0);
+
+		// 이번주에 등록되었는지 확인
+		const storeScore = await StoreScoreModel.findOne({
+			store: storeUUID,
+			date: monday,
+		});
+
+		if (storeScore) {
+			if (type === 'add') {
+				storeScore.score += 1;
+			} else {
+				storeScore.score -= 1;
+			}
+			await storeScore.save();
+		} else {
+			// 없다면 score 1으로 생성
+			const locationSplit = location.split(' ');
+			let shortLocation;
+			if (locationSplit.length < 2) {
+				// 주소가 한단어 이하인 경우 그냥 주소룰 할당
+				shortLocation = location;
+			} else {
+				// 두 글자 이상인 경우 앞 문자 두개 저장
+				shortLocation = `${locationSplit[0]} ${locationSplit[1]}`;
+			}
+
+			await new StoreScoreModel({
+				store: storeUUID,
+				shortLocation: shortLocation,
+				date: monday,
+				score: type === 'add' ? 1 : 0,
+			}).save();
+		}
 	}
 }
 

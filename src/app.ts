@@ -16,6 +16,7 @@ import v1CourseRouter from './lib/routes/courseController';
 import v1TestRouter from './lib/routes/testController';
 import { errorHandler } from './lib/middlewares/errors/errorHandler';
 import { NotFoundError } from './lib/middlewares/errors';
+import { getTopScore } from './utilies/rankScheduler';
 
 // env
 dotenv.config();
@@ -75,8 +76,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 	next();
 });
 // health check
-app.get('/', (req: Request, res: Response, next: NextFunction) => {
-	res.json('Server working');
+app.get('/', async (req: Request, res: Response, next: NextFunction) => {
+	const result = await getTopScore();
+	res.json({ data: result });
+	// res.json('Server working');
 });
 
 app.use(
