@@ -8,7 +8,7 @@ const logger = WinstonLogger.getInstance();
 
 const redis = Redis.getInstance().getClient();
 
-const getTopScore = (): void => {
+const rankingScheduler = (): void => {
 	// 매주 일요일 11시 50분에 이벤트 발생
 	const rule = new schedule.RecurrenceRule();
 	rule.dayOfWeek = 0;
@@ -58,4 +58,4 @@ const getTopScore = (): void => {
 	});
 };
 
-export { getTopScore };
+export { rankingScheduler };
