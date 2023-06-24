@@ -164,6 +164,18 @@ type UpdateStoreReviewForm = {
 	review: string;
 };
 
+type LocationAggregateStore = {
+	shortLocation: string;
+	data: {
+		store: string;
+		shortLocation: string;
+		date: Date;
+		score: number;
+		createdAt: Date;
+		updatedAt: Date;
+	};
+};
+
 // course
 type Course = {
 	uuid: string;
@@ -261,6 +273,7 @@ export type {
 	UpdateStoreForm,
 	CreateStoreReviewForm,
 	UpdateStoreReviewForm,
+	LocationAggregateStore,
 	Course,
 	CourseEntireInfo,
 	Transport,
