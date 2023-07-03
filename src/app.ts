@@ -1,12 +1,12 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
+import Mongo from './utilies/mongo';
 import Redis from './utilies/redis';
 import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
@@ -18,107 +18,122 @@ import { errorHandler } from './lib/middlewares/errors/errorHandler';
 import { NotFoundError } from './lib/middlewares/errors';
 import ErrorBot from './utilies/errorBot';
 
-// env
 dotenv.config();
 
-// 서버 가동
-const app = express();
+class Server {
+	private app = express();
 
-// redis initialize
-const redis = Redis.getInstance();
+	private mongo = Mongo.getInstance();
 
-// 로깅용 initialize
-const logger = WinstonLogger.getInstance();
+	private redis = Redis.getInstance();
 
-// discord errorBot
-const errorBot = ErrorBot.getInstance();
+	private logger = WinstonLogger.getInstance();
 
-// swagger 문서
-const swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
+	private errorBot = ErrorBot.getInstance();
 
-// Connect to MongoDB
-(async () => {
-	await mongoose.connect(`${process.env.DATABASE_URL}`, {
-		user: process.env.DATABASE_USER,
-		pass: process.env.DATABASE_PASSWORD,
-		dbName: process.env.DATABASE_NAME,
-		heartbeatFrequencyMS: 2000,
-	});
-	logger.info(`DB Connected`);
-})();
+	private swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
 
-//Connect to Redis
-(async () => {
-	await redis.connect();
-})();
+	constructor() {
+		this.initializeMiddleware();
+		this.initializeRoutes();
+		this.initializeDatabase();
+		this.initializeRedis();
+		this.initializeErrorBot();
+	}
 
-//Connect to ErrorBot
-(async () => {
-	await errorBot.connect();
-})();
+	private async initializeDatabase() {
+		await this.mongo.connect();
+	}
 
-// Express 설정
-app.use(
-	cors({
-		origin: true,
-		credentials: true,
-	})
-);
-app.all('/*', (req: Request, res: Response, next: NextFunction) => {
-	res.header('Access-Control-Allow-Origin', '*');
-	res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-	next();
-});
-app.set('port', process.env.PORT || 4000);
-app.use(helmet({ contentSecurityPolicy: false }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+	private async initializeRedis() {
+		await this.redis.connect();
+	}
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-	const start = Date.now();
-	res.on('finish', () => {
-		const duration = Date.now() - start;
-		logger.http(`[${req.method}] ${req.url} ${duration}ms`);
+	private async initializeErrorBot() {
+		await this.errorBot.connect();
+	}
 
-		// 2초이상 걸리는 api 로깅
-		if (duration > 2000) {
-			errorBot.sendMessage(
-				'latency',
-				`[${req.method}] ${req.url}`,
-				req.userUUID ?? null,
-				req.ip,
-				duration
-			);
-		}
-	});
-	next();
-});
+	private initializeMiddleware() {
+		this.app.use(
+			cors({
+				origin: true,
+				credentials: true,
+			})
+		);
+		this.app.all('/*', (req: Request, res: Response, next: NextFunction) => {
+			res.header('Access-Control-Allow-Origin', '*');
+			res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+			next();
+		});
+		this.app.set('port', process.env.PORT || 4000);
+		this.app.use(helmet({ contentSecurityPolicy: false }));
+		this.app.use(express.json());
+		this.app.use(express.urlencoded({ extended: true }));
+		this.app.use(cookieParser());
+	}
 
-// health check
-app.get('/', (req: Request, res: Response, next: NextFunction) => {
-	res.json('Server working');
-});
+	private initializeRoutes(): void {
+		// api time checker
+		this.app.use((req: Request, res: Response, next: NextFunction) => {
+			const start = Date.now();
+			res.on('finish', () => {
+				const duration = Date.now() - start;
+				this.logger.http(`[${req.method}] ${req.url} ${duration}ms`);
 
-app.use(
-	'/api-docs',
-	swaggerUi.serve,
-	swaggerUi.setup(swaggerSpec, { explorer: true })
-);
+				// check exceed 2000ms api
+				if (duration > 2000) {
+					this.errorBot.sendMessage(
+						'latency',
+						`[${req.method}] ${req.url}`,
+						req.userUUID ?? null,
+						req.ip,
+						duration
+					);
+				}
+			});
+			next();
+		});
 
-/**
- * 라우터 정의
- */
-app.use('/v1', v1AuthRouter);
-app.use('/v1', v1UserRouter);
-app.use('/v1', v1StoreRouter);
-app.use('/v1', v1CourseRouter);
-app.use('/v1', v1TestRouter);
+		// health-check
+		this.app.get('/', (req: Request, res: Response, next: NextFunction) => {
+			res.json('Server working');
+		});
 
-app.use((req, res) => {
-	throw new NotFoundError();
-});
+		// docs-route
+		this.app.use(
+			'/api-docs',
+			swaggerUi.serve,
+			swaggerUi.setup(this.swaggerSpec, { explorer: true })
+		);
 
-app.use(errorHandler);
+		// api-routes
+		this.app.use('/v1', v1AuthRouter);
+		this.app.use('/v1', v1UserRouter);
+		this.app.use('/v1', v1StoreRouter);
+		this.app.use('/v1', v1CourseRouter);
+		this.app.use('/v1', v1TestRouter);
 
-export default app;
+		// page not found
+		this.app.use((req, res) => {
+			throw new NotFoundError();
+		});
+
+		// error-handler
+		this.app.use(errorHandler);
+	}
+
+	// server-listen
+	public listen(): void {
+		this.app.listen(this.app.get('port'), () => {
+			this.logger.info(`Server is running on port ${this.app.get('port')}`);
+		});
+	}
+}
+
+try {
+	const appServer = new Server();
+
+	appServer.listen();
+} catch (error) {
+	console.error(error);
+}
