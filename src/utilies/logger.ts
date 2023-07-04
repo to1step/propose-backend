@@ -16,10 +16,7 @@ class WinstonLogger {
 	private readonly logPath: string;
 
 	private constructor() {
-		this.logPath =
-			process.env.NODE_ENV === 'local'
-				? `${process.env.LOCAL_LOG_PATH}`
-				: `${process.env.PROD_LOG_PATH}`;
+		this.logPath = `${process.env.LOG_PATH}`;
 
 		const infoLog = new WinstonDaily({
 			level: 'info',
