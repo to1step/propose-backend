@@ -26,7 +26,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LocalSignInDto"
+              $ref: '#/components/schemas/LocalSignInDto'
       responses:
         '200':
           description: 로그인 성공
@@ -55,7 +55,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EmailValidationDto"
+              $ref: '#/components/schemas/EmailValidationDto'
       responses:
         '200':
           description: 이메일 사용가능 여부
@@ -79,7 +79,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NicknameValidationDto"
+              $ref: '#/components/schemas/NicknameValidationDto'
       responses:
         '200':
           description: 닉네임 사용가능 여부
@@ -97,13 +97,13 @@ paths:
       tags:
         - AuthController
       summary: 인증메일 전송
-      description: 유저정보 redis에 저장, 인증메일 전송
+      description: '유저정보 redis에 저장, 인증메일 전송'
       requestBody:
         description: SendMailDto
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserDataDto"
+              $ref: '#/components/schemas/UserDataDto'
       responses:
         '200':
           description: 인증 메일 전송 여부
@@ -127,7 +127,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EmailVerificationDto"
+              $ref: '#/components/schemas/EmailVerificationDto'
       responses:
         '200':
           description: 회원가입 성공 즉시 로그인
@@ -145,13 +145,13 @@ paths:
       tags:
         - AuthController
       summary: 토큰 재발급
-      description: refreshToken이 유효하다면 accessToken 재발급, grant_type은 refresh_token으로 보내주세요
+      description: 'refreshToken이 유효하다면 accessToken 재발급, grant_type은 refresh_token으로 보내주세요'
       requestBody:
         description: RefreshTokenDto
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RefreshTokenDto"
+              $ref: '#/components/schemas/RefreshTokenDto'
       responses:
         '200':
           description: accessToken 갱신
@@ -200,7 +200,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetUserDataDto"
+                $ref: '#/components/schemas/GetUserDataDto'
     patch:
       tags:
         - UserController
@@ -214,7 +214,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateUserDto"
+              $ref: '#/components/schemas/UpdateUserDto'
       responses:
         '200':
           description: 닉네임 변경 성공
@@ -261,7 +261,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateStoreDto"
+              $ref: '#/components/schemas/CreateStoreDto'
       responses:
         '200':
           description: 가게 생성 성공
@@ -274,7 +274,7 @@ paths:
                     type: boolean
                     description: 가게 생성 성공
                     example: true
-  /v1/stores/{storeUUID}:
+  '/v1/stores/{storeUUID}':
     get:
       tags:
         - StoreController
@@ -296,7 +296,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EntireStoreDto"
+                $ref: '#/components/schemas/EntireStoreDto'
     patch:
       tags:
         - StoreController
@@ -317,7 +317,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateStoreDto"
+              $ref: '#/components/schemas/UpdateStoreDto'
       responses:
         '200':
           description: 가게 정보 수정 성공
@@ -357,7 +357,7 @@ paths:
                     type: boolean
                     description: 가게 삭제 성공
                     example: true
-  /v1/stores/{storeUUID}/like:
+  '/v1/stores/{storeUUID}/like':
     post:
       tags:
         - StoreController
@@ -412,7 +412,7 @@ paths:
                     type: boolean
                     description: 가게 좋아요 취소 성공
                     example: true
-  /v1/stores/{storeUUID}/review:
+  '/v1/stores/{storeUUID}/review':
     post:
       tags:
         - StoreController
@@ -433,7 +433,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateStoreReviewDto"
+              $ref: '#/components/schemas/CreateStoreReviewDto'
       responses:
         '200':
           description: 가게 리뷰 작성 성공
@@ -446,7 +446,7 @@ paths:
                     type: boolean
                     description: 가게 리뷰 작성 성공
                     example: true
-  /v1/stores/{storeUUID}/reviews/{storeReviewUUID}:
+  '/v1/stores/{storeUUID}/reviews/{storeReviewUUID}':
     patch:
       tags:
         - StoreController
@@ -473,7 +473,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateStoreReviewDto"
+              $ref: '#/components/schemas/UpdateStoreReviewDto'
       responses:
         '200':
           description: 가게 리뷰 수정 성공
@@ -533,7 +533,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateCourseDto"
+              $ref: '#/components/schemas/CreateCourseDto'
       responses:
         '200':
           description: 코스 생성 성공
@@ -546,7 +546,7 @@ paths:
                     type: boolean
                     description: 코스 생성 성공
                     example: true
-  /v1/courses/{courseUUID}:
+  '/v1/courses/{courseUUID}':
     get:
       tags:
         - CourseController
@@ -568,7 +568,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EntireCourseDto"
+                $ref: '#/components/schemas/EntireCourseDto'
     patch:
       tags:
         - CourseController
@@ -589,7 +589,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateCourseDto"
+              $ref: '#/components/schemas/UpdateCourseDto'
       responses:
         '200':
           description: 코스 정보 수정 성공
@@ -629,7 +629,7 @@ paths:
                     type: boolean
                     description: 코스 삭제 성공
                     example: true
-  /v1/courses/{courseUUID}/like:
+  '/v1/courses/{courseUUID}/like':
     post:
       tags:
         - CourseController
@@ -684,7 +684,7 @@ paths:
                     type: boolean
                     description: 코스 좋아요 취소 성공
                     example: true
-  /v1/courses/{courseUUID}/review:
+  '/v1/courses/{courseUUID}/review':
     post:
       tags:
         - CourseController
@@ -705,7 +705,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateCourseReviewDto"
+              $ref: '#/components/schemas/CreateCourseReviewDto'
       responses:
         '200':
           description: 코스 리뷰 작성 성공
@@ -718,7 +718,7 @@ paths:
                     type: boolean
                     description: 코스 리뷰 작성 성공
                     example: true
-  /v1/courses/{courseUUID}/reviews/{courseReviewUUID}:
+  '/v1/courses/{courseUUID}/reviews/{courseReviewUUID}':
     patch:
       tags:
         - CourseController
@@ -745,7 +745,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateCourseReviewDto"
+              $ref: '#/components/schemas/UpdateCourseReviewDto'
       responses:
         '200':
           description: 코스 리뷰 수정 성공
@@ -945,7 +945,9 @@ components:
         coordinates:
           type: array
           description: 가게 좌표
-          example: [123.45, 12.34]
+          example:
+            - 123.45
+            - 12.34
         representImage:
           type: string
           description: 가게 대표 사진 경로
@@ -953,15 +955,18 @@ components:
         tags:
           type: array
           description: 생성할 태그
-          example: ['맛집', '인스타감성', '야경']
+          example:
+            - 맛집
+            - 인스타감성
+            - 야경
         startTime:
           type: string
           description: 가게 오픈 시간
-          example: "아침 9시"
+          example: 아침 9시
         endTime:
           type: string
           description: 가게 마감 시간
-          example: "저녁 10시"
+          example: 저녁 10시
     EntireStoreDto:
       type: object
       properties:
@@ -988,7 +993,9 @@ components:
         coordinates:
           type: array
           description: 가게 좌표
-          example: [ 123.45, 12.34 ]
+          example:
+            - 123.45
+            - 12.34
         representImage:
           type: string
           description: 가게 대표 사진 경로
@@ -996,15 +1003,18 @@ components:
         tags:
           type: array
           description: 생성할 태그
-          example: [ '맛집', '인스타감성', '야경' ]
+          example:
+            - 맛집
+            - 인스타감성
+            - 야경
         startTime:
           type: string
           description: 가게 오픈 시간
-          example: "아침 9시"
+          example: 아침 9시
         endTime:
           type: string
           description: 가게 마감 시간
-          example: "저녁 10시"
+          example: 저녁 10시
         storeReviews:
           type: array
           description: 가게 리뷰들
@@ -1062,7 +1072,9 @@ components:
         coordinates:
           type: array
           description: 가게 좌표
-          example: [ 123.45, 12.34 ]
+          example:
+            - 123.45
+            - 12.34
         representImage:
           type: string
           description: 가게 대표 사진 경로
@@ -1070,15 +1082,18 @@ components:
         tags:
           type: array
           description: 생성할 태그
-          example: [ '맛집', '인스타감성', '야경' ]
+          example:
+            - 맛집
+            - 인스타감성
+            - 야경
         startTime:
           type: string
           description: 가게 오픈 시간
-          example: "아침 9시"
+          example: 아침 9시
         endTime:
           type: string
           description: 가게 마감 시간
-          example: "저녁 10시"
+          example: 저녁 10시
     CreateStoreReviewDto:
       type: object
       required:
@@ -1113,7 +1128,10 @@ components:
         stores:
           type: array
           description: 경유 가게들 uuid 순서대로
-          example: ["9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46"]
+          example:
+            - 9ddfe694-d960-4492-98a0-eb24ed98dd46
+            - 9ddfe694-d960-4492-98a0-eb24ed98dd46
+            - 9ddfe694-d960-4492-98a0-eb24ed98dd46
         shortComment:
           type: string
           description: 코스에 대한 짧은 설명
@@ -1149,11 +1167,14 @@ components:
                 example: 그냥 걸어가세요
               transportation:
                 type: number
-                description: 이동 수단 0,1,2 값 중 하나 0 = 버스 / 1 = 지하철 / 2 = 도보 / 3 = 기타
+                description: '이동 수단 0,1,2 값 중 하나 0 = 버스 / 1 = 지하철 / 2 = 도보 / 3 = 기타'
         tags:
           type: array
           description: 코스에 대한 태그 배열
-          example: [ '맛집', '인스타감성', '야경' ]
+          example:
+            - 맛집
+            - 인스타감성
+            - 야경
     EntireCourseDto:
       type: object
       properties:
@@ -1164,7 +1185,10 @@ components:
         stores:
           type: array
           description: 경유 가게들 uuid 순서대로
-          example: [ "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46"]
+          example:
+            - 9ddfe694-d960-4492-98a0-eb24ed98dd46
+            - 9ddfe694-d960-4492-98a0-eb24ed98dd46
+            - 9ddfe694-d960-4492-98a0-eb24ed98dd46
         shortComment:
           type: string
           description: 코스에 대한 짧은 설명
@@ -1197,11 +1221,14 @@ components:
                 example: 그냥 걸어가세요
               transportation:
                 type: number
-                description: 이동 수단 0,1,2 값 중 하나 0 = 버스 / 1 = 지하철 / 2 = 도보 / 3 = 기타
+                description: '이동 수단 0,1,2 값 중 하나 0 = 버스 / 1 = 지하철 / 2 = 도보 / 3 = 기타'
         tags:
           type: array
           description: 코스에 대한 태그 배열
-          example: [ '맛집', '인스타감성', '야경' ]
+          example:
+            - 맛집
+            - 인스타감성
+            - 야경
         courseReviews:
           type: array
           description: 코스 리뷰들
@@ -1247,7 +1274,10 @@ components:
         stores:
           type: array
           description: 경유 가게들 uuid 순서대로
-          example: [ "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46" ]
+          example:
+            - 9ddfe694-d960-4492-98a0-eb24ed98dd46
+            - 9ddfe694-d960-4492-98a0-eb24ed98dd46
+            - 9ddfe694-d960-4492-98a0-eb24ed98dd46
         shortComment:
           type: string
           description: 코스에 대한 짧은 설명
@@ -1283,11 +1313,14 @@ components:
                 example: 그냥 걸어가세요
               transportation:
                 type: number
-                description: 이동 수단 0,1,2 값 중 하나 0 = 버스 / 1 = 지하철 / 2 = 도보 / 3 = 기타
+                description: '이동 수단 0,1,2 값 중 하나 0 = 버스 / 1 = 지하철 / 2 = 도보 / 3 = 기타'
         tags:
           type: array
           description: 코스에 대한 태그 배열
-          example: [ '맛집', '인스타감성', '야경' ]
+          example:
+            - 맛집
+            - 인스타감성
+            - 야경
     CreateCourseReviewDto:
       type: object
       required:
@@ -1306,4 +1339,3 @@ components:
           type: string
           description: 리뷰 내용
           example: 코스 별로네요. 내가 더 잘만들듯?
-

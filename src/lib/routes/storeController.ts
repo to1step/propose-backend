@@ -1,7 +1,7 @@
-import express from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
 import StoreService from '../services/storeService';
-import checkHeaderToken from '../middlewares/checkHeaderToken';
+import checkAccessToken from '../middlewares/checkAccessToken';
 import CreateStoreDto from '../types/requestTypes/createStore.dto';
 import EntireStoreDto from '../types/responseTypes/entireStore.dto';
 import UpdateStoreDto from '../types/requestTypes/updateStore.dto';
@@ -10,76 +10,88 @@ import UpdateStoreReviewDto from '../types/requestTypes/updateStoreReview.dto';
 import { BadRequestError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
 
-const router = express.Router();
+const router = Router();
 const storeService = StoreService.getInstance();
 
-router.post('/store', checkHeaderToken, async (req, res, next) => {
-	try {
-		const createStoreDto = new CreateStoreDto(req.body);
+router.post(
+	'/store',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const createStoreDto = new CreateStoreDto(req.body);
 
-		await validateOrReject(createStoreDto);
+			await validateOrReject(createStoreDto);
 
-		await storeService.createStore(
-			req.userUUID,
-			createStoreDto.toServiceModel()
-		);
+			await storeService.createStore(
+				req.userUUID,
+				createStoreDto.toServiceModel()
+			);
 
-		res.json({ data: true });
-	} catch (error) {
-		next(error);
-	}
-});
-
-router.get('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
-	try {
-		const { storeUUID } = req.params;
-
-		if (!storeUUID) {
-			throw new BadRequestError(ErrorCode.INVALID_QUERY, [
-				{ data: 'Invalid query' },
-			]);
+			res.json({ data: true });
+		} catch (error) {
+			next(error);
 		}
-
-		const storeData = await storeService.getStore(req.userUUID, storeUUID);
-
-		const store = new EntireStoreDto(storeData);
-
-		res.json({ data: store });
-	} catch (error) {
-		next(error);
 	}
-});
+);
 
-router.patch('/stores/:storeUUID', checkHeaderToken, async (req, res, next) => {
-	try {
-		const { storeUUID } = req.params;
+router.get(
+	'/stores/:storeUUID',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { storeUUID } = req.params;
 
-		if (!storeUUID) {
-			throw new BadRequestError(ErrorCode.INVALID_QUERY, [
-				{ data: 'Invalid query' },
-			]);
+			if (!storeUUID) {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
+			}
+
+			const storeData = await storeService.getStore(req.userUUID, storeUUID);
+
+			const store = new EntireStoreDto(storeData);
+
+			res.json({ data: store });
+		} catch (error) {
+			next(error);
 		}
-
-		const updateStoreDto = new UpdateStoreDto(req.body);
-
-		await validateOrReject(updateStoreDto);
-
-		await storeService.updateStore(
-			req.userUUID,
-			storeUUID,
-			updateStoreDto.toServiceModel()
-		);
-
-		res.json({ data: true });
-	} catch (error) {
-		next(error);
 	}
-});
+);
+
+router.patch(
+	'/stores/:storeUUID',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { storeUUID } = req.params;
+
+			if (!storeUUID) {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
+			}
+
+			const updateStoreDto = new UpdateStoreDto(req.body);
+
+			await validateOrReject(updateStoreDto);
+
+			await storeService.updateStore(
+				req.userUUID,
+				storeUUID,
+				updateStoreDto.toServiceModel()
+			);
+
+			res.json({ data: true });
+		} catch (error) {
+			next(error);
+		}
+	}
+);
 
 router.delete(
 	'/stores/:storeUUID',
-	checkHeaderToken,
-	async (req, res, next) => {
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { storeUUID } = req.params;
 
@@ -100,8 +112,8 @@ router.delete(
 
 router.post(
 	'/stores/:storeUUID/like',
-	checkHeaderToken,
-	async (req, res, next) => {
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { storeUUID } = req.params;
 
@@ -122,8 +134,8 @@ router.post(
 
 router.delete(
 	'/stores/:storeUUID/like',
-	checkHeaderToken,
-	async (req, res, next) => {
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { storeUUID } = req.params;
 
@@ -144,8 +156,8 @@ router.delete(
 
 router.post(
 	'/stores/:storeUUID/review',
-	checkHeaderToken,
-	async (req, res, next) => {
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { storeUUID } = req.params;
 
@@ -174,8 +186,8 @@ router.post(
 
 router.patch(
 	'/stores/:storeUUID/reviews/:storeReviewUUID',
-	checkHeaderToken,
-	async (req, res, next) => {
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { storeUUID, storeReviewUUID } = req.params;
 
@@ -205,8 +217,8 @@ router.patch(
 
 router.delete(
 	'/stores/:storeUUID/reviews/:storeReviewUUID',
-	checkHeaderToken,
-	async (req, res, next) => {
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { storeUUID, storeReviewUUID } = req.params;
 

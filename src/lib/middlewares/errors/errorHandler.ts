@@ -8,8 +8,11 @@ import {
 	UnauthorizedError,
 } from './index';
 import WinstonLogger from '../../../utilies/logger';
+import ErrorBot from '../../../utilies/errorBot';
 
 const logger = WinstonLogger.getInstance();
+
+const errorBot = ErrorBot.getInstance();
 
 const validationErrorMessages = (err: ValidationError[]): string[] => {
 	const messages: string[] = [];
@@ -40,7 +43,7 @@ const errorHandler = (
 		res.status(400).send({
 			message: 'VALIDATION_ERROR',
 			code: 400,
-			errors: errorMessages.join('; '),
+			errors: errorMessages.join('| '),
 		});
 	} else if (err instanceof BadRequestError) {
 		res
@@ -61,7 +64,11 @@ const errorHandler = (
 	} else if (err instanceof NotFoundError) {
 		res.status(err.code).send({ message: 'NOT_FOUND' });
 	} else {
-		logger.error(JSON.stringify(err));
+		const errorMessage = err.stack.toString();
+
+		errorBot.sendMessage('error', errorMessage, req.userUUID ?? null, req.ip);
+
+		logger.error(errorMessage);
 		res.status(500).send({ message: 'INTERNAL_SERVER_ERROR' });
 	}
 };

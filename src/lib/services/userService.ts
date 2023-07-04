@@ -2,8 +2,13 @@ import { v4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import { UserModel } from '../../database/models/user';
 import ModelConverter from '../../utilies/converter/modelConverter';
-import { User, UserCreateKey, UserCreateForm } from '../types/type';
-import { BadRequestError } from '../middlewares/errors';
+import {
+	ChangeProfileForm,
+	User,
+	UserCreateForm,
+	UserCreateKey,
+} from '../types/type';
+import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
 
 class UserService {
@@ -34,6 +39,10 @@ class UserService {
 		return ModelConverter.toUser(user);
 	}
 
+	/**
+	 * 유저 생성
+	 * @param userData
+	 */
 	async createUser<T extends UserCreateKey>(
 		userData: UserCreateForm<T>
 	): Promise<User> {
@@ -56,6 +65,73 @@ class UserService {
 		}).save();
 
 		return ModelConverter.toUser(user);
+	}
+
+	/**
+	 * 나의 정보 모두 가져오기
+	 * @param userUUID
+	 */
+	async getProfile(userUUID: string): Promise<User> {
+		const user = await UserModel.findOne({
+			uuid: userUUID,
+			deletedAt: null,
+		});
+
+		if (!user) {
+			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
+				{ data: 'User not found' },
+			]);
+		}
+
+		return ModelConverter.toUser(user);
+	}
+
+	/**
+	 * 개인정보 변경하기
+	 * @param changeProfileForm
+	 * @param userUUID
+	 */
+	async changeProfile(
+		changeProfileForm: ChangeProfileForm,
+		userUUID: string
+	): Promise<void> {
+		const { nickname, profileImage, commentAlarm, updateAlarm } =
+			changeProfileForm;
+
+		const user = await UserModel.findOne({ uuid: userUUID, deletedAt: null });
+
+		if (!user) {
+			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
+				{ data: 'User not found' },
+			]);
+		}
+
+		user.nickname = nickname;
+		user.profileImage = profileImage;
+		user.commentAlarm = commentAlarm;
+		user.updateAlarm = updateAlarm;
+
+		await user.save();
+	}
+
+	/**
+	 * 회원 탈퇴
+	 * @param userUUID
+	 */
+	async deleteUser(userUUID: string): Promise<void> {
+		const user = await UserModel.findOne({
+			uuid: userUUID,
+			deletedAt: null,
+		});
+
+		if (!user) {
+			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
+				{ data: 'User not found' },
+			]);
+		}
+
+		user.deletedAt = new Date();
+		await user.save();
 	}
 }
 

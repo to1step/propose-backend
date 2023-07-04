@@ -1,12 +1,12 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
+import Mongo from './utilies/mongo';
 import Redis from './utilies/redis';
 import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
@@ -16,88 +16,124 @@ import v1CourseRouter from './lib/routes/courseController';
 import v1TestRouter from './lib/routes/testController';
 import { errorHandler } from './lib/middlewares/errors/errorHandler';
 import { NotFoundError } from './lib/middlewares/errors';
+import ErrorBot from './utilies/errorBot';
 
-// env
 dotenv.config();
 
-// 서버 가동
-const app = express();
+class Server {
+	private app = express();
 
-// redis initialize
-const redis = Redis.getInstance();
+	private mongo = Mongo.getInstance();
 
-// 로깅용 initialize
-const logger = WinstonLogger.getInstance();
+	private redis = Redis.getInstance();
 
-// swagger 문서
-const swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
+	private logger = WinstonLogger.getInstance();
 
-// Connect to MongoDB
-(async () => {
-	await mongoose.connect(`${process.env.DATABASE_URL}`, {
-		user: process.env.DATABASE_USER,
-		pass: process.env.DATABASE_PASSWORD,
-		dbName: process.env.DATABASE_NAME,
-		heartbeatFrequencyMS: 2000,
-	});
-	logger.info(`DB Connected`);
-})();
+	private errorBot = ErrorBot.getInstance();
 
-//Connect to Redis
-(async () => {
-	await redis.connect();
-})();
+	private swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
 
-// Express 설정
-app.use(
-	cors({
-		origin: true,
-		credentials: true,
-	})
-);
-app.all('/*', (req, res, next) => {
-	res.header('Access-Control-Allow-Origin', '*');
-	res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-	next();
-});
-app.set('port', process.env.PORT || 4000);
-app.use(helmet({ contentSecurityPolicy: false }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+	constructor() {
+		this.initializeMiddleware();
+		this.initializeRoutes();
+		this.initializeDatabase();
+		this.initializeRedis();
+		this.initializeErrorBot();
+	}
 
-app.use((req, res, next) => {
-	const start = Date.now();
-	res.on('finish', () => {
-		const duration = Date.now() - start;
-		logger.http(`[${req.method}] ${req.url} ${duration}ms`);
-	});
-	next();
-});
-// health check
-app.get('/', (req, res, next) => {
-	res.json('Server working');
-});
+	private async initializeDatabase() {
+		await this.mongo.connect();
+	}
 
-app.use(
-	'/api-docs',
-	swaggerUi.serve,
-	swaggerUi.setup(swaggerSpec, { explorer: true })
-);
+	private async initializeRedis() {
+		await this.redis.connect();
+	}
 
-/**
- * 라우터 정의
- */
-app.use('/v1', v1AuthRouter);
-app.use('/v1', v1UserRouter);
-app.use('/v1', v1StoreRouter);
-app.use('/v1', v1CourseRouter);
-app.use('/v1', v1TestRouter);
+	private async initializeErrorBot() {
+		await this.errorBot.connect();
+	}
 
-app.use((req, res) => {
-	throw new NotFoundError();
-});
+	private initializeMiddleware() {
+		this.app.use(
+			cors({
+				origin: true,
+				credentials: true,
+			})
+		);
+		this.app.all('/*', (req: Request, res: Response, next: NextFunction) => {
+			res.header('Access-Control-Allow-Origin', '*');
+			res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+			next();
+		});
+		this.app.set('port', process.env.PORT || 4000);
+		this.app.use(helmet({ contentSecurityPolicy: false }));
+		this.app.use(express.json());
+		this.app.use(express.urlencoded({ extended: true }));
+		this.app.use(cookieParser());
+	}
 
-app.use(errorHandler);
+	private initializeRoutes(): void {
+		// api time checker
+		this.app.use((req: Request, res: Response, next: NextFunction) => {
+			const start = Date.now();
+			res.on('finish', () => {
+				const duration = Date.now() - start;
+				this.logger.http(`[${req.method}] ${req.url} ${duration}ms`);
 
-export default app;
+				// check exceed 2000ms api
+				if (duration > 2000) {
+					this.errorBot.sendMessage(
+						'latency',
+						`[${req.method}] ${req.url}`,
+						req.userUUID ?? null,
+						req.ip,
+						duration
+					);
+				}
+			});
+			next();
+		});
+
+		// health-check
+		this.app.get('/', (req: Request, res: Response, next: NextFunction) => {
+			res.json('Server working');
+		});
+
+		// docs-route
+		this.app.use(
+			'/api-docs',
+			swaggerUi.serve,
+			swaggerUi.setup(this.swaggerSpec, { explorer: true })
+		);
+
+		// api-routes
+		this.app.use('/v1', v1AuthRouter);
+		this.app.use('/v1', v1UserRouter);
+		this.app.use('/v1', v1StoreRouter);
+		this.app.use('/v1', v1CourseRouter);
+		this.app.use('/v1', v1TestRouter);
+
+		// page not found
+		this.app.use((req, res) => {
+			throw new NotFoundError();
+		});
+
+		// error-handler
+		this.app.use(errorHandler);
+	}
+
+	// server-listen
+	public listen(): void {
+		this.app.listen(this.app.get('port'), () => {
+			this.logger.info(`Server is running on port ${this.app.get('port')}`);
+		});
+	}
+}
+
+try {
+	const appServer = new Server();
+
+	appServer.listen();
+} catch (error) {
+	console.error(error);
+}

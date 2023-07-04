@@ -1,5 +1,8 @@
 import { createLogger, format, transports, Logger } from 'winston';
 import WinstonDaily from 'winston-daily-rotate-file';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const logFormat = format.printf((info) => {
 	return `[${info.timestamp}] [${info.level}] : ${info.message}`; // 날짜 시간 로그레벨: 메세지
@@ -10,32 +13,39 @@ class WinstonLogger {
 
 	private readonly logger: Logger;
 
+	private readonly logPath: string;
+
 	private constructor() {
+		this.logPath =
+			process.env.NODE_ENV === 'local'
+				? `${process.env.LOCAL_LOG_PATH}`
+				: `${process.env.PROD_LOG_PATH}`;
+
 		const infoLog = new WinstonDaily({
 			level: 'info',
 			datePattern: 'YYYY-MM-DD', // 파일 날짜 형식
-			dirname: `/tmp/logs/info`, // 파일 경로
+			dirname: `${this.logPath}/info`, // 파일 경로
 			filename: `%DATE%.info.log`, // 파일 이름 형식 2020-05-28.info.log
 		});
 
 		const httpLog = new WinstonDaily({
 			level: 'http', // http 보다 낮은애들은 모두 파일에 저장
 			datePattern: 'YYYY-MM-DD',
-			dirname: `/tmp/logs/http`,
-			filename: `%DATE%.info.log`,
+			dirname: `${this.logPath}/http`,
+			filename: `%DATE%.http.log`,
 		});
 
 		const errorLog = new WinstonDaily({
 			level: 'error',
 			datePattern: 'YYYY-MM-DD',
-			dirname: `/tmp/logs/error`,
+			dirname: `${this.logPath}/error`,
 			filename: `%DATE%.error.log`,
 		});
 
 		const exceptionLog = new WinstonDaily({
 			level: 'error',
 			datePattern: 'YYYY-MM-DD',
-			dirname: `/tmp/logs/exception`,
+			dirname: `${this.logPath}/exception`,
 			filename: `%DATE%.exception.log`,
 		});
 
