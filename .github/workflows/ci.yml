@@ -63,7 +63,6 @@ jobs:
             DISCORD_DEV_CHANNEL_ID = ${{ secrets.DISCORD_DEV_CHANNEL_ID }}
             LOCAL_LOG_PATH = ${{ secrets.LOCAL_LOG_PATH }}
             PROD_LOG_PATH = ${{ secrets.PROD_LOG_PATH }}
-
   code-deploy:
     needs: build-and-push-image
     runs-on: ubuntu-latest
