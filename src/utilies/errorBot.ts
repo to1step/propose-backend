@@ -1,14 +1,6 @@
-import {
-	Client,
-	IntentsBitField,
-	TextChannel,
-	EmbedBuilder,
-	Channel,
-} from 'discord.js';
+import { Client, IntentsBitField, TextChannel, Channel } from 'discord.js';
 import dotenv from 'dotenv';
 import WinstonLogger from './logger';
-import { InternalServerError } from '../lib/middlewares/errors';
-import ErrorCode from '../lib/types/customTypes/error';
 
 const logger = WinstonLogger.getInstance();
 
