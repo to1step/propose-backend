@@ -61,7 +61,8 @@ jobs:
             DISCORD_BOT_TOKEN = ${{ secrets.DISCORD_BOT_TOKEN }}
             DISCORD_PROD_CHANNEL_ID = ${{ secrets.DISCORD_PROD_CHANNEL_ID }}
             DISCORD_DEV_CHANNEL_ID = ${{ secrets.DISCORD_DEV_CHANNEL_ID }}
-            DOCKER_VOLUME_LOG_PATH = ${{ secrets.DOCKER_VOLUME_LOG_PATH }}
+            LOCAL_LOG_PATH = ${{ secrets.LOCAL_LOG_PATH }}
+            PROD_LOG_PATH = ${{ secrets.PROD_LOG_PATH }}
 
   code-deploy:
     needs: build-and-push-image

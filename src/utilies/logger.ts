@@ -13,32 +13,39 @@ class WinstonLogger {
 
 	private readonly logger: Logger;
 
+	private readonly logPath: string;
+
 	private constructor() {
+		this.logPath =
+			process.env.NODE_ENV === 'local'
+				? `${process.env.LOCAL_LOG_PATH}`
+				: `${process.env.PROD_LOG_PATH}`;
+
 		const infoLog = new WinstonDaily({
 			level: 'info',
 			datePattern: 'YYYY-MM-DD', // 파일 날짜 형식
-			dirname: `${process.env.DOCKER_VOLUME_LOG_PATH}/info`, // 파일 경로
+			dirname: `${this.logPath}/info`, // 파일 경로
 			filename: `%DATE%.info.log`, // 파일 이름 형식 2020-05-28.info.log
 		});
 
 		const httpLog = new WinstonDaily({
 			level: 'http', // http 보다 낮은애들은 모두 파일에 저장
 			datePattern: 'YYYY-MM-DD',
-			dirname: `${process.env.DOCKER_VOLUME_LOG_PATH}/http`,
+			dirname: `${this.logPath}/http`,
 			filename: `%DATE%.http.log`,
 		});
 
 		const errorLog = new WinstonDaily({
 			level: 'error',
 			datePattern: 'YYYY-MM-DD',
-			dirname: `${process.env.DOCKER_VOLUME_LOG_PATH}/error`,
+			dirname: `${this.logPath}/error`,
 			filename: `%DATE%.error.log`,
 		});
 
 		const exceptionLog = new WinstonDaily({
 			level: 'error',
 			datePattern: 'YYYY-MM-DD',
-			dirname: `${process.env.DOCKER_VOLUME_LOG_PATH}/exception`,
+			dirname: `${this.logPath}/exception`,
 			filename: `%DATE%.exception.log`,
 		});
 
