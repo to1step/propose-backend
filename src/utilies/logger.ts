@@ -54,11 +54,11 @@ class WinstonLogger {
 		let transport;
 		let exceptionHandler;
 		if (process.env.NODE_ENV === 'production') {
-			transport = [infoLog, errorLog, httpLog];
-			exceptionHandler = exceptionLog;
+			transport = [infoLog, errorLog, httpLog, terminalLog];
+			exceptionHandler = [exceptionLog, terminalLog];
 		} else if (process.env.NODE_ENV === 'development') {
-			transport = [infoLog, errorLog, httpLog];
-			exceptionHandler = exceptionLog;
+			transport = [infoLog, errorLog, httpLog, terminalLog];
+			exceptionHandler = [exceptionLog, terminalLog];
 		} else {
 			transport = terminalLog;
 			exceptionHandler = terminalLog;
