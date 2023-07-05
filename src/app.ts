@@ -8,6 +8,7 @@ import YAML from 'yamljs';
 import path from 'path';
 import Mongo from './utilies/mongo';
 import Redis from './utilies/redis';
+import ErrorBot from './utilies/errorBot';
 import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
@@ -16,7 +17,7 @@ import v1CourseRouter from './lib/routes/courseController';
 import v1TestRouter from './lib/routes/testController';
 import { errorHandler } from './lib/middlewares/errors/errorHandler';
 import { NotFoundError } from './lib/middlewares/errors';
-import ErrorBot from './utilies/errorBot';
+import { needEnv } from './utilies/envList';
 
 dotenv.config();
 
@@ -34,11 +35,31 @@ class Server {
 	private swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
 
 	constructor() {
-		this.initializeMiddleware();
-		this.initializeRoutes();
+		this.validateEnv();
 		this.initializeDatabase();
 		this.initializeRedis();
 		this.initializeErrorBot();
+		this.initializeMiddleware();
+		this.initializeRoutes();
+	}
+
+	private validateEnv() {
+		const missingVariables: string[] = [];
+
+		needEnv.forEach((envVariable) => {
+			if (!process.env[envVariable]) {
+				missingVariables.push(envVariable);
+			}
+		});
+
+		if (missingVariables.length > 0) {
+			missingVariables.forEach((variable) => {
+				this.logger.error(`${variable} is missing`);
+			});
+			process.exit(1);
+		} else {
+			this.logger.info('All required environment variables are present.');
+		}
 	}
 
 	private async initializeDatabase() {
