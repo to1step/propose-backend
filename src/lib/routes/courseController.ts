@@ -61,6 +61,28 @@ router.get(
 	}
 );
 
+router.get(
+	'/courses/tag/:tag',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { tag } = req.params;
+
+			if (!tag) {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
+			}
+
+			const coursesData = await courseService.findCourseByTag(tag);
+
+			res.json({ data: coursesData });
+		} catch (error) {
+			next(error);
+		}
+	}
+);
+
 router.patch(
 	'/courses/:courseUUID',
 	checkAccessToken,

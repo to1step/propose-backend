@@ -58,6 +58,28 @@ router.get(
 	}
 );
 
+router.get(
+	'/stores/tag/:tag',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { tag } = req.params;
+
+			if (!tag) {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
+			}
+
+			const storesData = await storeService.findStoreByTag(tag);
+
+			res.json({ data: storesData });
+		} catch (error) {
+			next(error);
+		}
+	}
+);
+
 router.patch(
 	'/stores/:storeUUID',
 	checkAccessToken,

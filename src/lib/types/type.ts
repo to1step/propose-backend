@@ -241,6 +241,27 @@ type UpdateCourseReviewForm = {
 	review: string;
 };
 
+// etc
+type ElasticSearchResponse = {
+	body:
+		| {
+				took: number;
+				timed_out: boolean;
+				_shards: {
+					total: number;
+					successful: number;
+					skipped: number;
+					failed: number;
+				};
+				hits: { total: object[]; max_score: number; hits: any[] };
+		  }
+		| boolean;
+	statusCode: number | null;
+	headers: object | null;
+	warnings: string[] | null;
+	meta: object;
+};
+
 export type {
 	KakaoTokenResponse,
 	KakaoUserReponse,
@@ -270,4 +291,5 @@ export type {
 	CourseReview,
 	CreateCourseReviewForm,
 	UpdateCourseReviewForm,
+	ElasticSearchResponse,
 };
