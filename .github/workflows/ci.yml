@@ -76,6 +76,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER_NAME }}
           key: ${{ secrets.SSH_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
           script: |
             if docker ps -a | grep -q ${{ secrets.CONTAINER_NAME }}; then
               docker stop ${{ secrets.CONTAINER_NAME }} 
