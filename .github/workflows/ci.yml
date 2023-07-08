@@ -73,9 +73,9 @@ jobs:
       - name: Access to server and Run container
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.AWS_PUBLIC_IP }}
-          username: ${{ secrets.AWS_USER_NAME }}
-          key: ${{ secrets.AWS_PEM_KEY }}
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER_NAME }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             if docker ps -a | grep -q ${{ secrets.CONTAINER_NAME }}; then
               docker stop ${{ secrets.CONTAINER_NAME }} 
