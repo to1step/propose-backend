@@ -77,19 +77,4 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            if docker ps -a | grep -q ${{ secrets.CONTAINER_NAME }}; then
-              docker stop ${{ secrets.CONTAINER_NAME }} 
-              docker rm ${{ secrets.CONTAINER_NAME }}
-            else
-              echo "no container"
-            fi
-            
-            if docker images | grep -q ${{ secrets.IMAGE_NAME }}; then
-              docker rmi ${{ secrets.IMAGE_NAME }} 
-            else
-              echo "no image"
-            fi
-            
-            docker pull ${{ secrets.IMAGE_NAME }}:latest 
-            docker run -d -p ${{ secrets.HOST_PORT }}:${{ secrets.CONTAINER_PORT }} --name ${{ secrets.CONTAINER_NAME }} ${{ secrets.IMAGE_NAME }}
-  
+            docker-compose -f ${{ secrets.SERVER_DOCKER_COMPOSE_FILE }} up -d
