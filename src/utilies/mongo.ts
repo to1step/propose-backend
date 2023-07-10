@@ -34,7 +34,7 @@ class Mongo {
 
 	async connect(): Promise<void> {
 		await mongoose.connect(this.mongoUri, this.connectOption);
-		logger.info(`DB Connected`);
+		logger.info(`Mongo Connected`);
 	}
 }
 

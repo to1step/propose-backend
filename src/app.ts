@@ -8,6 +8,7 @@ import YAML from 'yamljs';
 import path from 'path';
 import Mongo from './utilies/mongo';
 import Redis from './utilies/redis';
+import Elastic from './utilies/elastic';
 import ErrorBot from './utilies/errorBot';
 import WinstonLogger from './utilies/logger';
 import v1AuthRouter from './lib/routes/authController';
@@ -25,6 +26,8 @@ class Server {
 	private app = express();
 
 	private mongo = Mongo.getInstance();
+
+	private elastic = Elastic.getInstance();
 
 	private redis = Redis.getInstance();
 
@@ -64,6 +67,7 @@ class Server {
 
 	private async initializeDatabase() {
 		await this.mongo.connect();
+		this.elastic.connect();
 	}
 
 	private async initializeRedis() {

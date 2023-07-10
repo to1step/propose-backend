@@ -1,7 +1,10 @@
 import { v4 } from 'uuid';
+import { Client } from '@elastic/elasticsearch';
 import {
 	CreateStoreForm,
 	CreateStoreReviewForm,
+	ElasticSearchResponse,
+	Store,
 	StoreEntireInfo,
 	UpdateStoreForm,
 	UpdateStoreReviewForm,
@@ -12,17 +15,67 @@ import { StoreLikeModel } from '../../database/models/storeLike';
 import { StoreReviewModel } from '../../database/models/storeReview';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
+import Elastic from '../../utilies/elastic';
+
+const elastic = Elastic.getInstance();
 
 class StoreService {
 	private static instance: StoreService;
 
-	private constructor() {}
+	private elasticClient: Client;
+
+	private constructor() {
+		this.elasticClient = elastic.getClient();
+	}
 
 	public static getInstance(): StoreService {
 		if (!StoreService.instance) {
 			StoreService.instance = new StoreService();
 		}
 		return StoreService.instance;
+	}
+
+	/**
+	 * 태그로 가게 검색 (elasticsearch)
+	 * @param tag
+	 */
+	async findStoreByTag(tag: string): Promise<Store[]> {
+		try {
+			const searchResults: ElasticSearchResponse =
+				await this.elasticClient.search({
+					index: tag,
+				});
+
+			if (
+				typeof searchResults.body === 'boolean' ||
+				!searchResults.statusCode ||
+				!searchResults.headers
+			) {
+				throw new InternalServerError(ErrorCode.UNCATCHED_ERROR, [
+					{ data: 'Elastic search error' },
+				]);
+			}
+
+			const storeUUIDs = searchResults.body.hits.hits.map((searchResult) => {
+				return searchResult._source.storeUUID;
+			});
+
+			const stores = await StoreModel.find({
+				uuid: { $in: storeUUIDs },
+				deletedAt: null,
+			});
+
+			return stores.map((store) => ModelConverter.toStore(store));
+		} catch (error: any) {
+			// elastic search는 해당 index가 존재하지 않다면 에러가 발생하기 때문에 따로 try-catch로 처리
+			if (error.meta?.body?.status === 404) {
+				return [];
+			}
+
+			throw new InternalServerError(ErrorCode.UNCATCHED_ERROR, [
+				{ data: 'Elastic search error' },
+			]);
+		}
 	}
 
 	/**
@@ -47,6 +100,17 @@ class StoreService {
 		} = createStoreForm;
 
 		const newUUID = v4();
+
+		const promises = tags.map((tag) => {
+			return this.elasticClient.index({
+				index: tag,
+				body: {
+					storeUUID: newUUID,
+				},
+			});
+		});
+
+		await Promise.all(promises);
 
 		await new StoreModel({
 			user: userUUID,

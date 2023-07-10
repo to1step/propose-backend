@@ -1,8 +1,11 @@
 import { v4 } from 'uuid';
+import { Client } from '@elastic/elasticsearch';
 import {
+	Course,
 	CourseEntireInfo,
 	CreateCourseForm,
 	CreateCourseReviewForm,
+	ElasticSearchResponse,
 	UpdateCourseReviewForm,
 } from '../types/type';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
@@ -12,11 +15,18 @@ import { CourseModel } from '../../database/models/course';
 import { CourseLikeModel } from '../../database/models/courseLike';
 import { CourseReviewModel } from '../../database/models/courseReview';
 import { StoreModel } from '../../database/models/store';
+import Elastic from '../../utilies/elastic';
+
+const elastic = Elastic.getInstance();
 
 class CourseService {
 	private static instance: CourseService;
 
-	private constructor() {}
+	private elasticClient: Client;
+
+	private constructor() {
+		this.elasticClient = elastic.getClient();
+	}
 
 	public static getInstance(): CourseService {
 		if (!CourseService.instance) {
@@ -58,6 +68,17 @@ class CourseService {
 
 		const newUUID = v4();
 
+		const promises = tags.map((tag) => {
+			return this.elasticClient.index({
+				index: tag,
+				body: {
+					courseUUID: newUUID,
+				},
+			});
+		});
+
+		await Promise.all(promises);
+
 		await new CourseModel({
 			uuid: newUUID,
 			user: userUUID,
@@ -90,15 +111,6 @@ class CourseService {
 
 		const courseData = ModelConverter.toCourse(course);
 
-		const { isPrivate, user } = courseData;
-
-		// 비공개인 남의 코스를 가져오려 하는 경우
-		if (isPrivate && user !== userUUID) {
-			throw new BadRequestError(ErrorCode.PRIVATE_COURSE, [
-				{ data: 'Private course' },
-			]);
-		}
-
 		const [courseReviews, courseLikes] = await Promise.all([
 			CourseReviewModel.findCourseReviewByStore(courseUUID),
 			CourseLikeModel.find({ course: courseUUID, deletedAt: null }),
@@ -128,6 +140,49 @@ class CourseService {
 			likeCount,
 			iLike,
 		};
+	}
+
+	/**
+	 * 태그로 코스 검색 (elasticsearch)
+	 * @param tag
+	 */
+	async findCourseByTag(tag: string): Promise<Course[]> {
+		try {
+			const searchResults: ElasticSearchResponse =
+				await this.elasticClient.search({
+					index: tag,
+				});
+
+			if (
+				typeof searchResults.body === 'boolean' ||
+				!searchResults.statusCode ||
+				!searchResults.headers
+			) {
+				throw new InternalServerError(ErrorCode.UNCATCHED_ERROR, [
+					{ data: 'Elastic search error' },
+				]);
+			}
+
+			const courseUUIDs = searchResults.body.hits.hits.map((searchResult) => {
+				return searchResult._source.courseUUID;
+			});
+
+			const courses = await CourseModel.find({
+				uuid: { $in: courseUUIDs },
+				deletedAt: null,
+			});
+
+			return courses.map((course) => ModelConverter.toCourse(course));
+		} catch (error: any) {
+			// elastic search는 해당 index가 존재하지 않다면 에러가 발생하기 때문에 따로 try-catch로 처리
+			if (error.meta?.body?.status === 404) {
+				return [];
+			}
+
+			throw new InternalServerError(ErrorCode.UNCATCHED_ERROR, [
+				{ data: 'Elastic search error' },
+			]);
+		}
 	}
 
 	/**
