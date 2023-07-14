@@ -2,6 +2,7 @@ import { v4 } from 'uuid';
 import {
 	CreateStoreForm,
 	CreateStoreReviewForm,
+	Store,
 	StoreEntireInfo,
 	UpdateStoreForm,
 	UpdateStoreReviewForm,
@@ -13,6 +14,9 @@ import { StoreReviewModel } from '../../database/models/storeReview';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
 import { StoreScoreModel } from '../../database/models/storeScore';
+import Redis from '../../utilies/redis';
+
+const redis = Redis.getInstance().getClient();
 
 class StoreService {
 	private static instance: StoreService;
@@ -113,6 +117,23 @@ class StoreService {
 			likeCount,
 			iLike,
 		};
+	}
+
+	/**
+	 * 자신 주위의 ranking에 등재된 5개의 store가져오기
+	 * @param location
+	 */
+	async getTopStores(location: string): Promise<Store[]> {
+		const storeUUIDs = await redis.lRange(location, 0, -1);
+
+		const topStores = await StoreModel.find({
+			uuid: { $in: storeUUIDs },
+			deletedAt: null,
+		});
+
+		return topStores.map((topStore) => {
+			return ModelConverter.toStore(topStore);
+		});
 	}
 
 	/**
