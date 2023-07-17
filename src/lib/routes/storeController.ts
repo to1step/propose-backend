@@ -14,7 +14,7 @@ const router = Router();
 const storeService = StoreService.getInstance();
 
 router.post(
-	'/store',
+	'/stores',
 	checkAccessToken,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
@@ -50,30 +50,6 @@ router.get(
 			const storeData = await storeService.getStore(req.userUUID, storeUUID);
 
 			const store = new EntireStoreDto(storeData);
-
-			res.json({ data: store });
-		} catch (error) {
-			next(error);
-		}
-	}
-);
-
-router.get(
-	'/stores/:location/top',
-	checkAccessToken,
-	async (req: Request, res: Response, next: NextFunction) => {
-		try {
-			const { location } = req.params;
-
-			if (!location) {
-				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
-					{ data: 'Invalid query' },
-				]);
-			}
-
-			const store = await storeService.getTopStores(
-				decodeURIComponent(location) // 한글은 깨질 수 있으니 encoding한 후 decoding
-			);
 
 			res.json({ data: store });
 		} catch (error) {

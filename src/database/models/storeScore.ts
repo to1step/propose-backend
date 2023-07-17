@@ -1,10 +1,9 @@
 import { Model, model, Schema } from 'mongoose';
 
 interface StoreScoreDAO {
-	user: string;
 	store: string;
 	shortLocation: string;
-	date: Date;
+	date: number;
 	score: number;
 }
 
@@ -15,9 +14,9 @@ interface StoreScoreDAOModel extends Model<StoreScoreDAO> {
 const storeScoreSchema = new Schema<StoreScoreDAO, StoreScoreDAOModel>(
 	{
 		store: { type: String, required: true }, // 가게 식별 uuid
-		shortLocation: { type: String, required: true }, // 해당 주의 월요일 00시 00분
-		date: { type: Date, required: true }, // 해당 주의 월요일 00시 00분
-		score: { type: Number, required: true, default: 0 }, // 해당 주의 월요일 00시 00분
+		shortLocation: { type: String, required: true }, // 해당 지역 string 두 글자
+		date: { type: Number, required: true }, // 저장된 시각 millisecond
+		score: { type: Number, required: true, default: 0 }, // 가게 점수
 	},
 	{
 		timestamps: true,

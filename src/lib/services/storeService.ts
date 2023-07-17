@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 import {
+	Course,
 	CreateStoreForm,
 	CreateStoreReviewForm,
 	Store,
@@ -8,15 +9,18 @@ import {
 	UpdateStoreReviewForm,
 } from '../types/type';
 import ModelConverter from '../../utilies/converter/modelConverter';
+import Redis from '../../utilies/redis';
+import GetTimeKr from '../../utilies/dayjsKR';
 import { StoreModel } from '../../database/models/store';
 import { StoreLikeModel } from '../../database/models/storeLike';
 import { StoreReviewModel } from '../../database/models/storeReview';
+import { StoreScoreModel } from '../../database/models/storeScore';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
-import { StoreScoreModel } from '../../database/models/storeScore';
-import Redis from '../../utilies/redis';
 
 const redis = Redis.getInstance().getClient();
+
+const dayjsKR = GetTimeKr.getInstance();
 
 class StoreService {
 	private static instance: StoreService;
@@ -122,8 +126,9 @@ class StoreService {
 	/**
 	 * 자신 주위의 ranking에 등재된 5개의 store가져오기
 	 * @param location
+	 * @param type
 	 */
-	async getTopStores(location: string): Promise<Store[]> {
+	async getTop(location: string, type: 'store' | 'course'): Promise<Store[]> {
 		const storeUUIDs = await redis.lRange(location, 0, -1);
 
 		const topStores = await StoreModel.find({
@@ -399,16 +404,12 @@ class StoreService {
 		location: string,
 		type: 'add' | 'sub'
 	): Promise<void> {
-		const today = new Date();
-		const day = today.getDay();
-		const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-		const monday = new Date(today.setDate(diff));
-		monday.setHours(0, 0, 0, 0);
+		const [sunStart, satEnd] = dayjsKR.getWeek();
 
-		// 이번주에 등록되었는지 확인
+		// 이번주(일~토)안에 등록되었는지 확인
 		const storeScore = await StoreScoreModel.findOne({
 			store: storeUUID,
-			date: monday,
+			date: { $gt: sunStart, $lt: satEnd },
 		});
 
 		if (storeScore) {
@@ -433,7 +434,7 @@ class StoreService {
 			await new StoreScoreModel({
 				store: storeUUID,
 				shortLocation: shortLocation,
-				date: monday,
+				date: Date.now(),
 				score: type === 'add' ? 1 : 0,
 			}).save();
 		}
