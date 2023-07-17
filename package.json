@@ -11,8 +11,8 @@
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
     "api-docs": "swagger-cli bundle src/utilies/swaggerDocs/docs.yaml --outfile dist/src/swagger.yaml --type yaml",
-    "api-docs-dev": "swagger-cli bundle src/utilies/swaggerDocs/docs.yaml --outfile src/swagger.yaml --type yaml",
-    "start_local": "npm run api-docs-dev && cross-env NODE_ENV=local && nodemon",
+    "api-docs-local": "swagger-cli bundle src/utilies/swaggerDocs/docs.yaml --outfile src/swagger.yaml --type yaml",
+    "start_local": "npm run api-docs-local && cross-env NODE_ENV=local && nodemon",
     "start_dev": "npm run build && npm run api-docs && cross-env NODE_ENV=development node dist/src/app.js"
   },
   "lint-staged": {
@@ -28,6 +28,7 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
+    "dayjs": "^1.11.9",
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
     "express": "4.18.2",

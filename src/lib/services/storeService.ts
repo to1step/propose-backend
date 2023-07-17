@@ -1,17 +1,26 @@
 import { v4 } from 'uuid';
 import {
+	Course,
 	CreateStoreForm,
 	CreateStoreReviewForm,
+	Store,
 	StoreEntireInfo,
 	UpdateStoreForm,
 	UpdateStoreReviewForm,
 } from '../types/type';
 import ModelConverter from '../../utilies/converter/modelConverter';
+import Redis from '../../utilies/redis';
+import GetTimeKr from '../../utilies/dayjsKR';
 import { StoreModel } from '../../database/models/store';
 import { StoreLikeModel } from '../../database/models/storeLike';
 import { StoreReviewModel } from '../../database/models/storeReview';
+import { StoreScoreModel } from '../../database/models/storeScore';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
+
+const redis = Redis.getInstance().getClient();
+
+const dayjsKR = GetTimeKr.getInstance();
 
 class StoreService {
 	private static instance: StoreService;
@@ -112,6 +121,24 @@ class StoreService {
 			likeCount,
 			iLike,
 		};
+	}
+
+	/**
+	 * 자신 주위의 ranking에 등재된 5개의 store가져오기
+	 * @param location
+	 * @param type
+	 */
+	async getTop(location: string, type: 'store' | 'course'): Promise<Store[]> {
+		const storeUUIDs = await redis.lRange(location, 0, -1);
+
+		const topStores = await StoreModel.find({
+			uuid: { $in: storeUUIDs },
+			deletedAt: null,
+		});
+
+		return topStores.map((topStore) => {
+			return ModelConverter.toStore(topStore);
+		});
 	}
 
 	/**
@@ -217,10 +244,13 @@ class StoreService {
 			]);
 		}
 
-		await new StoreLikeModel({
-			user: userUUID,
-			store: storeUUID,
-		}).save();
+		await Promise.all([
+			new StoreLikeModel({
+				user: userUUID,
+				store: storeUUID,
+			}).save(),
+			this.scoreToStore(userUUID, storeUUID, store.location, 'add'),
+		]);
 	}
 
 	/**
@@ -255,7 +285,10 @@ class StoreService {
 		}
 
 		likeHistory.deletedAt = new Date();
-		await likeHistory.save();
+		await Promise.all([
+			likeHistory.save(),
+			this.scoreToStore(userUUID, storeUUID, store.location, 'sub'),
+		]);
 	}
 
 	/**
@@ -285,12 +318,15 @@ class StoreService {
 
 		const newUUID = v4();
 
-		await new StoreReviewModel({
-			uuid: newUUID,
-			user: userUUID,
-			store: storeUUID,
-			review: review,
-		}).save();
+		await Promise.all([
+			new StoreReviewModel({
+				uuid: newUUID,
+				user: userUUID,
+				store: storeUUID,
+				review: review,
+			}).save(),
+			this.scoreToStore(userUUID, storeUUID, store.location, 'sub'),
+		]);
 	}
 
 	/**
@@ -353,6 +389,55 @@ class StoreService {
 
 		storeReview.deletedAt = new Date();
 		await storeReview.save();
+	}
+
+	/**
+	 * 가게에 점수 부여하기
+	 * @param userUUID
+	 * @param storeUUID
+	 * @param location
+	 * @param type
+	 */
+	async scoreToStore(
+		userUUID: string,
+		storeUUID: string,
+		location: string,
+		type: 'add' | 'sub'
+	): Promise<void> {
+		const [sunStart, satEnd] = dayjsKR.getWeek();
+
+		// 이번주(일~토)안에 등록되었는지 확인
+		const storeScore = await StoreScoreModel.findOne({
+			store: storeUUID,
+			date: { $gt: sunStart, $lt: satEnd },
+		});
+
+		if (storeScore) {
+			if (type === 'add') {
+				storeScore.score += 1;
+			} else {
+				storeScore.score -= 1;
+			}
+			await storeScore.save();
+		} else {
+			// 없다면 score 1으로 생성
+			const locationSplit = location.split(' ');
+			let shortLocation;
+			if (locationSplit.length < 2) {
+				// 주소가 한단어 이하인 경우 그냥 주소룰 할당
+				shortLocation = location;
+			} else {
+				// 두 글자 이상인 경우 앞 문자 두개 저장
+				shortLocation = `${locationSplit[0]} ${locationSplit[1]}`;
+			}
+
+			await new StoreScoreModel({
+				store: storeUUID,
+				shortLocation: shortLocation,
+				date: Date.now(),
+				score: type === 'add' ? 1 : 0,
+			}).save();
+		}
 	}
 }
 

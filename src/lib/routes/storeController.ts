@@ -14,7 +14,7 @@ const router = Router();
 const storeService = StoreService.getInstance();
 
 router.post(
-	'/store',
+	'/stores',
 	checkAccessToken,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {

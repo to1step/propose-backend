@@ -14,6 +14,7 @@ import v1AuthRouter from './lib/routes/authController';
 import v1UserRouter from './lib/routes/userController';
 import v1StoreRouter from './lib/routes/storeController';
 import v1CourseRouter from './lib/routes/courseController';
+import v1RankRouter from './lib/routes/rankController';
 import v1TestRouter from './lib/routes/testController';
 import { errorHandler } from './lib/middlewares/errors/errorHandler';
 import { NotFoundError } from './lib/middlewares/errors';
@@ -132,6 +133,7 @@ class Server {
 		this.app.use('/v1', v1UserRouter);
 		this.app.use('/v1', v1StoreRouter);
 		this.app.use('/v1', v1CourseRouter);
+		this.app.use('/v1', v1RankRouter);
 		this.app.use('/v1', v1TestRouter);
 
 		// page not found
