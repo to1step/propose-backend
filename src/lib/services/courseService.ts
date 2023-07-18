@@ -5,13 +5,21 @@ import {
 	CreateCourseReviewForm,
 	UpdateCourseReviewForm,
 } from '../types/type';
+import ModelConverter from '../../utilies/converter/modelConverter';
+import Redis from '../../utilies/redis';
+import GetTimeKr from '../../utilies/dayjsKR';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
-import ModelConverter from '../../utilies/converter/modelConverter';
 import { CourseModel } from '../../database/models/course';
 import { CourseLikeModel } from '../../database/models/courseLike';
 import { CourseReviewModel } from '../../database/models/courseReview';
 import { StoreModel } from '../../database/models/store';
+import { StoreScoreModel } from '../../database/models/storeScore';
+import { CourseScoreModel } from '../../database/models/courseScore';
+
+const redis = Redis.getInstance().getClient();
+
+const dayjsKR = GetTimeKr.getInstance();
 
 class CourseService {
 	private static instance: CourseService;
@@ -241,10 +249,13 @@ class CourseService {
 			]);
 		}
 
-		await new CourseLikeModel({
-			user: userUUID,
-			course: courseUUID,
-		}).save();
+		await Promise.all([
+			this.scoreToCourse(courseUUID, 'add'),
+			new CourseLikeModel({
+				user: userUUID,
+				course: courseUUID,
+			}).save(),
+		]);
 	}
 
 	/**
@@ -279,7 +290,11 @@ class CourseService {
 		}
 
 		likeHistory.deletedAt = new Date();
-		await likeHistory.save();
+
+		await Promise.all([
+			this.scoreToCourse(courseUUID, 'sub'),
+			likeHistory.save(),
+		]);
 	}
 
 	/**
@@ -309,12 +324,15 @@ class CourseService {
 
 		const newUUID = v4();
 
-		await new CourseReviewModel({
-			uuid: newUUID,
-			user: userUUID,
-			course: courseUUID,
-			review: review,
-		}).save();
+		await Promise.all([
+			this.scoreToCourse(courseUUID, 'add'),
+			new CourseReviewModel({
+				uuid: newUUID,
+				user: userUUID,
+				course: courseUUID,
+				review: review,
+			}).save(),
+		]);
 	}
 
 	/**
@@ -371,6 +389,37 @@ class CourseService {
 
 		courseReview.deletedAt = new Date();
 		await courseReview.save();
+	}
+
+	/**
+	 * 코스에 점수 부여
+	 * @param courseUUID
+	 * @param type
+	 */
+	async scoreToCourse(courseUUID: string, type: 'add' | 'sub'): Promise<void> {
+		const [sunStart, satEnd] = dayjsKR.getWeek();
+
+		// 이번주(일~토)안에 등록되었는지 확인
+		const courseScore = await CourseScoreModel.findOne({
+			course: courseUUID,
+			date: { $gt: sunStart, $lt: satEnd },
+		});
+
+		if (courseScore) {
+			if (type === 'add') {
+				courseScore.score += 1;
+			} else {
+				courseScore.score -= 1;
+			}
+			await courseScore.save();
+		} else {
+			// 없다면 score 1으로 생성
+			await new CourseScoreModel({
+				course: courseUUID,
+				date: Date.now().toString(),
+				score: type === 'add' ? 1 : 0,
+			}).save();
+		}
 	}
 }
 

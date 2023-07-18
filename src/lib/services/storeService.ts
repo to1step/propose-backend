@@ -1,9 +1,7 @@
 import { v4 } from 'uuid';
 import {
-	Course,
 	CreateStoreForm,
 	CreateStoreReviewForm,
-	Store,
 	StoreEntireInfo,
 	UpdateStoreForm,
 	UpdateStoreReviewForm,
@@ -121,24 +119,6 @@ class StoreService {
 			likeCount,
 			iLike,
 		};
-	}
-
-	/**
-	 * 자신 주위의 ranking에 등재된 5개의 store가져오기
-	 * @param location
-	 * @param type
-	 */
-	async getTop(location: string, type: 'store' | 'course'): Promise<Store[]> {
-		const storeUUIDs = await redis.lRange(location, 0, -1);
-
-		const topStores = await StoreModel.find({
-			uuid: { $in: storeUUIDs },
-			deletedAt: null,
-		});
-
-		return topStores.map((topStore) => {
-			return ModelConverter.toStore(topStore);
-		});
 	}
 
 	/**
@@ -434,7 +414,7 @@ class StoreService {
 			await new StoreScoreModel({
 				store: storeUUID,
 				shortLocation: shortLocation,
-				date: Date.now(),
+				date: Date.now().toString(),
 				score: type === 'add' ? 1 : 0,
 			}).save();
 		}

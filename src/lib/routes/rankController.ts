@@ -2,9 +2,9 @@ import { NextFunction, Request, Response, Router } from 'express';
 import checkAccessToken from '../middlewares/checkAccessToken';
 import { BadRequestError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
-import StoreService from '../services/storeService';
+import RankService from '../services/rankService';
 
-const storeService = StoreService.getInstance();
+const rankService = RankService.getInstance();
 const router = Router();
 
 router.get(
@@ -14,6 +14,7 @@ router.get(
 		try {
 			const { type, region } = req.query;
 
+			// 여기 로직 수정
 			if (!(type === 'course' || type === 'store')) {
 				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
 					{ data: 'Invalid query' },
@@ -26,7 +27,7 @@ router.get(
 				]);
 			}
 
-			const store = await storeService.getTop(region, type);
+			const store = await rankService.getTop(region, type);
 
 			res.json({ data: store });
 		} catch (error) {
