@@ -77,4 +77,5 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
+            cd docker-server
             docker-compose -f ${{ secrets.SERVER_DOCKER_COMPOSE_FILE }} up -d
