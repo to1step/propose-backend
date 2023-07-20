@@ -14,6 +14,8 @@ tags:
     description: 가게 관련 api
   - name: CourseController
     description: 코스 관련 api
+  - name: RankController
+    description: 랭크 관련 api
 paths:
   /v1/auth/local/sign-in:
     post:
@@ -816,6 +818,32 @@ paths:
                     type: boolean
                     description: 코스 리뷰 삭제 성공
                     example: true
+  /v1/rank:
+    get:
+      tags:
+        - RankController
+      summary: 이번주 top5 가게 or 코스 가져오기
+      description: 이번주 top5 가게 or 코스 가져오기
+      parameters:
+        - name: accessToken
+          in: header
+          required: true
+        - name: type
+          in: query
+          description: store | course
+          required: true
+        - name: region
+          in: query
+          description: type이 store인 경우 해당 지역 두 단어
+      responses:
+        '200':
+          description: 가게들 정보
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TopStoresDto'
 components:
   schemas:
     EmailVerificationDto:
@@ -1069,54 +1097,6 @@ components:
           type: boolean
           description: 내가 해당 가게에 좋아요 누른 여부
           example: true
-    TopStoresDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: 가게 UUID
-          example: 1210c3f2-4f68-4e85-94a7-81dc3d764393
-        name:
-          type: string
-          description: 가게 이름
-          example: 행보칸 카페
-        category:
-          type: number
-          description: 가게 카테고리 0 카페 / 1 식당 / 2 공원
-          example: 0
-        description:
-          type: string
-          description: 가게에 대한 설명
-          example: 커피가 맛있는 감성있는 카페
-        location:
-          type: string
-          description: 가게 주소
-          example: 경인남길 134-1
-        coordinates:
-          type: array
-          description: 가게 좌표
-          example:
-            - 123.45
-            - 12.34
-        representImage:
-          type: string
-          description: 가게 대표 사진 경로
-          example: storeImage.png
-        tags:
-          type: array
-          description: 생성할 태그
-          example:
-            - 맛집
-            - 인스타감성
-            - 야경
-        startTime:
-          type: string
-          description: 가게 오픈 시간
-          example: 아침 9시
-        endTime:
-          type: string
-          description: 가게 마감 시간
-          example: 저녁 10시
     UpdateStoreDto:
       type: object
       required:
@@ -1412,3 +1392,51 @@ components:
           type: string
           description: 리뷰 내용
           example: 코스 별로네요. 내가 더 잘만들듯?
+    TopStoresDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: 가게 UUID
+          example: 1210c3f2-4f68-4e85-94a7-81dc3d764393
+        name:
+          type: string
+          description: 가게 이름
+          example: 행보칸 카페
+        category:
+          type: number
+          description: 가게 카테고리 0 카페 / 1 식당 / 2 공원
+          example: 0
+        description:
+          type: string
+          description: 가게에 대한 설명
+          example: 커피가 맛있는 감성있는 카페
+        location:
+          type: string
+          description: 가게 주소
+          example: 경인남길 134-1
+        coordinates:
+          type: array
+          description: 가게 좌표
+          example:
+            - 123.45
+            - 12.34
+        representImage:
+          type: string
+          description: 가게 대표 사진 경로
+          example: storeImage.png
+        tags:
+          type: array
+          description: 생성할 태그
+          example:
+            - 맛집
+            - 인스타감성
+            - 야경
+        startTime:
+          type: string
+          description: 가게 오픈 시간
+          example: 아침 9시
+        endTime:
+          type: string
+          description: 가게 마감 시간
+          example: 저녁 10시

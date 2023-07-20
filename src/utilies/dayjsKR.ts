@@ -20,9 +20,15 @@ class DayjsKR {
 		return DayjsKR.instance;
 	}
 
-	getWeek(): [number, number] {
-		const sunStart = dayjs().tz().startOf('week').utc().unix();
-		const satEnd = dayjs().tz().endOf('week').endOf('day').utc().unix();
+	getWeek(): [string, string] {
+		const sunStart = dayjs().tz().startOf('week').utc().unix().toString();
+		const satEnd = dayjs()
+			.tz()
+			.endOf('week')
+			.endOf('day')
+			.utc()
+			.unix()
+			.toString();
 		return [sunStart, satEnd];
 	}
 }
