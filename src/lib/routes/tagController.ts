@@ -2,35 +2,33 @@ import { NextFunction, Request, Response, Router } from 'express';
 import checkAccessToken from '../middlewares/checkAccessToken';
 import { BadRequestError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
-import RankService from '../services/rankService';
+import TagService from '../services/tagService';
 
-const rankService = RankService.getInstance();
+const tagService = TagService.getInstance();
 const router = Router();
 
 router.get(
-	'/rank',
+	'/tags',
 	checkAccessToken,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const { type } = req.query;
-			const region = req.query.region as string;
+			const { tag, type } = req.query;
 
-			// 여기 로직 수정
 			if (!(type === 'course' || type === 'store')) {
 				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
 					{ data: 'Invalid query' },
 				]);
 			}
 
-			if (type === 'store' && !region) {
+			if (!tag || typeof tag !== 'string') {
 				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
 					{ data: 'Invalid query' },
 				]);
 			}
 
-			const store = await rankService.getTop(type, region);
+			const data = await tagService.getByTag(type, tag);
 
-			res.json({ data: store });
+			res.json({ data: data });
 		} catch (error) {
 			next(error);
 		}

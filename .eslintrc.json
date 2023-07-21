@@ -27,6 +27,7 @@
     "spaced-comment": "off",
     "object-shorthand": "off",
     "yoda": "off",
-    "max-classes-per-file": "off"
+    "max-classes-per-file": "off",
+    "@typescript-eslint/no-useless-constructor": "off"
   }
 }
