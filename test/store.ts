@@ -16,7 +16,17 @@ const seedingStores = async () => {
 		const name = `${faker.name.lastName()}의 카페`;
 		const category = Math.floor(Math.random() * 3);
 		const description = faker.lorem.sentence();
-		const location = '경기 남양주시 고산로 168';
+		const location = `${faker.lorem.word()} ${faker.lorem.word()} ${faker.lorem.word()}`;
+		const locationSplit = location.split(' ');
+		let shortLocation;
+		if (locationSplit.length < 2) {
+			// 주소가 한단어 이하인 경우 그냥 주소룰 할당
+			shortLocation = location;
+		} else {
+			// 두 글자 이상인 경우 앞 문자 두개 저장
+			shortLocation = `${locationSplit[0]} ${locationSplit[1]}`;
+		}
+
 		const coordinates = [faker.address.latitude(), faker.address.longitude()];
 		const representImage = faker.image.imageUrl();
 		const tags = [faker.lorem.word(), faker.lorem.word(), faker.lorem.word()];
@@ -28,6 +38,7 @@ const seedingStores = async () => {
 			category: category,
 			description: description,
 			location: location,
+			shortLocation: shortLocation,
 			coordinates: coordinates,
 			representImage: representImage,
 			tags: tags,

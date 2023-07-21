@@ -35,6 +35,42 @@ router.post(
 );
 
 router.get(
+	'/stores/me',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const stores = await storeService.getMyStores(req.userUUID);
+
+			res.json({ data: stores });
+		} catch (error) {
+			next(error);
+		}
+	}
+);
+
+router.get(
+	'/stores/location',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { region } = req.query;
+
+			if (!region || typeof region !== 'string') {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
+			}
+
+			const stores = await storeService.getStoreByLocation(region);
+
+			res.json({ data: stores });
+		} catch (error) {
+			next(error);
+		}
+	}
+);
+
+router.get(
 	'/stores/:storeUUID',
 	checkAccessToken,
 	async (req: Request, res: Response, next: NextFunction) => {

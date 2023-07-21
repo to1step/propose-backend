@@ -2,6 +2,7 @@ import { v4 } from 'uuid';
 import {
 	CreateStoreForm,
 	CreateStoreReviewForm,
+	Store,
 	StoreEntireInfo,
 	UpdateStoreForm,
 	UpdateStoreReviewForm,
@@ -55,12 +56,23 @@ class StoreService {
 
 		const newUUID = v4();
 
+		const locationSplit = location.split(' ');
+		let shortLocation;
+		if (locationSplit.length < 2) {
+			// 주소가 한단어 이하인 경우 그냥 주소룰 할당
+			shortLocation = location;
+		} else {
+			// 두 글자 이상인 경우 앞 문자 두개 저장
+			shortLocation = `${locationSplit[0]} ${locationSplit[1]}`;
+		}
+
 		await new StoreModel({
 			user: userUUID,
 			uuid: newUUID,
 			name: name,
 			category: category,
 			description: description,
+			shortLocation: shortLocation,
 			location: location,
 			coordinates: coordinates,
 			representImage: representImage,
@@ -122,6 +134,42 @@ class StoreService {
 	}
 
 	/**
+	 * 지역 기반 가게들 가져오기
+	 * @param region
+	 */
+	async getStoreByLocation(region: string): Promise<Store[]> {
+		const stores = await StoreModel.find({
+			shortLocation: region,
+			deletedAt: null,
+			allowed: true,
+		});
+
+		if (stores.length === 0) {
+			return [];
+		}
+
+		return stores.map((store) => {
+			return ModelConverter.toStore(store);
+		});
+	}
+
+	/**
+	 * 내가 등록한 가게들 가져오기
+	 * @param userUUID
+	 */
+	async getMyStores(userUUID: string): Promise<Store[]> {
+		const stores = await StoreModel.find({ user: userUUID, deletedAt: null });
+
+		if (stores.length === 0) {
+			return [];
+		}
+
+		return stores.map((store) => {
+			return ModelConverter.toStore(store);
+		});
+	}
+
+	/**
 	 * 가게 정보 업데이트
 	 * @param userUUID
 	 * @param storeUUID
@@ -157,10 +205,21 @@ class StoreService {
 			]);
 		}
 
+		const locationSplit = location.split(' ');
+		let shortLocation;
+		if (locationSplit.length < 2) {
+			// 주소가 한단어 이하인 경우 그냥 주소룰 할당
+			shortLocation = location;
+		} else {
+			// 두 글자 이상인 경우 앞 문자 두개 저장
+			shortLocation = `${locationSplit[0]} ${locationSplit[1]}`;
+		}
+
 		store.name = name;
 		store.category = category;
 		store.description = description;
 		store.location = location;
+		store.shortLocation = shortLocation;
 		store.coordinates = coordinates;
 		store.representImage = representImage;
 		store.tags = tags;

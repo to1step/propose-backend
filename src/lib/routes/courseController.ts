@@ -14,7 +14,7 @@ const router = Router();
 const courseService = CourseService.getInstance();
 
 router.post(
-	'/course',
+	'/courses',
 	checkAccessToken,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
@@ -28,6 +28,20 @@ router.post(
 			);
 
 			res.json({ data: true });
+		} catch (error) {
+			next(error);
+		}
+	}
+);
+
+router.get(
+	'/courses/me',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const courses = await courseService.getMyCourse(req.userUUID);
+
+			res.json({ data: courses });
 		} catch (error) {
 			next(error);
 		}
