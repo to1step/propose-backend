@@ -299,31 +299,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntireStoreDto'
-  '/v1/{location}/top':
-    get:
-      tags:
-        - StoreController
-      summary: 이번주 top5 가게 가져오기
-      description: 이번주 top5 가게 가져오기
-      parameters:
-        - name: accessToken
-          in: header
-          required: true
-        - name: location
-          in: path
-          description: 현재 위치의 앞 문자열 두개 ex)서울시 마포구 (한글이 깨지니 encoding해서 보내주세요)
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 가게들 정보
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TopStoresDto'
     patch:
       tags:
         - StoreController
@@ -837,7 +812,7 @@ paths:
           description: type이 store인 경우 해당 지역 두 단어
       responses:
         '200':
-          description: 가게들 정보
+          description: top5 가게 or 코스들 정보
           content:
             application/json:
               schema:

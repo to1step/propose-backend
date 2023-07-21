@@ -9,6 +9,7 @@ interface StoreDAO {
 	description: string;
 	coordinates: number[];
 	location: string;
+	shortLocation: string;
 	representImage: string | null;
 	tags: string[];
 	startTime: string | null;
@@ -30,6 +31,7 @@ const storeSchema = new Schema<StoreDAO, StoreDAOModel>(
 		description: { type: String, required: true }, // 가게 설명
 		coordinates: { type: [Number], required: true }, // 가게 좌표
 		location: { type: String, required: true }, // 가게 주소
+		shortLocation: { type: String, required: true }, // 해당 지역 string 두 글자
 		representImage: { type: String }, // 가게 대표 사진 src
 		tags: { type: [String] }, // 가게 태그 배열
 		startTime: { type: String }, // 가게 오픈 시간

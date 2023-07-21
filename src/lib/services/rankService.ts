@@ -20,16 +20,16 @@ class RankService {
 
 	/**
 	 * 자신 주위의 ranking에 등재된 5개의 store or course 가져오기
-	 * @param location
+	 * @param region
 	 * @param type
 	 */
 	async getTop(
-		location: string,
-		type: 'store' | 'course'
+		type: 'store' | 'course',
+		region?: string
 	): Promise<Store[] | Course[]> {
 		// store
 		if (type === 'store') {
-			const storeUUIDs = await redis.lRange(location, 0, -1);
+			const storeUUIDs = await redis.lRange(region!, 0, -1);
 
 			const topStores = await StoreModel.find({
 				uuid: { $in: storeUUIDs },

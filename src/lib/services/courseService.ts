@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 import {
+	Course,
 	CourseEntireInfo,
 	CreateCourseForm,
 	CreateCourseReviewForm,
@@ -136,6 +137,21 @@ class CourseService {
 			likeCount,
 			iLike,
 		};
+	}
+
+	async getMyCourse(userUUID: string): Promise<Course[]> {
+		const courses = await CourseModel.find({
+			user: userUUID,
+			deletedAt: null,
+		});
+
+		if (courses.length === 0) {
+			return [];
+		}
+
+		return courses.map((course) => {
+			return ModelConverter.toCourse(course);
+		});
 	}
 
 	/**
