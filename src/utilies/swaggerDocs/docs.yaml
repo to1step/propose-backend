@@ -300,8 +300,8 @@ paths:
     get:
       tags:
         - StoreController
-      summary: 내 가게 가져오기
-      description: 내가 생성한 가게들 가져오기
+      summary: 내 주위 가게들 가져오기
+      description: 내 주위 가게들 가져오기
       parameters:
         - name: accessToken
           in: header
