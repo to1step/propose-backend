@@ -50,7 +50,6 @@ router.get(
 
 router.get(
 	'/courses/:courseUUID',
-	checkAccessToken,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { courseUUID } = req.params;
