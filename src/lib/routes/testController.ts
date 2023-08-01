@@ -2,6 +2,7 @@ import path from 'path';
 import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import TestService from '../services/testService';
+import checkAccessToken from '../middlewares/checkAccessToken';
 
 const testService = TestService.getInstance();
 const router = Router();
@@ -15,6 +16,7 @@ const upload = multer({
 });
 router.post(
 	'/test/images',
+	checkAccessToken,
 	upload.array('images', 1),
 	async (req: Request, res: Response, next: NextFunction) => {
 		// 이미지 파일을 보내지 않았다면 빈 배열로 초기화
