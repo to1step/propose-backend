@@ -4,11 +4,15 @@
 
 Web application project built with TypeScript, Express.js
 
+<br/>
+
 ## Tech Stack
 
 - TypeScript, Express.js,
 - Mongoose, Redis, AWS-S3, AWS-SES
 - Prettier, Husky
+
+<br/>
 
 ## Folder Structure
 
@@ -33,6 +37,8 @@ Web application project built with TypeScript, Express.js
 |— `nodemon.json` Nodemon Setting
 
 |— `tsconfig.json` TypeScript configuration
+
+<br/>
 
 ## Getting Started
 
