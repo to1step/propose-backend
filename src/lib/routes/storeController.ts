@@ -50,7 +50,6 @@ router.get(
 
 router.get(
 	'/stores/location',
-	checkAccessToken,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { region } = req.query;
@@ -72,7 +71,6 @@ router.get(
 
 router.get(
 	'/stores/:storeUUID',
-	checkAccessToken,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { storeUUID } = req.params;
