@@ -20,6 +20,13 @@ import v1TestRouter from './lib/routes/testController';
 import { errorHandler } from './lib/middlewares/errors/errorHandler';
 import { NotFoundError } from './lib/middlewares/errors';
 import { needEnv } from './utilies/envList';
+import { seedingStores } from '../test/seedingStore';
+import { seedingUsers } from '../test/seedingUser';
+import { seedingCourses } from '../test/seedingCourses';
+import { seedingStoreReviews } from '../test/seedingStoreReview';
+import { seedingCourseReviews } from '../test/seedingCourseReview';
+import { seedingStoreLike } from '../test/seedingStoreLike';
+import { seedingCourseLike } from '../test/seedingCourseLike';
 
 dotenv.config();
 
@@ -43,6 +50,7 @@ class Server {
 		this.initializeErrorBot();
 		this.initializeMiddleware();
 		this.initializeRoutes();
+		// this.seeding();
 	}
 
 	private validateEnv() {
@@ -74,6 +82,16 @@ class Server {
 
 	private async initializeErrorBot() {
 		await this.errorBot.connect();
+	}
+
+	private async seeding() {
+		// await seedingUsers(1000);
+		// await seedingStores(10000);
+		// await seedingCourses(10000);
+		// await seedingStoreReviews();
+		// await seedingCourseReviews();
+		// await seedingStoreLike();
+		// await seedingCourseLike();
 	}
 
 	private initializeMiddleware() {

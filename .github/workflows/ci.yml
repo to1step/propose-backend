@@ -22,7 +22,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.DOCKER_BUILD }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata (tagData.ts, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -33,7 +33,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tagData.ts }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
