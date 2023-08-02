@@ -288,7 +288,7 @@ class StoreService {
 				user: userUUID,
 				store: storeUUID,
 			}).save(),
-			this.scoreToStore(userUUID, storeUUID, store.location, 'add'),
+			this.scoreToStore(userUUID, storeUUID, store.shortLocation, 'add'),
 		]);
 	}
 
@@ -434,13 +434,13 @@ class StoreService {
 	 * 가게에 점수 부여하기
 	 * @param userUUID
 	 * @param storeUUID
-	 * @param location
+	 * @param shortLocation
 	 * @param type
 	 */
 	async scoreToStore(
 		userUUID: string,
 		storeUUID: string,
-		location: string,
+		shortLocation: string,
 		type: 'add' | 'sub'
 	): Promise<void> {
 		const [sunStart, satEnd] = dayjsKR.getWeek();
@@ -459,17 +459,6 @@ class StoreService {
 			}
 			await storeScore.save();
 		} else {
-			// 없다면 score 1으로 생성
-			const locationSplit = location.split(' ');
-			let shortLocation;
-			if (locationSplit.length < 2) {
-				// 주소가 한단어 이하인 경우 그냥 주소룰 할당
-				shortLocation = location;
-			} else {
-				// 두 글자 이상인 경우 앞 문자 두개 저장
-				shortLocation = `${locationSplit[0]} ${locationSplit[1]}`;
-			}
-
 			await new StoreScoreModel({
 				store: storeUUID,
 				shortLocation: shortLocation,
