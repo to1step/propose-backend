@@ -9,7 +9,7 @@ import {
 	Tokens,
 	SendMailForm,
 	NicknameValidationForm,
-	KakaoUserReponse,
+	KakaoUserResponse,
 	KakaoTokenResponse,
 } from '../types/type';
 import { UserModel } from '../../database/models/user';
@@ -232,7 +232,7 @@ class AuthService {
 			]);
 		}
 
-		const userKaKaoData = await axios.post<KakaoUserReponse>(
+		const userKaKaoData = await axios.post<KakaoUserResponse>(
 			`https://kapi.kakao.com/v2/user/me`,
 			{},
 			{
