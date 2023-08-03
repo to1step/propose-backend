@@ -12,7 +12,7 @@ jobs:
       # Reference a specific version
       - uses: actions/checkout@v3.2.0
       # Reference a branch
-      - uses: actions/checkout@test
+      - uses: actions/checkout@main
         with:
           node-version: '16' 
           registry-url: 'https://npm.pkg.github.com'
