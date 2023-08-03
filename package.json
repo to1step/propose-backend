@@ -1,9 +1,9 @@
 {
   "name": "@to1step/propose-backend",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "",
   "main": "dist/src/app.js",
-  "types": "dist/src/types.d.ts",
+  "types": "src/types.d.ts",
   "author": "rkdden, gkqkehs7",
   "repository": {
     "type": "git",
