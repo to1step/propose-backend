@@ -1,6 +1,6 @@
 {
   "name": "@to1step/propose-backend",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "",
   "main": "dist/src/app.js",
   "types": "dist/src/types.d.ts",
