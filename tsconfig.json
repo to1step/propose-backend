@@ -14,7 +14,9 @@
     "noImplicitAny": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/app.ts",
+    "src/types.d.ts"
   ],
   "exclude": [
     "node_modules"

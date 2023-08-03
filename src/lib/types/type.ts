@@ -5,7 +5,7 @@ type KakaoTokenResponse = {
 	access_token?: string;
 };
 
-type KakaoUserReponse = {
+type KakaoUserResponse = {
 	id: number;
 	properties?: {
 		nickname?: string;
@@ -243,7 +243,7 @@ type UpdateCourseReviewForm = {
 
 export type {
 	KakaoTokenResponse,
-	KakaoUserReponse,
+	KakaoUserResponse,
 	User,
 	LocalUser,
 	UserCreateKey,
