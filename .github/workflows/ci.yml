@@ -78,5 +78,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd docker-server
+            docker-compose down
+            docker rmi ${{ secrets.IMAGE_NANE }} 
             docker pull ${{ secrets.IMAGE_NANE }} 
-            docker-compose -f ${{ secrets.SERVER_DOCKER_COMPOSE_FILE }} up -d
+            docker-compose up -d
