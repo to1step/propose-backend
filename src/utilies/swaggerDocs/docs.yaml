@@ -16,7 +16,7 @@ tags:
     description: 코스 관련 api
   - name: RankController
     description: 랭크 관련 api
-  - name: TagController
+  - name: SearchController
     description: 태그 관련 api
 paths:
   /v1/auth/local/sign-in:
@@ -303,8 +303,6 @@ paths:
       summary: 내 주위 가게들 가져오기
       description: 내 주위 가게들 가져오기
       parameters:
-        - name: accessToken
-          in: header
         - name: region
           in: query
           description: 해당 지역 두 단어 ex) 서울시 마포구
@@ -324,9 +322,6 @@ paths:
       summary: 특정 가게 정보 가져오기
       description: 가게 정보 가져오기
       parameters:
-        - name: accessToken
-          in: header
-          required: true
         - name: storeUUID
           in: path
           description: 가게 UUID
@@ -613,9 +608,6 @@ paths:
       summary: 특정 코스 정보 가져오기
       description: 코스 정보 가져오기
       parameters:
-        - name: accessToken
-          in: header
-          required: true
         - name: courseUUID
           in: path
           description: 코스 UUID
@@ -858,9 +850,6 @@ paths:
       summary: 이번주 top5 가게 or 코스 가져오기
       description: 이번주 top5 가게 or 코스 가져오기
       parameters:
-        - name: accessToken
-          in: header
-          required: true
         - name: type
           in: query
           description: store | course
@@ -877,21 +866,41 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TopStoresDto'
-  /v1/tags:
+  /v1/search/tags:
     get:
       tags:
-        - TagController
+        - SearchController
       summary: 해당 태그를 가지는 가게/코스 가져오기
       description: 해당 태그를 가지는 가게/코스 가져오기
       parameters:
-        - name: accessToken
-          in: header
         - name: type
           in: query
           description: store / course 중 하나
         - name: tag
           in: query
           description: 검색하려는 태그
+      responses:
+        '200':
+          description: 가게 or 코스 정보들
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GetStoreDto"
+  /v1/search/keyword:
+    get:
+      tags:
+        - SearchController
+      summary: 해당 keyword를 가지는 가게/코스 가져오기
+      description: 해당 keyword를 가지는 가게/코스 가져오기
+      parameters:
+        - name: type
+          in: query
+          description: store / course 중 하나
+        - name: tag
+          in: keyword
+          description: 검색하려는 keyword
       responses:
         '200':
           description: 가게 or 코스 정보들
