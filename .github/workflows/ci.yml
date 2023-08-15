@@ -79,7 +79,6 @@ jobs:
           script: |
             cd docker-server
             docker-compose down
-            docker-compose rm
             docker rmi ${{ secrets.IMAGE_NANE }} 
             docker pull ${{ secrets.IMAGE_NANE }} 
             docker-compose up -d
