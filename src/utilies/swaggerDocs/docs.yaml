@@ -196,7 +196,7 @@ paths:
       summary: 내 정보 모두 가져오기
       description: 비밀번호를 제외한 나의 정보 모두 가져오기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
       responses:
         '200':
@@ -211,7 +211,7 @@ paths:
       summary: 유저 정보 변경
       description: 유저 정보 변경하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
       requestBody:
         description: UpdateUserDto
@@ -237,7 +237,7 @@ paths:
       summary: 회원탈퇴
       description: 회원탈퇴하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
       responses:
         '200':
@@ -258,7 +258,7 @@ paths:
       summary: 가게 생성
       description: 새로운 가게를 생성하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
       requestBody:
         description: CreateStoreDto
@@ -285,7 +285,7 @@ paths:
       summary: 내 가게 가져오기
       description: 내가 생성한 가게들 가져오기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
       responses:
         '200':
@@ -341,7 +341,7 @@ paths:
       summary: 가게 정보 수정
       description: 가게 정보 수정하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: storeUUID
@@ -374,7 +374,7 @@ paths:
       summary: 가게 삭제하기
       description: 가게를 삭제하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: storeUUID
@@ -402,7 +402,7 @@ paths:
       summary: 가게 좋아요
       description: 특정 가게 좋아요 하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: storeUUID
@@ -429,7 +429,7 @@ paths:
       summary: 가게 좋아요 취소
       description: 특정 가게 좋아요 취소 하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: storeUUID
@@ -457,7 +457,7 @@ paths:
       summary: 가게 리뷰 작성
       description: 가게에 리뷰 작성
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: storeUUID
@@ -491,7 +491,7 @@ paths:
       summary: 가게 리뷰 수정
       description: 가게에 리뷰 수정
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: storeUUID
@@ -530,7 +530,7 @@ paths:
       summary: 가게 리뷰 삭제
       description: 가게에 리뷰 삭제
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: storeUUID
@@ -564,7 +564,7 @@ paths:
       summary: 코스 생성
       description: 새로운 코스를 생성하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
       requestBody:
         description: CreateCourseDto
@@ -591,7 +591,7 @@ paths:
       summary: 내 코스들 가져오기
       description: 내가 생성한 코스들 가져오기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
       responses:
@@ -627,7 +627,7 @@ paths:
       summary: 코스 정보 수정
       description: 코스 정보 수정하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: storeUUID
@@ -660,7 +660,7 @@ paths:
       summary: 코스 삭제하기
       description: 내가 생성한 코스를 삭제하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: courseUUID
@@ -688,7 +688,7 @@ paths:
       summary: 코스 좋아요
       description: 특정 코스 좋아요 하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: storeUUID
@@ -715,7 +715,7 @@ paths:
       summary: 코스 좋아요 취소
       description: 특정 코스 좋아요 취소 하기
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: courseUUID
@@ -743,7 +743,7 @@ paths:
       summary: 코스 리뷰 작성
       description: 코스에 리뷰 작성
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: courseUUID
@@ -777,7 +777,7 @@ paths:
       summary: 코스 리뷰 수정
       description: 코스에 대한 리뷰 수정
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: courseUUID
@@ -816,7 +816,7 @@ paths:
       summary: 코스 리뷰 삭제
       description: 코스에 대한 리뷰 삭제
       parameters:
-        - name: accessToken
+        - name: Authorization
           in: header
           required: true
         - name: courseUUID
