@@ -61,6 +61,10 @@ jobs:
             DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
             DISCORD_PROD_CHANNEL_ID=${{ secrets.DISCORD_PROD_CHANNEL_ID }}
             DISCORD_DEV_CHANNEL_ID=${{ secrets.DISCORD_DEV_CHANNEL_ID }}
+            MAIL_SERVICE=${{ secrets.MAIL_SERVICE }}
+            MAIL_ID=${{ secrets.MAIL_ID }}
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            MAIL_SENDER=${{ secrets.MAIL_SENDER }}
             LOG_PATH=${{ secrets.LOG_PATH }}
 
   code-deploy:
@@ -79,7 +83,6 @@ jobs:
           script: |
             cd docker-server
             docker-compose down
-            docker-compose rm
             docker rmi ${{ secrets.IMAGE_NANE }} 
             docker pull ${{ secrets.IMAGE_NANE }} 
             docker-compose up -d

@@ -16,12 +16,14 @@ import { UserModel } from '../../database/models/user';
 import Redis from '../../utilies/redis';
 import SESClient from '../../utilies/sesClient';
 import WinstonLogger from '../../utilies/logger';
+import NodeMailer from '../../utilies/nodeMailer';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
 
 const redis = Redis.getInstance().getClient();
 const sesClient = SESClient.getInstance();
 const logger = WinstonLogger.getInstance();
+const nodeMailer = NodeMailer.getInstance();
 
 class AuthService {
 	private static instance: AuthService;
@@ -163,7 +165,7 @@ class AuthService {
 		}
 
 		// AWS-SES를 통해 해당 이메일로 인증코드 보내기
-		sesClient.sendEmail(email, verifyCode);
+		nodeMailer.sendMail(email, verifyCode);
 	}
 
 	/**
