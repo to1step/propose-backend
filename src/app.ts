@@ -50,7 +50,7 @@ class Server {
 		this.initializeErrorBot();
 		this.initializeMiddleware();
 		this.initializeRoutes();
-		// this.seeding();
+		this.seeding();
 	}
 
 	private validateEnv() {
@@ -85,13 +85,11 @@ class Server {
 	}
 
 	private async seeding() {
-		// await seedingUsers(1000);
-		// await seedingStores(10000);
-		// await seedingCourses(10000);
-		// await seedingStoreReviews();
-		// await seedingCourseReviews();
-		// await seedingStoreLike();
-		// await seedingCourseLike();
+		await seedingUsers(1000);
+		await seedingStores(10000);
+		await seedingCourses(10000);
+		await Promise.all([seedingStoreReviews(), seedingCourseReviews()]);
+		await Promise.all([seedingStoreLike(), seedingCourseLike()]);
 	}
 
 	private initializeMiddleware() {
