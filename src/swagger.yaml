@@ -1295,6 +1295,10 @@ components:
             - 9ddfe694-d960-4492-98a0-eb24ed98dd46
             - 9ddfe694-d960-4492-98a0-eb24ed98dd46
             - 9ddfe694-d960-4492-98a0-eb24ed98dd46
+        representImage:
+          type: string
+          description: 코스 대표 이미지
+          example: courseImage.png
         shortComment:
           type: string
           description: 코스에 대한 짧은 설명
@@ -1385,6 +1389,10 @@ components:
             - 9ddfe694-d960-4492-98a0-eb24ed98dd46
             - 9ddfe694-d960-4492-98a0-eb24ed98dd46
             - 9ddfe694-d960-4492-98a0-eb24ed98dd46
+        representImage:
+          type: string
+          description: 코스 대표 이미지
+          example: courseImage.png
         shortComment:
           type: string
           description: 코스에 대한 짧은 설명
@@ -1474,6 +1482,10 @@ components:
             - 9ddfe694-d960-4492-98a0-eb24ed98dd46
             - 9ddfe694-d960-4492-98a0-eb24ed98dd46
             - 9ddfe694-d960-4492-98a0-eb24ed98dd46
+        representImage:
+          type: string
+          description: 코스 대표 이미지
+          example: courseImage.png
         shortComment:
           type: string
           description: 코스에 대한 짧은 설명
