@@ -16,6 +16,7 @@ import { StoreReviewModel } from '../../database/models/storeReview';
 import { StoreScoreModel } from '../../database/models/storeScore';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
+import { StoreTagModel } from '../../database/models/storeTag';
 
 const redis = Redis.getInstance().getClient();
 
@@ -65,6 +66,21 @@ class StoreService {
 			// 두 글자 이상인 경우 앞 문자 두개 저장
 			shortLocation = `${locationSplit[0]} ${locationSplit[1]}`;
 		}
+
+		const promises = tags.map(async (tag) => {
+			const tagData = await StoreTagModel.findOne({ tag: tag });
+
+			if (!tagData) {
+				await new StoreTagModel({
+					tag: tag,
+					stores: [newUUID],
+				}).save();
+			} else {
+				tagData.stores = [...tagData.stores, newUUID];
+			}
+		});
+
+		await Promise.all(promises);
 
 		await new StoreModel({
 			user: userUUID,
@@ -137,7 +153,7 @@ class StoreService {
 	 * 지역 기반 가게들 가져오기
 	 * @param region
 	 */
-	async getStoreByLocation(region: string): Promise<Store[]> {
+	async getStoresByLocation(region: string): Promise<Store[]> {
 		const stores = await StoreModel.find({
 			shortLocation: region,
 			deletedAt: null,
@@ -151,6 +167,34 @@ class StoreService {
 		return stores.map((store) => {
 			return ModelConverter.toStore(store);
 		});
+	}
+
+	/**
+	 * 태그를 통한 가게 검색
+	 * @param tag
+	 */
+	async getStoresByTag(tag: string): Promise<Store[]> {
+		const tagData = await StoreTagModel.findOne({ tag: tag });
+
+		if (!tagData) {
+			return [];
+		}
+
+		const stores: Store[] = [];
+
+		tagData.stores.map(async (storeUUID) => {
+			const store = await StoreModel.findOne({
+				uuid: storeUUID,
+				deletedAt: null,
+				allowed: true,
+			});
+
+			if (store) {
+				stores.push(ModelConverter.toStore(store));
+			}
+		});
+
+		return stores;
 	}
 
 	/**
@@ -215,6 +259,43 @@ class StoreService {
 			shortLocation = `${locationSplit[0]} ${locationSplit[1]}`;
 		}
 
+		// 새롭게 생성된 태그들과 삭제된 태그들 분류
+		const newTags = tags.filter((tag: string) => !store.tags.includes(tag));
+		const deletedTags = store.tags.filter((tag: string) => !tags.includes(tag));
+
+		// 새로운 태그 추가
+		const newPromises = newTags.map(async (tag) => {
+			const tagData = await StoreTagModel.findOne({ tag: tag });
+
+			if (!tagData) {
+				await new StoreTagModel({
+					tag: tag,
+					stores: [storeUUID],
+				}).save();
+			} else {
+				tagData.stores = [...tagData.stores, storeUUID];
+			}
+		});
+
+		// 해당 태그 배열에서 storeUUID 삭제
+		const deletePromises = deletedTags.map(async (tag) => {
+			const tagData = await StoreTagModel.findOne({ tag: tag });
+
+			if (!tagData) {
+				throw new InternalServerError(ErrorCode.TAG_NOT_FOUND, [
+					{ data: 'Tag not found' },
+				]);
+			} else {
+				tagData.stores = tagData.stores.filter(
+					(storeId) => storeId !== storeUUID
+				);
+
+				await tagData.save();
+			}
+		});
+
+		await Promise.all([newPromises, deletePromises]);
+
 		store.name = name;
 		store.category = category;
 		store.description = description;
@@ -247,6 +328,23 @@ class StoreService {
 				{ data: 'Store not found' },
 			]);
 		}
+
+		// 각 태그들에서 가게 삭제
+		store.tags.map(async (tag) => {
+			const tagData = await StoreTagModel.findOne({ tag: tag });
+
+			if (!tagData) {
+				throw new InternalServerError(ErrorCode.TAG_NOT_FOUND, [
+					{ data: 'Tag not found' },
+				]);
+			} else {
+				tagData.stores = tagData.stores.filter(
+					(storeId) => storeId !== storeUUID
+				);
+
+				await tagData.save();
+			}
+		});
 
 		store.deletedAt = new Date();
 		await store.save();
