@@ -170,6 +170,7 @@ type Course = {
 	user: string;
 	name: string;
 	stores: string[];
+	representImage: string | null;
 	shortComment: string;
 	longComment: string | null;
 	isPrivate: boolean;
@@ -182,6 +183,7 @@ type CourseEntireInfo = {
 	user: string;
 	name: string;
 	stores: string[];
+	representImage: string | null;
 	shortComment: string;
 	longComment: string | null;
 	isPrivate: boolean;
@@ -210,6 +212,7 @@ type CreateTransportForm = {
 type CreateCourseForm = {
 	name: string;
 	stores: string[];
+	representImage: string | null;
 	shortComment: string;
 	longComment: string | null;
 	isPrivate: boolean;
@@ -220,6 +223,7 @@ type CreateCourseForm = {
 type UpdateCourseForm = {
 	name: string;
 	stores: string[];
+	representImage: string | null;
 	shortComment: string;
 	longComment: string | null;
 	isPrivate: boolean;
