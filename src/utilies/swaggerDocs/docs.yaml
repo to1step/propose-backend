@@ -898,8 +898,8 @@ paths:
         - name: type
           in: query
           description: store / course 중 하나
-        - name: tag
-          in: keyword
+        - name: keyword
+          in: query
           description: 검색하려는 keyword
       responses:
         '200':
@@ -1272,6 +1272,10 @@ components:
           type: array
           description: 경유 가게들 uuid 순서대로
           example: ["9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46"]
+        representImage:
+          type: string
+          description: 코스 대표 이미지
+          example: courseImage.png
         shortComment:
           type: string
           description: 코스에 대한 짧은 설명
@@ -1350,6 +1354,10 @@ components:
           type: array
           description: 경유 가게들 uuid 순서대로
           example: [ "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46"]
+        representImage:
+          type: string
+          description: 코스 대표 이미지
+          example: courseImage.png
         shortComment:
           type: string
           description: 코스에 대한 짧은 설명
@@ -1433,6 +1441,10 @@ components:
           type: array
           description: 경유 가게들 uuid 순서대로
           example: [ "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46", "9ddfe694-d960-4492-98a0-eb24ed98dd46" ]
+        representImage:
+          type: string
+          description: 코스 대표 이미지
+          example: courseImage.png
         shortComment:
           type: string
           description: 코스에 대한 짧은 설명

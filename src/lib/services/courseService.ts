@@ -4,6 +4,7 @@ import {
 	CourseEntireInfo,
 	CreateCourseForm,
 	CreateCourseReviewForm,
+	Store,
 	UpdateCourseReviewForm,
 } from '../types/type';
 import ModelConverter from '../../utilies/converter/modelConverter';
@@ -15,8 +16,9 @@ import { CourseModel } from '../../database/models/course';
 import { CourseLikeModel } from '../../database/models/courseLike';
 import { CourseReviewModel } from '../../database/models/courseReview';
 import { StoreModel } from '../../database/models/store';
-import { StoreScoreModel } from '../../database/models/storeScore';
 import { CourseScoreModel } from '../../database/models/courseScore';
+import { CourseTagModel } from '../../database/models/courseTag';
+import { StoreTagModel } from '../../database/models/storeTag';
 
 const redis = Redis.getInstance().getClient();
 
@@ -46,6 +48,7 @@ class CourseService {
 		const {
 			name,
 			stores,
+			representImage,
 			shortComment,
 			longComment,
 			isPrivate,
@@ -67,11 +70,27 @@ class CourseService {
 
 		const newUUID = v4();
 
+		const promises = tags.map(async (tag) => {
+			const tagData = await CourseTagModel.findOne({ tag: tag });
+
+			if (!tagData) {
+				await new CourseTagModel({
+					tag: tag,
+					courses: [newUUID],
+				}).save();
+			} else {
+				tagData.courses = [...tagData.courses, newUUID];
+			}
+		});
+
+		await Promise.all(promises);
+
 		await new CourseModel({
 			uuid: newUUID,
 			user: userUUID,
 			name: name,
 			stores: stores,
+			representImage: representImage,
 			shortComment: shortComment,
 			longComment: longComment,
 			isPrivate: isPrivate,
@@ -139,7 +158,11 @@ class CourseService {
 		};
 	}
 
-	async getMyCourse(userUUID: string): Promise<Course[]> {
+	/**
+	 * 내가 만든 코스들 가져오기
+	 * @param userUUID
+	 */
+	async getMyCourses(userUUID: string): Promise<Course[]> {
 		const courses = await CourseModel.find({
 			user: userUUID,
 			deletedAt: null,
@@ -152,6 +175,34 @@ class CourseService {
 		return courses.map((course) => {
 			return ModelConverter.toCourse(course);
 		});
+	}
+
+	/**
+	 * 태그를 통한 코스 검색
+	 * @param tag
+	 */
+	async getCoursesByTag(tag: string): Promise<Course[]> {
+		const tagData = await CourseTagModel.findOne({ tag: tag });
+
+		if (!tagData) {
+			return [];
+		}
+
+		const courses: Course[] = [];
+
+		tagData.courses.map(async (courseUUID) => {
+			const course = await CourseModel.findOne({
+				uuid: courseUUID,
+				deletedAt: null,
+				isPrivate: false,
+			});
+
+			if (course) {
+				courses.push(ModelConverter.toCourse(course));
+			}
+		});
+
+		return courses;
 	}
 
 	/**
@@ -168,6 +219,7 @@ class CourseService {
 		const {
 			name,
 			stores,
+			representImage,
 			shortComment,
 			longComment,
 			isPrivate,
@@ -200,8 +252,48 @@ class CourseService {
 			]);
 		}
 
+		// 새롭게 생성된 태그들과 삭제된 태그들 분류
+		const newTags = tags.filter((tag: string) => !course.tags.includes(tag));
+		const deletedTags = course.tags.filter(
+			(tag: string) => !tags.includes(tag)
+		);
+
+		// 새로운 태그 추가
+		const newPromises = newTags.map(async (tag) => {
+			const tagData = await CourseTagModel.findOne({ tag: tag });
+
+			if (!tagData) {
+				await new CourseTagModel({
+					tag: tag,
+					stores: [courseUUID],
+				}).save();
+			} else {
+				tagData.courses = [...tagData.courses, courseUUID];
+			}
+		});
+
+		// 해당 태그 배열에서 storeUUID 삭제
+		const deletePromises = deletedTags.map(async (tag) => {
+			const tagData = await CourseTagModel.findOne({ tag: tag });
+
+			if (!tagData) {
+				throw new InternalServerError(ErrorCode.TAG_NOT_FOUND, [
+					{ data: 'Tag not found' },
+				]);
+			} else {
+				tagData.courses = tagData.courses.filter(
+					(courseId) => courseId !== courseUUID
+				);
+
+				await tagData.save();
+			}
+		});
+
+		await Promise.all([newPromises, deletePromises]);
+
 		course.name = name;
 		course.stores = stores;
+		course.representImage = representImage;
 		course.shortComment = shortComment;
 		course.longComment = longComment;
 		course.isPrivate = isPrivate;
@@ -229,6 +321,22 @@ class CourseService {
 				{ data: 'Course not found' },
 			]);
 		}
+
+		course.tags.map(async (tag) => {
+			const tagData = await CourseTagModel.findOne({ tag: tag });
+
+			if (!tagData) {
+				throw new InternalServerError(ErrorCode.TAG_NOT_FOUND, [
+					{ data: 'Tag not found' },
+				]);
+			} else {
+				tagData.courses = tagData.courses.filter(
+					(courseId) => courseId !== courseUUID
+				);
+
+				await tagData.save();
+			}
+		});
 
 		course.deletedAt = new Date();
 		await course.save();

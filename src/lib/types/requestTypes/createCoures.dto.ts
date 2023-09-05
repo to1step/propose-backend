@@ -50,6 +50,10 @@ class CreateCourseDto {
 	@IsString({ each: true })
 	stores: string[];
 
+	@IsOptional()
+	@IsString()
+	representImage: string | null;
+
 	@IsString()
 	shortComment: string;
 
@@ -71,6 +75,7 @@ class CreateCourseDto {
 	constructor(obj: CreateCourseDto) {
 		this.name = obj.name;
 		this.stores = obj.stores;
+		this.representImage = obj.representImage;
 		this.shortComment = obj.shortComment;
 		this.longComment = obj.longComment;
 		this.isPrivate = obj.isPrivate;
@@ -84,6 +89,7 @@ class CreateCourseDto {
 		return {
 			name: this.name,
 			stores: this.stores,
+			representImage: this.representImage ?? null,
 			shortComment: this.shortComment,
 			longComment: this.longComment ?? null,
 			isPrivate: this.isPrivate,
