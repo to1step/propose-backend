@@ -898,8 +898,8 @@ paths:
         - name: type
           in: query
           description: store / course 중 하나
-        - name: tag
-          in: keyword
+        - name: keyword
+          in: query
           description: 검색하려는 keyword
       responses:
         '200':
