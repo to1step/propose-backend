@@ -13,6 +13,7 @@ interface CourseDAO {
 	user: string;
 	name: string;
 	stores: string[];
+	representImage: string | null;
 	shortComment: string;
 	longComment: string | null;
 	isPrivate: boolean;
@@ -42,6 +43,7 @@ const courseSchema = new Schema<CourseDAO, CourseDAOModel>(
 		user: { type: String, required: true }, // 코스를 만든 유저 식별 uuid
 		stores: { type: [String], required: true }, // 코스에 들어가는 가게들
 		name: { type: String, required: true }, // 코스 이름
+		representImage: { type: String }, // 코스 대표 사진 src
 		shortComment: { type: String, required: true }, // 코스에 대한 짧은 소개
 		longComment: { type: String }, // 코스에 대한 긴 설명
 		isPrivate: { type: Boolean, required: true }, // 공개 여부

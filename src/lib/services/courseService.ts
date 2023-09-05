@@ -15,7 +15,6 @@ import { CourseModel } from '../../database/models/course';
 import { CourseLikeModel } from '../../database/models/courseLike';
 import { CourseReviewModel } from '../../database/models/courseReview';
 import { StoreModel } from '../../database/models/store';
-import { StoreScoreModel } from '../../database/models/storeScore';
 import { CourseScoreModel } from '../../database/models/courseScore';
 
 const redis = Redis.getInstance().getClient();
@@ -46,6 +45,7 @@ class CourseService {
 		const {
 			name,
 			stores,
+			representImage,
 			shortComment,
 			longComment,
 			isPrivate,
@@ -72,6 +72,7 @@ class CourseService {
 			user: userUUID,
 			name: name,
 			stores: stores,
+			representImage: representImage,
 			shortComment: shortComment,
 			longComment: longComment,
 			isPrivate: isPrivate,
@@ -168,6 +169,7 @@ class CourseService {
 		const {
 			name,
 			stores,
+			representImage,
 			shortComment,
 			longComment,
 			isPrivate,
@@ -202,6 +204,7 @@ class CourseService {
 
 		course.name = name;
 		course.stores = stores;
+		course.representImage = representImage;
 		course.shortComment = shortComment;
 		course.longComment = longComment;
 		course.isPrivate = isPrivate;

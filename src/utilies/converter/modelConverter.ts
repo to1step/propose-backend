@@ -55,6 +55,7 @@ class ModelConverter {
 			user: course.user,
 			name: course.name,
 			stores: course.stores,
+			representImage: course.representImage,
 			shortComment: course.shortComment,
 			longComment: course.longComment,
 			isPrivate: course.isPrivate,
