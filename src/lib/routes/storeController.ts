@@ -60,7 +60,7 @@ router.get(
 				]);
 			}
 
-			const stores = await storeService.getStoreByLocation(region);
+			const stores = await storeService.getStoresByLocation(region);
 
 			res.json({ data: stores });
 		} catch (error) {

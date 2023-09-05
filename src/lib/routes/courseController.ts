@@ -39,7 +39,7 @@ router.get(
 	checkAccessToken,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const courses = await courseService.getMyCourse(req.userUUID);
+			const courses = await courseService.getMyCourses(req.userUUID);
 
 			res.json({ data: courses });
 		} catch (error) {

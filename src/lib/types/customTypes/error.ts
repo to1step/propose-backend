@@ -32,11 +32,14 @@ enum ErrorCode {
 	COURSE_REVIEW_NOT_FOUND = 1403, // 코스 리뷰 조회시 없는 리뷰
 	PRIVATE_COURSE = 1404, // 비공개인 코스를 가져오려 하는 경우
 
+	// 태그 관련 에러 코드
+	TAG_NOT_FOUND = 1500,
+
 	// api 요청 에러
-	INVALID_QUERY = 1500,
+	INVALID_QUERY = 1600,
 
 	// 기타 에러
-	UNCATCHED_ERROR = 1600, // 예상 못한 에러
+	UNCATCHED_ERROR = 1700, // 예상 못한 에러
 }
 
 export default ErrorCode;
