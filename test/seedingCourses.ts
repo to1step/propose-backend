@@ -4,6 +4,8 @@ import { StoreModel } from '../src/database/models/store';
 import { UserModel } from '../src/database/models/user';
 import WinstonLogger from '../src/utilies/logger';
 import { CourseModel } from '../src/database/models/course';
+import { StoreTagModel } from '../src/database/models/storeTag';
+import { CourseTagModel } from '../src/database/models/courseTag';
 
 const logger = WinstonLogger.getInstance();
 export const seedingCourses = async (numbers: number) => {
@@ -38,6 +40,7 @@ export const seedingCourses = async (numbers: number) => {
 			randomStores[3].uuid,
 		];
 		const name = `${randomUser.nickname}의 코스`;
+		const representImage = faker.image.url();
 		const shortComment = faker.lorem.sentence();
 		const longComment = faker.lorem.sentence();
 		const transports = [
@@ -66,11 +69,22 @@ export const seedingCourses = async (numbers: number) => {
 			tagData[Math.floor(Math.random() * tagData.length)],
 		];
 
+		tags.map(async (tag) => {
+			const tagDatas = await CourseTagModel.findOne({ tag: tag });
+
+			if (tagDatas) {
+				tagDatas.courses.push(uuid);
+
+				await tagDatas.save();
+			}
+		});
+
 		return new CourseModel({
 			uuid: uuid,
 			user: randomUserUUID,
 			name: name,
 			stores: randomStoresUUID,
+			representImage: representImage,
 			shortComment: shortComment,
 			longComment: longComment,
 			transports: transports,

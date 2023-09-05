@@ -27,6 +27,7 @@ import { seedingStoreReviews } from '../test/seedingStoreReview';
 import { seedingCourseReviews } from '../test/seedingCourseReview';
 import { seedingStoreLike } from '../test/seedingStoreLike';
 import { seedingCourseLike } from '../test/seedingCourseLike';
+import { seedingTags } from '../test/seedingTag';
 
 dotenv.config();
 
@@ -85,6 +86,7 @@ class Server {
 	}
 
 	private async seeding() {
+		await seedingTags();
 		await seedingUsers(1000);
 		await seedingStores(10000);
 		await seedingCourses(10000);
