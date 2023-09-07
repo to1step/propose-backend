@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 import {
+	Course,
 	CreateStoreForm,
 	CreateStoreReviewForm,
 	Store,
@@ -174,11 +175,17 @@ class StoreService {
 	/**
 	 * 태그를 통한 가게 검색
 	 * @param tag
+	 * @param page
+	 * @param pageSize
 	 */
-	async getStoresByTag(tag: string): Promise<Store[]> {
+	async getStoresByTag(
+		tag: string,
+		page: number,
+		pageSize: number
+	): Promise<Store[]> {
 		const stores = await StoreModel.find({ tags: tag }, null, {
-			limit: 8,
-			skip: 0,
+			skip: page,
+			limit: pageSize,
 		});
 
 		return stores.map((store) => ModelConverter.toStore(store));
@@ -196,6 +203,25 @@ class StoreService {
 		// const stores = await StoreModel.find({ name: { $in: storeUUIDs } });
 		//
 		// return stores.map((store) => ModelConverter.toStore(store));
+	}
+
+	/**
+	 * keyword로 가게 검색
+	 * @param keyword
+	 * @param page
+	 * @param pageSize
+	 */
+	async getStoresByKeyword(
+		keyword: string,
+		page: number,
+		pageSize: number
+	): Promise<Store[]> {
+		const stores = await StoreModel.find({ name: { $regex: keyword } }, null, {
+			skip: page,
+			limit: pageSize,
+		});
+
+		return stores.map((store) => ModelConverter.toStore(store));
 	}
 
 	/**
