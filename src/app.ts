@@ -86,12 +86,12 @@ class Server {
 	}
 
 	private async seeding() {
-		await seedingTags();
-		await seedingUsers(1000);
-		await seedingStores(10000);
-		await seedingCourses(10000);
-		await Promise.all([seedingStoreReviews(), seedingCourseReviews()]);
-		await Promise.all([seedingStoreLike(), seedingCourseLike()]);
+		// await seedingTags();
+		// await seedingUsers(1000);
+		// await seedingStores(10000);
+		// await seedingCourses(10000);
+		// await Promise.all([seedingStoreReviews(), seedingCourseReviews()]);
+		// await Promise.all([seedingStoreLike(), seedingCourseLike()]);
 	}
 
 	private initializeMiddleware() {
