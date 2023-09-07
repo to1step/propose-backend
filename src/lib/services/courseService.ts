@@ -79,7 +79,9 @@ class CourseService {
 					courses: [newUUID],
 				}).save();
 			} else {
-				tagData.courses = [...tagData.courses, newUUID];
+				tagData.courses.push(newUUID);
+
+				await tagData.save();
 			}
 		});
 
@@ -180,29 +182,57 @@ class CourseService {
 	/**
 	 * 태그를 통한 코스 검색
 	 * @param tag
+	 * @param page
+	 * @param pageSize
 	 */
-	async getCoursesByTag(tag: string): Promise<Course[]> {
-		const tagData = await CourseTagModel.findOne({ tag: tag });
-
-		if (!tagData) {
-			return [];
-		}
-
-		const courses: Course[] = [];
-
-		tagData.courses.map(async (courseUUID) => {
-			const course = await CourseModel.findOne({
-				uuid: courseUUID,
-				deletedAt: null,
-				isPrivate: false,
-			});
-
-			if (course) {
-				courses.push(ModelConverter.toCourse(course));
-			}
+	async getCoursesByTag(
+		tag: string,
+		page: number,
+		pageSize: number
+	): Promise<Course[]> {
+		const courses = await CourseModel.find({ tags: tag }, null, {
+			skip: page,
+			limit: pageSize,
 		});
 
-		return courses;
+		return courses.map((course) => ModelConverter.toCourse(course));
+
+		// const tagData = await CourseTagModel.findOne({ tag: tag });
+		//
+		// if (!tagData) {
+		// 	throw new InternalServerError(ErrorCode.TAG_NOT_FOUND, [
+		// 		{ data: 'Tag not found' },
+		// 	]);
+		// }
+		//
+		// const courseUUIDs = tagData.courses;
+		//
+		// const courses = await CourseModel.find({ name: { $in: courseUUIDs } });
+		//
+		// return courses.map((course) => ModelConverter.toCourse(course));
+	}
+
+	/**
+	 * keyword로 코스 검색
+	 * @param keyword
+	 * @param page
+	 * @param pageSize
+	 */
+	async getCoursesByKeyword(
+		keyword: string,
+		page: number,
+		pageSize: number
+	): Promise<Course[]> {
+		const courses = await CourseModel.find(
+			{ name: { $regex: keyword } },
+			null,
+			{
+				skip: page,
+				limit: pageSize,
+			}
+		);
+
+		return courses.map((course) => ModelConverter.toCourse(course));
 	}
 
 	/**
@@ -268,7 +298,9 @@ class CourseService {
 					stores: [courseUUID],
 				}).save();
 			} else {
-				tagData.courses = [...tagData.courses, courseUUID];
+				tagData.courses.push(courseUUID);
+
+				await tagData.save();
 			}
 		});
 

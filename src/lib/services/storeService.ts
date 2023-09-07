@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 import {
+	Course,
 	CreateStoreForm,
 	CreateStoreReviewForm,
 	Store,
@@ -76,7 +77,9 @@ class StoreService {
 					stores: [newUUID],
 				}).save();
 			} else {
-				tagData.stores = [...tagData.stores, newUUID];
+				tagData.stores.push(newUUID);
+
+				await tagData.save();
 			}
 		});
 
@@ -172,29 +175,53 @@ class StoreService {
 	/**
 	 * 태그를 통한 가게 검색
 	 * @param tag
+	 * @param page
+	 * @param pageSize
 	 */
-	async getStoresByTag(tag: string): Promise<Store[]> {
-		const tagData = await StoreTagModel.findOne({ tag: tag });
-
-		if (!tagData) {
-			return [];
-		}
-
-		const stores: Store[] = [];
-
-		tagData.stores.map(async (storeUUID) => {
-			const store = await StoreModel.findOne({
-				uuid: storeUUID,
-				deletedAt: null,
-				allowed: true,
-			});
-
-			if (store) {
-				stores.push(ModelConverter.toStore(store));
-			}
+	async getStoresByTag(
+		tag: string,
+		page: number,
+		pageSize: number
+	): Promise<Store[]> {
+		const stores = await StoreModel.find({ tags: tag }, null, {
+			skip: page,
+			limit: pageSize,
 		});
 
-		return stores;
+		return stores.map((store) => ModelConverter.toStore(store));
+
+		// const tagData = await StoreTagModel.findOne({ tag: tag });
+		//
+		// if (!tagData) {
+		// 	throw new InternalServerError(ErrorCode.TAG_NOT_FOUND, [
+		// 		{ data: 'Tag not found' },
+		// 	]);
+		// }
+		//
+		// const storeUUIDs = tagData.stores;
+		//
+		// const stores = await StoreModel.find({ name: { $in: storeUUIDs } });
+		//
+		// return stores.map((store) => ModelConverter.toStore(store));
+	}
+
+	/**
+	 * keyword로 가게 검색
+	 * @param keyword
+	 * @param page
+	 * @param pageSize
+	 */
+	async getStoresByKeyword(
+		keyword: string,
+		page: number,
+		pageSize: number
+	): Promise<Store[]> {
+		const stores = await StoreModel.find({ name: { $regex: keyword } }, null, {
+			skip: page,
+			limit: pageSize,
+		});
+
+		return stores.map((store) => ModelConverter.toStore(store));
 	}
 
 	/**
@@ -273,7 +300,9 @@ class StoreService {
 					stores: [storeUUID],
 				}).save();
 			} else {
-				tagData.stores = [...tagData.stores, storeUUID];
+				tagData.stores.push(storeUUID);
+
+				await tagData.save();
 			}
 		});
 

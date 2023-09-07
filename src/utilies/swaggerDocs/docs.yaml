@@ -879,6 +879,12 @@ paths:
         - name: tag
           in: query
           description: 검색하려는 태그
+        - name: page
+          in: query
+          description: 시작 페이지
+        - name: pageSize
+          in: query
+          description: 가져올 개수
       responses:
         '200':
           description: 가게 or 코스 정보들
@@ -901,6 +907,12 @@ paths:
         - name: keyword
           in: query
           description: 검색하려는 keyword
+        - name: page
+          in: query
+          description: 시작 페이지
+        - name: pageSize
+          in: query
+          description: 가져올 개수
       responses:
         '200':
           description: 가게 or 코스 정보들

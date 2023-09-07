@@ -5,6 +5,7 @@ import { getRandomCoordinates } from './coordinateData';
 import { StoreModel } from '../src/database/models/store';
 import { UserModel } from '../src/database/models/user';
 import WinstonLogger from '../src/utilies/logger';
+import { StoreTagModel } from '../src/database/models/storeTag';
 
 const logger = WinstonLogger.getInstance();
 export const seedingStores = async (numbers: number) => {
@@ -36,6 +37,16 @@ export const seedingStores = async (numbers: number) => {
 			tagData[Math.floor(Math.random() * tagData.length)],
 			tagData[Math.floor(Math.random() * tagData.length)],
 		];
+
+		tags.map(async (tag) => {
+			const tagDatas = await StoreTagModel.findOne({ tag: tag });
+
+			if (tagDatas) {
+				tagDatas.stores.push(uuid);
+
+				await tagDatas.save();
+			}
+		});
 
 		return new StoreModel({
 			user: user,
