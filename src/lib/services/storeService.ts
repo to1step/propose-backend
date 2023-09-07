@@ -76,7 +76,9 @@ class StoreService {
 					stores: [newUUID],
 				}).save();
 			} else {
-				tagData.stores = [...tagData.stores, newUUID];
+				tagData.stores.push(newUUID);
+
+				await tagData.save();
 			}
 		});
 
@@ -174,27 +176,26 @@ class StoreService {
 	 * @param tag
 	 */
 	async getStoresByTag(tag: string): Promise<Store[]> {
-		const tagData = await StoreTagModel.findOne({ tag: tag });
-
-		if (!tagData) {
-			return [];
-		}
-
-		const stores: Store[] = [];
-
-		tagData.stores.map(async (storeUUID) => {
-			const store = await StoreModel.findOne({
-				uuid: storeUUID,
-				deletedAt: null,
-				allowed: true,
-			});
-
-			if (store) {
-				stores.push(ModelConverter.toStore(store));
-			}
+		const stores = await StoreModel.find({ tags: tag }, null, {
+			limit: 8,
+			skip: 0,
 		});
 
-		return stores;
+		return stores.map((store) => ModelConverter.toStore(store));
+
+		// const tagData = await StoreTagModel.findOne({ tag: tag });
+		//
+		// if (!tagData) {
+		// 	throw new InternalServerError(ErrorCode.TAG_NOT_FOUND, [
+		// 		{ data: 'Tag not found' },
+		// 	]);
+		// }
+		//
+		// const storeUUIDs = tagData.stores;
+		//
+		// const stores = await StoreModel.find({ name: { $in: storeUUIDs } });
+		//
+		// return stores.map((store) => ModelConverter.toStore(store));
 	}
 
 	/**
@@ -273,7 +274,9 @@ class StoreService {
 					stores: [storeUUID],
 				}).save();
 			} else {
-				tagData.stores = [...tagData.stores, storeUUID];
+				tagData.stores.push(storeUUID);
+
+				await tagData.save();
 			}
 		});
 

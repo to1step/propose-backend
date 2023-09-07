@@ -79,7 +79,9 @@ class CourseService {
 					courses: [newUUID],
 				}).save();
 			} else {
-				tagData.courses = [...tagData.courses, newUUID];
+				tagData.courses.push(newUUID);
+
+				await tagData.save();
 			}
 		});
 
@@ -268,7 +270,9 @@ class CourseService {
 					stores: [courseUUID],
 				}).save();
 			} else {
-				tagData.courses = [...tagData.courses, courseUUID];
+				tagData.courses.push(courseUUID);
+
+				await tagData.save();
 			}
 		});
 
