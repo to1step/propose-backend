@@ -40,6 +40,10 @@ class Redis {
 		await this.client.connect();
 	}
 
+	async disconnect(): Promise<void> {
+		this.client.quit();
+	}
+
 	getClient(): RedisClientType {
 		return this.client;
 	}

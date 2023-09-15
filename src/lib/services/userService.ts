@@ -48,6 +48,7 @@ class UserService {
 	): Promise<User> {
 		const { email, password, nickname, provider, snsId } = userData;
 
+		// TODO: front에서 인증 진행 하였지만, 여기서 email/nickname 중복확인 한번 더 하기
 		const newUUID = v4();
 
 		const salt = await bcrypt.genSalt(10);
