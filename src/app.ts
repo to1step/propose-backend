@@ -73,15 +73,16 @@ const swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
 	await redis.connect();
 })();
 
-// seeding
-// (async () => {
-// 	await seedingTags();
-// 	await seedingUsers(1000);
-// 	await seedingStores(10000);
-// 	await seedingCourses(10000);
-// 	await Promise.all([seedingStoreReviews(), seedingCourseReviews()]);
-// 	await Promise.all([seedingStoreLike(), seedingCourseLike()]);
-// })();
+if (process.env.NODE_ENV === 'seed') {
+	(async () => {
+		await seedingTags();
+		await seedingUsers(1000);
+		await seedingStores(10000);
+		await seedingCourses(10000);
+		await Promise.all([seedingStoreReviews(), seedingCourseReviews()]);
+		await Promise.all([seedingStoreLike(), seedingCourseLike()]);
+	})();
+}
 
 app.use(
 	cors({

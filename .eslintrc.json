@@ -28,6 +28,7 @@
     "object-shorthand": "off",
     "yoda": "off",
     "max-classes-per-file": "off",
-    "@typescript-eslint/no-useless-constructor": "off"
+    "@typescript-eslint/no-useless-constructor": "off",
+    "consistent-return": "off"
   }
 }

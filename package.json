@@ -8,6 +8,7 @@
     "lint": "eslint \"./src/**/*.{ts,js}\"",
     "lint:fix": "eslint --fix \"./src/**/*.{ts,js}\"",
     "lint-staged": "lint-staged",
+    "seed": "npm run build && npm run api-docs && cross-env NODE_ENV=seed node dist/src/server.js",
     "test": "NODE_ENV=test jest --setupFiles dotenv/config --forceExit --detectOpenHandles",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
