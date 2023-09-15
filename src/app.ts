@@ -20,163 +20,133 @@ import v1TestRouter from './lib/routes/testController';
 import { errorHandler } from './lib/middlewares/errors/errorHandler';
 import { NotFoundError } from './lib/middlewares/errors';
 import { needEnv } from './utilies/envList';
-import { seedingStores } from '../test/seedingStore';
-import { seedingUsers } from '../test/seedingUser';
-import { seedingCourses } from '../test/seedingCourses';
-import { seedingStoreReviews } from '../test/seedingStoreReview';
-import { seedingCourseReviews } from '../test/seedingCourseReview';
-import { seedingStoreLike } from '../test/seedingStoreLike';
-import { seedingCourseLike } from '../test/seedingCourseLike';
-import { seedingTags } from '../test/seedingTag';
+import { seedingStores } from '../seed/seedingStore';
+import { seedingUsers } from '../seed/seedingUser';
+import { seedingCourses } from '../seed/seedingCourses';
+import { seedingStoreReviews } from '../seed/seedingStoreReview';
+import { seedingCourseReviews } from '../seed/seedingCourseReview';
+import { seedingStoreLike } from '../seed/seedingStoreLike';
+import { seedingCourseLike } from '../seed/seedingCourseLike';
+import { seedingTags } from '../seed/seedingTag';
 
 dotenv.config();
 
-class Server {
-	private app = express();
+const app = express();
 
-	private mongo = Mongo.getInstance();
+const mongo = Mongo.getInstance();
 
-	private redis = Redis.getInstance();
+const redis = Redis.getInstance();
 
-	private logger = WinstonLogger.getInstance();
+const logger = WinstonLogger.getInstance();
 
-	private errorBot = ErrorBot.getInstance();
+const errorBot = ErrorBot.getInstance();
 
-	private swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
+const swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
 
-	constructor() {
-		this.validateEnv();
-		this.initializeDatabase();
-		this.initializeRedis();
-		this.initializeErrorBot();
-		this.initializeMiddleware();
-		this.initializeRoutes();
-		this.seeding();
-	}
+(() => {
+	const missingVariables: string[] = [];
 
-	private validateEnv() {
-		const missingVariables: string[] = [];
-
-		needEnv.forEach((envVariable) => {
-			if (!process.env[envVariable]) {
-				missingVariables.push(envVariable);
-			}
-		});
-
-		if (missingVariables.length > 0) {
-			missingVariables.forEach((variable) => {
-				this.logger.error(`${variable} is missing`);
-			});
-			process.exit(1);
-		} else {
-			this.logger.info('All required environment variables are present.');
+	needEnv.forEach((envVariable) => {
+		if (!process.env[envVariable]) {
+			missingVariables.push(envVariable);
 		}
-	}
+	});
 
-	private async initializeDatabase() {
-		await this.mongo.connect();
-	}
-
-	private async initializeRedis() {
-		await this.redis.connect();
-	}
-
-	private async initializeErrorBot() {
-		await this.errorBot.connect();
-	}
-
-	private async seeding() {
-		// await seedingTags();
-		// await seedingUsers(1000);
-		// await seedingStores(10000);
-		// await seedingCourses(10000);
-		// await Promise.all([seedingStoreReviews(), seedingCourseReviews()]);
-		// await Promise.all([seedingStoreLike(), seedingCourseLike()]);
-	}
-
-	private initializeMiddleware() {
-		this.app.use(
-			cors({
-				origin: true,
-				credentials: true,
-			})
-		);
-		this.app.all('/*', (req: Request, res: Response, next: NextFunction) => {
-			res.header('Access-Control-Allow-Origin', '*');
-			res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-			next();
+	if (missingVariables.length > 0) {
+		missingVariables.forEach((variable) => {
+			logger.error(`${variable} is missing`);
 		});
-		this.app.set('port', process.env.PORT || 4000);
-		this.app.use(helmet({ contentSecurityPolicy: false }));
-		this.app.use(express.json());
-		this.app.use(express.urlencoded({ extended: true }));
-		this.app.use(cookieParser());
+		process.exit(1);
+	} else {
+		logger.info('All required environment variables are present.');
+	}
+})();
+
+// Connect Database
+(async () => {
+	if (process.env.NODE_ENV !== 'test') {
+		await mongo.connect();
+
+		await errorBot.connect();
 	}
 
-	private initializeRoutes(): void {
-		// api time checker
-		this.app.use((req: Request, res: Response, next: NextFunction) => {
-			const start = Date.now();
-			res.on('finish', () => {
-				const duration = Date.now() - start;
-				this.logger.http(`[${req.method}] ${req.url} ${duration}ms`);
+	await redis.connect();
+})();
 
-				// check exceed 2000ms api
-				if (duration > 2000) {
-					this.errorBot.sendMessage(
-						'latency',
-						`[${req.method}] ${req.url}`,
-						req.userUUID ?? null,
-						req.ip,
-						duration
-					);
-				}
-			});
-			next();
-		});
+// seeding
+// (async () => {
+// 	await seedingTags();
+// 	await seedingUsers(1000);
+// 	await seedingStores(10000);
+// 	await seedingCourses(10000);
+// 	await Promise.all([seedingStoreReviews(), seedingCourseReviews()]);
+// 	await Promise.all([seedingStoreLike(), seedingCourseLike()]);
+// })();
 
-		// health-check
-		this.app.get('/', (req: Request, res: Response, next: NextFunction) => {
-			res.json('Server working');
-		});
+app.use(
+	cors({
+		origin: true,
+		credentials: true,
+	})
+);
+app.all('/*', (req: Request, res: Response, next: NextFunction) => {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+	next();
+});
+app.set('port', process.env.PORT || 4000);
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-		// docs-route
-		this.app.use(
-			'/api-docs',
-			swaggerUi.serve,
-			swaggerUi.setup(this.swaggerSpec, { explorer: true })
-		);
+app.use((req: Request, res: Response, next: NextFunction) => {
+	const start = Date.now();
+	res.on('finish', () => {
+		const duration = Date.now() - start;
+		logger.http(`[${req.method}] ${req.url} ${duration}ms`);
 
-		// api-routes
-		this.app.use('/v1', v1AuthRouter);
-		this.app.use('/v1', v1UserRouter);
-		this.app.use('/v1', v1StoreRouter);
-		this.app.use('/v1', v1CourseRouter);
-		this.app.use('/v1', v1RankRouter);
-		this.app.use('/v1', v1SearchRouter);
-		this.app.use('/v1', v1TestRouter);
+		// check exceed 2000ms api
+		if (duration > 2000) {
+			errorBot.sendMessage(
+				'latency',
+				`[${req.method}] ${req.url}`,
+				req.userUUID ?? null,
+				req.ip,
+				duration
+			);
+		}
+	});
+	next();
+});
 
-		// page not found
-		this.app.use((req, res) => {
-			throw new NotFoundError();
-		});
+// health-check
+app.get('/', (req: Request, res: Response, next: NextFunction) => {
+	res.json('Server working');
+});
 
-		// error-handler
-		this.app.use(errorHandler);
-	}
+// docs-route
+app.use(
+	'/api-docs',
+	swaggerUi.serve,
+	swaggerUi.setup(swaggerSpec, { explorer: true })
+);
 
-	// server-listen
-	public listen(): void {
-		this.app.listen(this.app.get('port'), () => {
-			this.logger.info(`Server is running on port ${this.app.get('port')}`);
-		});
-	}
-}
+// api-routes
+app.use('/v1', v1AuthRouter);
+app.use('/v1', v1UserRouter);
+app.use('/v1', v1StoreRouter);
+app.use('/v1', v1CourseRouter);
+app.use('/v1', v1RankRouter);
+app.use('/v1', v1SearchRouter);
+app.use('/v1', v1TestRouter);
 
-try {
-	const appServer = new Server();
+// page not found
+app.use((req, res) => {
+	throw new NotFoundError();
+});
 
-	appServer.listen();
-} catch (error) {
-	console.error(error);
-}
+// error-handler
+app.use(errorHandler);
+
+export { app };
