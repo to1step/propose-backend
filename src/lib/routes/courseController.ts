@@ -9,6 +9,7 @@ import ErrorCode from '../types/customTypes/error';
 import UpdateCourseReviewDto from '../types/requestTypes/updateCourseReview.dto';
 import CreateCourseReviewDto from '../types/requestTypes/createCourseReview.dto';
 import EntireCourseDto from '../types/responseTypes/entireCourse.dto';
+import checkToken from '../middlewares/checkToken';
 
 const router = Router();
 const courseService = CourseService.getInstance();
@@ -50,6 +51,7 @@ router.get(
 
 router.get(
 	'/courses/:courseUUID',
+	checkToken,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { courseUUID } = req.params;

@@ -136,10 +136,12 @@ class StoreService {
 
 		let iLike = false;
 
-		for (let i = 0; i < likeCount; i += 1) {
-			if (storeLikes[i].user === userUUID) {
-				iLike = true;
-				break;
+		if (userUUID) {
+			for (let i = 0; i < likeCount; i += 1) {
+				if (storeLikes[i].user === userUUID) {
+					iLike = true;
+					break;
+				}
 			}
 		}
 
