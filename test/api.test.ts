@@ -31,35 +31,28 @@ describe('API Test', () => {
 			heartbeatFrequencyMS: 2000,
 		};
 
-		await mongoose
-			.connect(mongoUri, connectOption)
-			.then(() => console.log('MongoDB conected...'))
-			.catch((err) => {
-				console.log(err);
-			});
+		await mongoose.connect(mongoUri, connectOption);
 
 		redis = Redis.getInstance().getClient();
 	});
 
-	describe('Auth API test', () => {
-		describe('Create user test', () => {
-			test('Create test user', async () => {
-				userUUID = v4();
-				const salt = await bcrypt.genSalt(10);
-				const hashedPassword = await bcrypt.hash('pass1', salt);
+	describe('AUTH API TEST', () => {
+		test('Create test user', async () => {
+			userUUID = v4();
+			const salt = await bcrypt.genSalt(10);
+			const hashedPassword = await bcrypt.hash('pass1', salt);
 
-				await new UserModel({
-					uuid: userUUID,
-					email: 'test@naver.com',
-					password: hashedPassword,
-					nickname: 'test',
-					provider: 'local',
-					snsId: null,
-				}).save();
-			});
+			await new UserModel({
+				uuid: userUUID,
+				email: 'test@naver.com',
+				password: hashedPassword,
+				nickname: 'test',
+				provider: 'local',
+				snsId: null,
+			}).save();
 		});
 
-		describe('Email validation test', () => {
+		describe('SIGN-UP TEST', () => {
 			// 중복인 이메일
 			test('[POST] /v1/auth/local/email-validation', async () => {
 				await request(app)
@@ -81,9 +74,7 @@ describe('API Test', () => {
 					})
 					.expect({ data: true });
 			});
-		});
 
-		describe('Nickname validation test', () => {
 			// 중복인 닉네임
 			test('[POST] /v1/auth/local/nickname-validation', async () => {
 				await request(app)
@@ -103,9 +94,7 @@ describe('API Test', () => {
 					})
 					.expect({ data: false });
 			});
-		});
 
-		describe('Send mail test', () => {
 			test('[POST] /v1/auth/local/email-code', async () => {
 				await request(app)
 					.post('/v1/auth/local/email-code')
@@ -118,7 +107,7 @@ describe('API Test', () => {
 			});
 		});
 
-		describe('Login test', () => {
+		describe('SIGN-IN/OUT TEST', () => {
 			// 로그인 성공
 			test('[POST] /v1/auth/local/sign-in', async () => {
 				await request(app)
@@ -176,7 +165,8 @@ describe('API Test', () => {
 			});
 		});
 
-		describe('Logout test', () => {
+		// 로그아웃
+		describe('LOGOUT TEST', () => {
 			test('[POST] /v1/auth/sign-out', async () => {
 				await request(app)
 					.post('/v1/auth/sign-out')
@@ -188,10 +178,10 @@ describe('API Test', () => {
 		});
 	});
 
-	describe('Store API Test', () => {
+	describe('STORE API TEST', () => {
 		let storeUUID: string;
 		let storeReviewUUID: string;
-		describe('Create store test', () => {
+		describe('STORE POST TEST', () => {
 			test('[POST] /v1/stores', async () => {
 				await request(app)
 					.post('/v1/stores')
@@ -242,7 +232,7 @@ describe('API Test', () => {
 			});
 		});
 
-		describe('Read store test', () => {
+		describe('STORE GET TEST', () => {
 			test('[GET] /v1/stores/me', async () => {
 				await request(app)
 					.get('/v1/stores/me')
@@ -276,7 +266,7 @@ describe('API Test', () => {
 							category: 0,
 							description: 'test store description',
 							location: '서울시 동작구 **',
-							coordinates: [Array],
+							coordinates: [123.123, 123.123],
 							representImage: null,
 							tags: [],
 							startTime: null,
@@ -285,7 +275,7 @@ describe('API Test', () => {
 								{
 									uuid: storeReviewUUID,
 									user: userUUID,
-									review: 'change review',
+									review: 'test review',
 								},
 							],
 							reviewCount: 1,
@@ -296,7 +286,7 @@ describe('API Test', () => {
 			});
 		});
 
-		describe('Update store test', () => {
+		describe('STORE PATCH TEST', () => {
 			test('[PATCH] /v1/stores/:storeUUID', async () => {
 				await request(app)
 					.patch(`/v1/stores/${storeUUID}`)
@@ -330,7 +320,7 @@ describe('API Test', () => {
 			});
 		});
 
-		describe('Delete store test', () => {
+		describe('STORE DELETE TEST', () => {
 			test('[DELETE] /v1/stores/:storeUUID/reviews/:storeReviewUUID', async () => {
 				await request(app)
 					.delete(`/v1/stores/${storeUUID}/reviews/${storeReviewUUID}`)
@@ -360,12 +350,12 @@ describe('API Test', () => {
 		});
 	});
 
-	describe('Course API Test', () => {
+	describe('COURSE API TEST', () => {
 		let courseUUID: string;
 		let courseReviewUUID: string;
 		const storeUUIDs: string[] = [];
 
-		test('Create stores', async () => {
+		test('Create test stores', async () => {
 			for (let i = 0; i < 3; i += 1) {
 				const newUUID = v4();
 				storeUUIDs.push(newUUID);
@@ -388,7 +378,7 @@ describe('API Test', () => {
 			}
 		});
 
-		describe('Create course test', () => {
+		describe('COURSE POST TEST', () => {
 			test('[POST] /v1/courses', async () => {
 				await request(app)
 					.post('/v1/courses')
@@ -425,7 +415,6 @@ describe('API Test', () => {
 			});
 
 			test('[POST] /v1/courses/:courseUUID/like', async () => {
-				console.log(courseUUID);
 				await request(app)
 					.post(`/v1/courses/${courseUUID}/like`)
 					.set('Authorization', `Bearer ${token}`)
@@ -452,7 +441,7 @@ describe('API Test', () => {
 			});
 		});
 
-		describe('Read course test', () => {
+		describe('COURSE GET TEST', () => {
 			test('[GET] /v1/courses/me', async () => {
 				await request(app)
 					.get('/v1/courses/me')
@@ -525,13 +514,13 @@ describe('API Test', () => {
 							],
 							reviewCount: 1,
 							likeCount: 1,
-							iLike: false,
+							iLike: true,
 						},
 					});
 			});
 		});
 
-		describe('Update course test', () => {
+		describe('COURSE PATCH TEST', () => {
 			test('[PATCH] /v1/courses', async () => {
 				await request(app)
 					.patch(`/v1/courses/${courseUUID}`)
@@ -574,6 +563,35 @@ describe('API Test', () => {
 					})
 					.expect({
 						data: true,
+					});
+			});
+		});
+
+		describe('COURSE DELETE TEST', () => {
+			test('[DELETE] /v1/courses/:courseUUID/reviews/:courseReviewUUID', async () => {
+				await request(app)
+					.delete(`/v1/courses/${courseUUID}/reviews/${courseReviewUUID}`)
+					.set('Authorization', `Bearer ${token}`)
+					.expect({
+						data: true,
+					});
+			});
+
+			test('[DELETE] /v1/courses/:courseUUID/like', async () => {
+				await request(app)
+					.delete(`/v1/courses/${courseUUID}/like`)
+					.set('Authorization', `Bearer ${token}`)
+					.expect({
+						data: true,
+					});
+			});
+
+			test('[DELETE] /v1/courses/:courseUUID', async () => {
+				await request(app)
+					.delete(`/v1/courses/${courseUUID}`)
+					.set('Authorization', `Bearer ${token}`)
+					.expect({
+						data: false,
 					});
 			});
 		});
