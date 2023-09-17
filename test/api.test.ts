@@ -591,7 +591,7 @@ describe('API Test', () => {
 					.delete(`/v1/courses/${courseUUID}`)
 					.set('Authorization', `Bearer ${token}`)
 					.expect({
-						data: false,
+						data: true,
 					});
 			});
 		});
