@@ -9,6 +9,7 @@ import CreateStoreReviewDto from '../types/requestTypes/createStoreReview.dto';
 import UpdateStoreReviewDto from '../types/requestTypes/updateStoreReview.dto';
 import { BadRequestError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
+import checkToken from '../middlewares/checkToken';
 
 const router = Router();
 const storeService = StoreService.getInstance();
@@ -71,6 +72,7 @@ router.get(
 
 router.get(
 	'/stores/:storeUUID',
+	checkToken,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { storeUUID } = req.params;

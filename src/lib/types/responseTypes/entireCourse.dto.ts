@@ -7,6 +7,8 @@ class EntireCourseDto {
 
 	stores: string[];
 
+	representImage: string | null;
+
 	shortComment: string;
 
 	longComment: string | null;
@@ -29,6 +31,7 @@ class EntireCourseDto {
 		this.uuid = obj.uuid;
 		this.name = obj.name;
 		this.stores = obj.stores;
+		this.representImage = obj.representImage;
 		this.shortComment = obj.shortComment;
 		this.longComment = obj.longComment;
 		this.isPrivate = obj.isPrivate;
