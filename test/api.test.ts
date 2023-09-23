@@ -451,6 +451,7 @@ describe('API Test', () => {
 							{
 								uuid: courseUUID,
 								user: userUUID,
+								userName: 'test',
 								name: 'testCourse',
 								stores: storeUUIDs,
 								representImage: null,

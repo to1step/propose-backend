@@ -11,6 +11,7 @@ interface TransportDAO {
 interface CourseDAO {
 	uuid: string;
 	user: string;
+	userName: string;
 	name: string;
 	stores: string[];
 	representImage: string | null;
@@ -41,6 +42,7 @@ const courseSchema = new Schema<CourseDAO, CourseDAOModel>(
 	{
 		uuid: { type: String, required: true }, // 코스 식별 uuid
 		user: { type: String, required: true }, // 코스를 만든 유저 식별 uuid
+		userName: { type: String, required: true }, // 코스를 만든 유저 닉네임
 		stores: { type: [String], required: true }, // 코스에 들어가는 가게들
 		name: { type: String, required: true }, // 코스 이름
 		representImage: { type: String }, // 코스 대표 사진 src

@@ -18,6 +18,7 @@ import { StoreScoreModel } from '../../database/models/storeScore';
 import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
 import { StoreTagModel } from '../../database/models/storeTag';
+import { UserModel } from '../../database/models/user';
 
 const redis = Redis.getInstance().getClient();
 
