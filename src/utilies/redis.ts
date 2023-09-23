@@ -4,9 +4,6 @@ import WinstonLogger from './logger';
 
 const logger = WinstonLogger.getInstance();
 
-/**
- * static 변수는 가장먼저 메모리에 올라가기 떄문에 dotenv.config()보다 먼저 실행되어 process.env가 적용되지 않는다.
- */
 dotenv.config();
 
 class Redis {
@@ -15,9 +12,15 @@ class Redis {
 	private readonly client: RedisClientType;
 
 	constructor() {
-		this.client = createClient({
-			url: process.env.REDIS_URL,
-		});
+		if (process.env.NODE_ENV === 'local' || process.env.NODE_ENV === 'test') {
+			this.client = createClient({
+				url: process.env.DEV_REDIS_URL,
+			});
+		} else {
+			this.client = createClient({
+				url: process.env.PROD_REDIS_URL,
+			});
+		}
 
 		this.client.on('connect', () => {
 			logger.info(`Redis Connected`);

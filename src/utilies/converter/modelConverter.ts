@@ -53,6 +53,7 @@ class ModelConverter {
 		return {
 			uuid: course.uuid,
 			user: course.user,
+			userName: course.userName,
 			name: course.name,
 			stores: course.stores,
 			representImage: course.representImage,
