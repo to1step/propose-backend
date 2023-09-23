@@ -168,6 +168,7 @@ type UpdateStoreReviewForm = {
 type Course = {
 	uuid: string;
 	user: string;
+	userName: string;
 	name: string;
 	stores: string[];
 	representImage: string | null;
@@ -181,6 +182,7 @@ type Course = {
 type CourseEntireInfo = {
 	uuid: string;
 	user: string;
+	userName: string;
 	name: string;
 	stores: string[];
 	representImage: string | null;

@@ -19,6 +19,7 @@ import { StoreModel } from '../../database/models/store';
 import { CourseScoreModel } from '../../database/models/courseScore';
 import { CourseTagModel } from '../../database/models/courseTag';
 import { StoreTagModel } from '../../database/models/storeTag';
+import { UserModel } from '../../database/models/user';
 
 const redis = Redis.getInstance().getClient();
 
@@ -56,6 +57,17 @@ class CourseService {
 			tags,
 		} = createCourseForm;
 
+		const user = await UserModel.findOne({
+			uuid: userUUID,
+			deletedAt: null,
+		});
+
+		if (!user) {
+			throw new InternalServerError(ErrorCode.USER_NOT_FOUND, [
+				{ data: 'User not found' },
+			]);
+		}
+
 		// 실제로 있는 가게인지 확인
 		const isExist = await StoreModel.find({
 			uuid: { $in: stores },
@@ -90,6 +102,7 @@ class CourseService {
 		await new CourseModel({
 			uuid: newUUID,
 			user: userUUID,
+			userName: user.nickname,
 			name: name,
 			stores: stores,
 			representImage: representImage,

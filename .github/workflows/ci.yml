@@ -40,7 +40,7 @@ jobs:
             DATABASE_USER=${{ secrets.DATABASE_USER }}
             DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
             DATABASE_NAME=${{ secrets.DATABASE_NAME }}
-            REDIS_URL=${{ secrets.REDIS_URL }}
+            PROD_REDIS_URL=${{ secrets.PROD_REDIS_URL }}
             FRONT_PORT=${{ secrets.FRONT_PORT }}
             ACCESS_TOKEN_SECRET_KEY=${{ secrets.ACCESS_TOKEN_SECRET_KEY }}
             ACCESS_TOKEN_EXPIRE_TIME=${{ secrets.ACCESS_TOKEN_EXPIRE_TIME }}
