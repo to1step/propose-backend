@@ -5,7 +5,7 @@ import ErrorCode from '../types/customTypes/error';
 
 const checkAccessToken = (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const header = req.header('Authorization');
+		const header = req.cookies.Authorization;
 
 		if (!header) {
 			throw new BadRequestError(ErrorCode.NO_ACCESS_TOKEN_IN_HEADER, [

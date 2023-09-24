@@ -5,7 +5,7 @@ import ErrorCode from '../types/customTypes/error';
 
 const checkToken = (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const header = req.header('Authorization');
+		const header = req.cookies.Authorization;
 
 		if (!header) {
 			return next();
