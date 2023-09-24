@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import { RedisClientType } from 'redis';
 import jwt from 'jsonwebtoken';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { app } from '../src/app';
 import { UserModel } from '../src/database/models/user';
 import Redis from '../src/utilies/redis';
@@ -590,6 +591,48 @@ describe('API Test', () => {
 			test('[DELETE] /v1/courses/:courseUUID', async () => {
 				await request(app)
 					.delete(`/v1/courses/${courseUUID}`)
+					.set('Authorization', `Bearer ${token}`)
+					.expect({
+						data: true,
+					});
+			});
+		});
+
+		describe('USER API TEST', () => {
+			test('[GET] /v1/users/me', async () => {
+				await request(app)
+					.get(`/v1/users/me`)
+					.set('Authorization', `Bearer ${token}`)
+					.expect({
+						data: {
+							email: 'test@naver.com',
+							nickname: 'test',
+							provider: 'local',
+							profileImage: null,
+							commentAlarm: true,
+							updateAlarm: true,
+						},
+					});
+			});
+
+			test('[PATCH] /v1/users/me', async () => {
+				await request(app)
+					.patch(`/v1/users/me`)
+					.set('Authorization', `Bearer ${token}`)
+					.send({
+						nickname: 'changeNick',
+						profileImage: 'imageUrl',
+						commentAlarm: false,
+						updateAlarm: false,
+					})
+					.expect({
+						data: true,
+					});
+			});
+
+			test('[GET] /v1/users/me', async () => {
+				await request(app)
+					.delete(`/v1/users/me`)
 					.set('Authorization', `Bearer ${token}`)
 					.expect({
 						data: true,

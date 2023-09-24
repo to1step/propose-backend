@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
+import jwt from 'jsonwebtoken';
 import Mongo from './utilies/mongo';
 import Redis from './utilies/redis';
 import ErrorBot from './utilies/errorBot';
@@ -123,6 +124,17 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // health-check
 app.get('/', (req: Request, res: Response, next: NextFunction) => {
+	const refreshToken = jwt.sign(
+		{ userUUID: '1585835e-e32d-49e5-9ca2-6c3e8edb5f55' },
+		`${process.env.REFRESH_TOKEN_SECRET_KEY}`,
+		{
+			algorithm: 'HS256',
+			expiresIn: `${process.env.REFRESH_TOKEN_EXPIRE_TIME}`,
+		}
+	);
+
+	console.log(refreshToken);
+
 	res.json('Server working');
 });
 
