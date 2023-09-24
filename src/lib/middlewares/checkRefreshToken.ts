@@ -5,11 +5,12 @@ import ErrorCode from '../types/customTypes/error';
 
 const checkRefreshToken = (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const refreshToken = req.header('refresh_token');
+		const refreshToken = req.cookies.refresh_token;
+		// const refreshToken = req.header('refresh_token');
 
 		if (!refreshToken) {
 			throw new BadRequestError(ErrorCode.NO_REFRESH_TOKEN_IN_HEADER, [
-				{ data: 'No token in header' },
+				{ data: 'No token in cookie' },
 			]);
 		}
 

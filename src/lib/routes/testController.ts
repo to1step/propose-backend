@@ -16,7 +16,6 @@ const upload = multer({
 });
 router.post(
 	'/test/images',
-	checkAccessToken,
 	upload.array('images', 1),
 	async (req: Request, res: Response, next: NextFunction) => {
 		// 이미지 파일을 보내지 않았다면 빈 배열로 초기화

@@ -5,18 +5,10 @@ import ErrorCode from '../types/customTypes/error';
 
 const checkToken = (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const header = req.header('Authorization');
+		const accessToken = req.cookies.Authorization;
 
-		if (!header) {
+		if (!accessToken) {
 			return next();
-		}
-
-		const [tokenType, accessToken] = header.split(' ');
-
-		if (tokenType !== 'Bearer') {
-			throw new BadRequestError(ErrorCode.INVALID_ACCESS_TOKEN, [
-				{ data: 'Invalid token type' },
-			]);
 		}
 
 		const decoded = jwt.verify(
