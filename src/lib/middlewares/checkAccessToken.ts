@@ -5,19 +5,11 @@ import ErrorCode from '../types/customTypes/error';
 
 const checkAccessToken = (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const header = req.cookies.Authorization;
+		const accessToken = req.cookies.Authorization;
 
-		if (!header) {
+		if (!accessToken) {
 			throw new BadRequestError(ErrorCode.NO_ACCESS_TOKEN_IN_HEADER, [
-				{ data: 'No token in header' },
-			]);
-		}
-
-		const [tokenType, accessToken] = header.split(' ');
-
-		if (tokenType !== 'Bearer') {
-			throw new BadRequestError(ErrorCode.INVALID_ACCESS_TOKEN, [
-				{ data: 'Invalid token type' },
+				{ data: 'No token in cookie' },
 			]);
 		}
 

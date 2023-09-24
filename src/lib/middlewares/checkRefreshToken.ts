@@ -10,7 +10,7 @@ const checkRefreshToken = (req: Request, res: Response, next: NextFunction) => {
 
 		if (!refreshToken) {
 			throw new BadRequestError(ErrorCode.NO_REFRESH_TOKEN_IN_HEADER, [
-				{ data: 'No token in header' },
+				{ data: 'No token in cookie' },
 			]);
 		}
 
