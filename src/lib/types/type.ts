@@ -191,6 +191,7 @@ type CourseEntireInfo = {
 	isPrivate: boolean;
 	transports: Transport[];
 	tags: string[];
+	storeNames: { [key: string]: string };
 	courseReviews: CourseReview[];
 	reviewCount: number;
 	likeCount: number;

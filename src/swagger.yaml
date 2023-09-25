@@ -928,8 +928,8 @@ paths:
     post:
       tags:
         - imageController
-      summary: 해당 keyword를 가지는 가게/코스 가져오기
-      description: 해당 keyword를 가지는 가게/코스 가져오기
+      summary: 이미지 업로드
+      description: '이미지 업로드를 하면 저장소의 주소가 return됩니다. 해당 주소를 가게 이미지나, 리뷰 이미지, 사용자 프로필 변경등에 사용하면 됩니다.'
       requestBody:
         required: true
         content:
