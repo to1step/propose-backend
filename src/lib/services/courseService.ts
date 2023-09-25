@@ -133,6 +133,21 @@ class CourseService {
 
 		const courseData = ModelConverter.toCourse(course);
 
+		const storeUUIDs = courseData.stores;
+
+		const storeNames: { [key: string]: string } = {};
+
+		storeUUIDs.map(async (storeUUID) => {
+			const store = await StoreModel.findOne({ uuid: storeUUID });
+
+			if (!store) {
+				throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
+					{ data: 'Store not found' },
+				]);
+			}
+			storeNames[storeUUID] = store.name;
+		});
+
 		const { isPrivate, user } = courseData;
 
 		// 비공개인 남의 코스를 가져오려 하는 경우
@@ -169,6 +184,7 @@ class CourseService {
 		return {
 			...courseData,
 			courseReviews: courseReviewData,
+			storeNames,
 			reviewCount,
 			likeCount,
 			iLike,
