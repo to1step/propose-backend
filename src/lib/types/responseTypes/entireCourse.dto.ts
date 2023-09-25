@@ -19,6 +19,8 @@ class EntireCourseDto {
 
 	tags: string[];
 
+	storeNames: { [key: string]: string };
+
 	courseReviews: CourseReview[];
 
 	reviewCount: number;
@@ -37,6 +39,7 @@ class EntireCourseDto {
 		this.isPrivate = obj.isPrivate;
 		this.transports = obj.transports;
 		this.tags = obj.tags;
+		this.storeNames = obj.storeNames;
 		this.courseReviews = obj.courseReviews;
 		this.reviewCount = obj.reviewCount;
 		this.likeCount = obj.likeCount;
