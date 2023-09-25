@@ -1,7 +1,7 @@
 import S3Service from './s3Service';
 
-class TestService {
-	private static instance: TestService;
+class ImageService {
+	private static instance: ImageService;
 
 	s3Service: S3Service;
 
@@ -18,12 +18,12 @@ class TestService {
 		return imageLocationList;
 	}
 
-	public static getInstance(): TestService {
-		if (!TestService.instance) {
-			TestService.instance = new TestService();
+	public static getInstance(): ImageService {
+		if (!ImageService.instance) {
+			ImageService.instance = new ImageService();
 		}
-		return TestService.instance;
+		return ImageService.instance;
 	}
 }
 
-export default TestService;
+export default ImageService;

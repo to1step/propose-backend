@@ -17,7 +17,7 @@ import v1StoreRouter from './lib/routes/storeController';
 import v1CourseRouter from './lib/routes/courseController';
 import v1RankRouter from './lib/routes/rankController';
 import v1SearchRouter from './lib/routes/searchController';
-import v1TestRouter from './lib/routes/testController';
+import v1ImageRouter from './lib/routes/imageController';
 import { errorHandler } from './lib/middlewares/errors/errorHandler';
 import { NotFoundError } from './lib/middlewares/errors';
 import { needEnv } from './utilies/envList';
@@ -152,7 +152,7 @@ app.use('/v1', v1StoreRouter);
 app.use('/v1', v1CourseRouter);
 app.use('/v1', v1RankRouter);
 app.use('/v1', v1SearchRouter);
-app.use('/v1', v1TestRouter);
+app.use('/v1', v1ImageRouter);
 
 // page not found
 app.use((req, res) => {

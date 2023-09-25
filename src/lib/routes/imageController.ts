@@ -1,10 +1,10 @@
 import path from 'path';
 import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
-import TestService from '../services/testService';
+import ImageService from '../services/imageService';
 import checkAccessToken from '../middlewares/checkAccessToken';
 
-const testService = TestService.getInstance();
+const imageService = ImageService.getInstance();
 const router = Router();
 
 const upload = multer({
@@ -15,12 +15,12 @@ const upload = multer({
 	},
 });
 router.post(
-	'/test/images',
+	'/images',
 	upload.array('images', 1),
 	async (req: Request, res: Response, next: NextFunction) => {
 		// 이미지 파일을 보내지 않았다면 빈 배열로 초기화
 		const files = (req.files as Express.Multer.File[]) ?? [];
-		const imageLocationList = await testService.uploadImages(files);
+		const imageLocationList = await imageService.uploadImages(files);
 
 		res.json({
 			data: {

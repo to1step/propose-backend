@@ -18,6 +18,8 @@ tags:
     description: 랭크 관련 api
   - name: SearchController
     description: 태그 관련 api
+  - name: imageController
+    description: 이미지 관련 api
 paths:
   /v1/auth/local/sign-in:
     post:
@@ -913,6 +915,31 @@ paths:
         - name: pageSize
           in: query
           description: 가져올 개수
+      responses:
+        '200':
+          description: 가게 or 코스 정보들
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GetStoreDto"
+  /v1/images:
+    post:
+      tags:
+        - imageController
+      summary: 이미지 업로드
+      description: 이미지 업로드를 하면 저장소의 주소가 return됩니다. 해당 주소를 가게 이미지나, 리뷰 이미지, 사용자 프로필 변경등에 사용하면 됩니다.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                images:
+                  type: string
+                  format: binary
       responses:
         '200':
           description: 가게 or 코스 정보들
