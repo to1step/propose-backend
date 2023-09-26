@@ -5,13 +5,11 @@ import { v4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import { RedisClientType } from 'redis';
 import jwt from 'jsonwebtoken';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { app } from '../src/app';
 import { UserModel } from '../src/database/models/user';
 import Redis from '../src/utilies/redis';
 import { StoreModel } from '../src/database/models/store';
 import { StoreReviewModel } from '../src/database/models/storeReview';
-import { StoreReview } from '../src/lib/types/type';
 import { CourseReviewModel } from '../src/database/models/courseReview';
 import { CourseModel } from '../src/database/models/course';
 
@@ -171,7 +169,7 @@ describe('API Test', () => {
 			test('[POST] /v1/auth/sign-out', async () => {
 				await request(app)
 					.post('/v1/auth/sign-out')
-					.set('refresh_token', `${token}`)
+					.set('Cookie', `refresh_token=${token}`)
 					.expect({
 						data: true,
 					});
@@ -197,7 +195,7 @@ describe('API Test', () => {
 						startTime: null,
 						endTime: null,
 					})
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -209,7 +207,7 @@ describe('API Test', () => {
 			test('[POST] /v1/stores/:storeUUID/like', async () => {
 				await request(app)
 					.post(`/v1/stores/${storeUUID}/like`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -218,7 +216,7 @@ describe('API Test', () => {
 			test('[POST] /v1/stores/:storeUUID/review', async () => {
 				await request(app)
 					.post(`/v1/stores/${storeUUID}/review`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.send({
 						review: 'test review',
 					})
@@ -237,7 +235,7 @@ describe('API Test', () => {
 			test('[GET] /v1/stores/me', async () => {
 				await request(app)
 					.get('/v1/stores/me')
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: [
 							{
@@ -259,7 +257,7 @@ describe('API Test', () => {
 			test('[GET] /v1/stores/:storeUUID', async () => {
 				await request(app)
 					.get(`/v1/stores/${storeUUID}`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: {
 							uuid: storeUUID,
@@ -302,7 +300,7 @@ describe('API Test', () => {
 						startTime: null,
 						endTime: null,
 					})
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -311,7 +309,7 @@ describe('API Test', () => {
 			test('[PATCH] /v1/stores/:storeUUID/reviews/:storeReviewUUID', async () => {
 				await request(app)
 					.patch(`/v1/stores/${storeUUID}/reviews/${storeReviewUUID}`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.send({
 						review: 'change review',
 					})
@@ -325,7 +323,7 @@ describe('API Test', () => {
 			test('[DELETE] /v1/stores/:storeUUID/reviews/:storeReviewUUID', async () => {
 				await request(app)
 					.delete(`/v1/stores/${storeUUID}/reviews/${storeReviewUUID}`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -334,7 +332,7 @@ describe('API Test', () => {
 			test('[DELETE] /v1/stores/:storeUUID/like', async () => {
 				await request(app)
 					.delete(`/v1/stores/${storeUUID}/like`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -343,7 +341,7 @@ describe('API Test', () => {
 			test('[DELETE] /v1/stores/:storeUUID', async () => {
 				await request(app)
 					.delete(`/v1/stores/${storeUUID}`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -406,7 +404,7 @@ describe('API Test', () => {
 						isPrivate: false,
 						tags: [],
 					})
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -418,7 +416,7 @@ describe('API Test', () => {
 			test('[POST] /v1/courses/:courseUUID/like', async () => {
 				await request(app)
 					.post(`/v1/courses/${courseUUID}/like`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -427,7 +425,7 @@ describe('API Test', () => {
 			test('[POST] /v1/courses/:courseUUID/review', async () => {
 				await request(app)
 					.post(`/v1/courses/${courseUUID}/review`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.send({
 						review: 'test review',
 					})
@@ -446,7 +444,7 @@ describe('API Test', () => {
 			test('[GET] /v1/courses/me', async () => {
 				await request(app)
 					.get('/v1/courses/me')
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: [
 							{
@@ -482,7 +480,7 @@ describe('API Test', () => {
 			test('[GET] /v1/courses/:courseUUID', async () => {
 				await request(app)
 					.get(`/v1/courses/${courseUUID}`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: {
 							uuid: courseUUID,
@@ -507,6 +505,11 @@ describe('API Test', () => {
 								},
 							],
 							tags: [],
+							storeNames: {
+								[`${storeUUIDs[0]}`]: 'testStore0',
+								[`${storeUUIDs[1]}`]: 'testStore1',
+								[`${storeUUIDs[2]}`]: 'testStore2',
+							},
 							courseReviews: [
 								{
 									uuid: courseReviewUUID,
@@ -550,7 +553,7 @@ describe('API Test', () => {
 						isPrivate: false,
 						tags: [],
 					})
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -559,7 +562,7 @@ describe('API Test', () => {
 			test('[PATCH] /v1/courses/:courseUUID/reviews/:courseReviewUUID', async () => {
 				await request(app)
 					.patch(`/v1/courses/${courseUUID}/reviews/${courseReviewUUID}`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.send({
 						review: 'change review',
 					})
@@ -573,7 +576,7 @@ describe('API Test', () => {
 			test('[DELETE] /v1/courses/:courseUUID/reviews/:courseReviewUUID', async () => {
 				await request(app)
 					.delete(`/v1/courses/${courseUUID}/reviews/${courseReviewUUID}`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -582,7 +585,7 @@ describe('API Test', () => {
 			test('[DELETE] /v1/courses/:courseUUID/like', async () => {
 				await request(app)
 					.delete(`/v1/courses/${courseUUID}/like`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -591,7 +594,7 @@ describe('API Test', () => {
 			test('[DELETE] /v1/courses/:courseUUID', async () => {
 				await request(app)
 					.delete(`/v1/courses/${courseUUID}`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
@@ -602,7 +605,7 @@ describe('API Test', () => {
 			test('[GET] /v1/users/me', async () => {
 				await request(app)
 					.get(`/v1/users/me`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: {
 							email: 'test@naver.com',
@@ -618,7 +621,7 @@ describe('API Test', () => {
 			test('[PATCH] /v1/users/me', async () => {
 				await request(app)
 					.patch(`/v1/users/me`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.send({
 						nickname: 'changeNick',
 						profileImage: 'imageUrl',
@@ -630,10 +633,10 @@ describe('API Test', () => {
 					});
 			});
 
-			test('[GET] /v1/users/me', async () => {
+			test('[DELETE] /v1/users/me', async () => {
 				await request(app)
 					.delete(`/v1/users/me`)
-					.set('Authorization', `Bearer ${token}`)
+					.set('Cookie', `Authorization=${token}`)
 					.expect({
 						data: true,
 					});
