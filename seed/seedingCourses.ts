@@ -32,6 +32,7 @@ export const seedingCourses = async (numbers: number) => {
 		];
 
 		const randomUserUUID = randomUser.uuid;
+		const randomUserNickname = randomUser.nickname;
 		const uuid = faker.string.uuid();
 		const randomStoresUUID = [
 			randomStores[0].uuid,
@@ -81,8 +82,9 @@ export const seedingCourses = async (numbers: number) => {
 
 		return new CourseModel({
 			uuid: uuid,
-			user: randomUserUUID,
 			name: name,
+			user: randomUserUUID,
+			userName: randomUserNickname,
 			stores: randomStoresUUID,
 			representImage: representImage,
 			shortComment: shortComment,
