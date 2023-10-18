@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable guard-for-in */
 import Redis from '../../utilies/redis';
 import { Store, Course } from '../types/type';
 import { StoreModel } from '../../database/models/store';
@@ -49,9 +52,40 @@ class RankService {
 			deletedAt: null,
 		});
 
-		return topCourses.map((topCourse) => {
-			return ModelConverter.toCourse(topCourse);
-		});
+		// TODO: 진짜 미안하다.. 이게 최선이었다..
+		const result: any[] = [];
+		for (const key in topCourses) {
+			const topCourse = topCourses[key];
+			const course = ModelConverter.toCourse(topCourse);
+
+			const storeNames: any = [];
+			const storeName = await StoreModel.find({
+				id: { $in: course.stores },
+			});
+
+			storeName.forEach((store) => {
+				storeNames.push({
+					uuid: store.uuid,
+					name: store.name,
+					category: store.category,
+					description: store.description,
+					coordinates: store.coordinates,
+					location: store.location,
+					shortLocation: store.shortLocation,
+					representImage: store.representImage,
+					tags: store.tags,
+					startTime: store.startTime,
+					endTime: store.endTime,
+				});
+			});
+
+			result.push({
+				...course,
+				stores: storeNames,
+			});
+		}
+
+		return result;
 	}
 }
 
