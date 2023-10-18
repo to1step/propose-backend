@@ -60,7 +60,7 @@ class RankService {
 
 			const storeNames: any = [];
 			const storeName = await StoreModel.find({
-				id: { $in: course.stores },
+				uuid: { $in: course.stores },
 			});
 
 			storeName.forEach((store) => {
