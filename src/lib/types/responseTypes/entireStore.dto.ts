@@ -1,4 +1,4 @@
-import { StoreReview } from '../type';
+import { StoreImage, StoreReview, StoreReviewWithUser } from '../type';
 import { StoreCategory } from '../../../database/types/enums';
 
 class EntireStoreDto {
@@ -22,7 +22,9 @@ class EntireStoreDto {
 
 	endTime: string | null;
 
-	storeReviews: StoreReview[];
+	storeReviews: StoreReviewWithUser[];
+
+	storeReviewImages: StoreImage[];
 
 	reviewCount: number;
 
@@ -42,6 +44,7 @@ class EntireStoreDto {
 		this.startTime = obj.startTime;
 		this.endTime = obj.endTime;
 		this.storeReviews = obj.storeReviews;
+		this.storeReviewImages = obj.storeReviewImages;
 		this.reviewCount = obj.reviewCount;
 		this.likeCount = obj.likeCount;
 		this.iLike = obj.iLike;
