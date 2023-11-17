@@ -132,7 +132,7 @@ class StoreService {
 		const storeReviewData = await Promise.all(
 			storeReviews.map(async (storeReview) => {
 				const user = await UserModel.findOne({
-					id: storeReview.user,
+					uuid: storeReview.user,
 					deletedAt: null,
 				});
 
