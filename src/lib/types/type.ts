@@ -115,6 +115,14 @@ export type StoreReview = {
 	review: string;
 };
 
+export type StoreReviewWithUser = {
+	uuid: string;
+	user: string;
+	review: string;
+	myReview: boolean;
+	nickname: string;
+};
+
 type StoreEntireInfo = {
 	uuid: string;
 	name: string;
@@ -126,7 +134,8 @@ type StoreEntireInfo = {
 	tags: string[];
 	startTime: string | null;
 	endTime: string | null;
-	storeReviews: StoreReview[];
+	storeReviews: StoreReviewWithUser[];
+	storeReviewImages: StoreImage[];
 	reviewCount: number;
 	likeCount: number;
 	iLike: boolean;
@@ -162,6 +171,16 @@ type CreateStoreReviewForm = {
 
 type UpdateStoreReviewForm = {
 	review: string;
+};
+
+type StoreImage = {
+	user: string;
+	store: string;
+	imageSrc: string;
+};
+
+type CreateStoreReviewImageForm = {
+	src: string;
 };
 
 // course
@@ -277,4 +296,6 @@ export type {
 	CourseReview,
 	CreateCourseReviewForm,
 	UpdateCourseReviewForm,
+	CreateStoreReviewImageForm,
+	StoreImage,
 };

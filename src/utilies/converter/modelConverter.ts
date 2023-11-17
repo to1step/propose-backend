@@ -5,11 +5,13 @@ import {
 	Course,
 	CourseReview,
 	Store,
+	StoreImage,
 	StoreReview,
 	User,
 } from '../../lib/types/type';
 import { CourseReviewDAO } from '../../database/models/courseReview';
 import { CourseDAO } from '../../database/models/course';
+import { StoreImageDAO } from '../../database/models/storeImage';
 
 class ModelConverter {
 	static toUser(user: UserDAO): User {
@@ -46,6 +48,14 @@ class ModelConverter {
 			uuid: storeReview.uuid,
 			user: storeReview.user,
 			review: storeReview.review,
+		};
+	}
+
+	static toStoreReviewImage(storeImage: StoreImageDAO): StoreImage {
+		return {
+			user: storeImage.user,
+			store: storeImage.store,
+			imageSrc: storeImage.imageSrc,
 		};
 	}
 

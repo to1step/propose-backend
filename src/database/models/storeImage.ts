@@ -24,4 +24,4 @@ const StoreImageModel = model<StoreImageDAO, StoreImageDAOModel>(
 	storeImageSchema
 );
 
-export { StoreImageModel };
+export { StoreImageDAO, StoreImageModel };

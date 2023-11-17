@@ -36,6 +36,7 @@ class S3Service {
 					Bucket: bucketName,
 					Key: `${folderPath}/${file.originalname}`,
 					Body: fileStream,
+					ContentType: file.mimetype,
 				})
 				.promise();
 		});

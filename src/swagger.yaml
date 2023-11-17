@@ -559,6 +559,40 @@ paths:
                     type: boolean
                     description: 가게 리뷰 삭제 성공
                     example: true
+  '/v1/stores/{storeUUID}/image':
+    post:
+      tags:
+        - StoreController
+      summary: 가게 리뷰 이미지 생성
+      description: 가게에 리뷰 이미지 생성
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+        - name: storeUUID
+          in: path
+          description: 가게 UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: CreateCourseReviewImageDto
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseReviewImageDto'
+      responses:
+        '200':
+          description: 가게 이미지 생성 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    description: 가게 이미지 생성 성공
+                    example: true
   /v1/courses/:
     post:
       tags:
@@ -1314,6 +1348,14 @@ components:
           type: string
           description: 리뷰 내용
           example: 너무 맛없어요
+    CreateCourseReviewImageDto:
+      type: object
+      required:
+        - src
+      properties:
+        src:
+          type: string
+          description: 이미지 주소
     CreateCourseDto:
       type: object
       required:

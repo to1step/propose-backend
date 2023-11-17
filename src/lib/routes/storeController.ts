@@ -10,6 +10,7 @@ import UpdateStoreReviewDto from '../types/requestTypes/updateStoreReview.dto';
 import { BadRequestError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
 import checkToken from '../middlewares/checkToken';
+import CreateReviewImageDto from '../types/requestTypes/createReviewImage.dto';
 
 const router = Router();
 const storeService = StoreService.getInstance();
@@ -208,6 +209,36 @@ router.post(
 			await validateOrReject(createStoreReviewDto);
 
 			await storeService.createStoreReview(
+				req.userUUID,
+				storeUUID,
+				createStoreReviewDto.toServiceModel()
+			);
+
+			res.json({ data: true });
+		} catch (error) {
+			next(error);
+		}
+	}
+);
+
+router.patch(
+	'/stores/:storeUUID/image',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { storeUUID } = req.params;
+
+			if (!storeUUID) {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
+			}
+
+			const createStoreReviewDto = new CreateReviewImageDto(req.body);
+
+			await validateOrReject(createStoreReviewDto);
+
+			await storeService.createStoreReviewImage(
 				req.userUUID,
 				storeUUID,
 				createStoreReviewDto.toServiceModel()

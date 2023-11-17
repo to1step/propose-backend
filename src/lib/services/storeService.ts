@@ -3,6 +3,7 @@ import {
 	Course,
 	CreateStoreForm,
 	CreateStoreReviewForm,
+	CreateStoreReviewImageForm,
 	Store,
 	StoreEntireInfo,
 	UpdateStoreForm,
@@ -19,6 +20,7 @@ import { BadRequestError, InternalServerError } from '../middlewares/errors';
 import ErrorCode from '../types/customTypes/error';
 import { StoreTagModel } from '../../database/models/storeTag';
 import { UserModel } from '../../database/models/user';
+import { StoreImageModel } from '../../database/models/storeImage';
 
 const redis = Redis.getInstance().getClient();
 
@@ -127,8 +129,36 @@ class StoreService {
 			StoreLikeModel.find({ store: storeUUID, deletedAt: null }),
 		]);
 
-		const storeReviewData = storeReviews.map((storeReview) =>
-			ModelConverter.toStoreReview(storeReview)
+		const storeReviewData = await Promise.all(
+			storeReviews.map(async (storeReview) => {
+				const user = await UserModel.findOne({
+					id: storeReview.user,
+					deletedAt: null,
+				});
+
+				let userNickname = '탈퇴한 사용자';
+				let myReview = false;
+
+				if (user) {
+					userNickname = user.nickname;
+					myReview = user.id === userUUID;
+				}
+
+				return {
+					...{ nickname: userNickname },
+					...{ myReview: myReview },
+					...ModelConverter.toStoreReview(storeReview),
+				};
+			})
+		);
+
+		const storeReviewImages = await StoreImageModel.find({
+			store: storeUUID,
+			deletedAt: null,
+		});
+
+		const storeReviewImageData = storeReviewImages.map((storeReviewImage) =>
+			ModelConverter.toStoreReviewImage(storeReviewImage)
 		);
 
 		const reviewCount = storeReviews.length;
@@ -149,6 +179,7 @@ class StoreService {
 		return {
 			...storeData,
 			storeReviews: storeReviewData,
+			storeReviewImages: storeReviewImageData,
 			reviewCount,
 			likeCount,
 			iLike,
@@ -558,6 +589,32 @@ class StoreService {
 
 		storeReview.deletedAt = new Date();
 		await storeReview.save();
+	}
+
+	async createStoreReviewImage(
+		userUUID: string,
+		storeUUID: string,
+		createStoreReviewImageForm: CreateStoreReviewImageForm
+	) {
+		const { src } = createStoreReviewImageForm;
+
+		const store = await StoreModel.findOne({
+			uuid: storeUUID,
+			deletedAt: null,
+		});
+
+		if (!store) {
+			// 삭제되었거나 없는 가게일 경우
+			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
+				{ data: 'Store not found' },
+			]);
+		}
+
+		await new StoreImageModel({
+			user: userUUID,
+			store: storeUUID,
+			imageSrc: src,
+		});
 	}
 
 	/**
