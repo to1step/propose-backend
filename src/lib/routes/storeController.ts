@@ -221,7 +221,7 @@ router.post(
 	}
 );
 
-router.patch(
+router.post(
 	'/stores/:storeUUID/image',
 	checkAccessToken,
 	async (req: Request, res: Response, next: NextFunction) => {

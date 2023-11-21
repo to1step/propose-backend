@@ -134,13 +134,13 @@ app.use(
 );
 
 // api-routes
-app.use('/v1', v1AuthRouter);
-app.use('/v1', v1UserRouter);
-app.use('/v1', v1StoreRouter);
-app.use('/v1', v1CourseRouter);
-app.use('/v1', v1RankRouter);
-app.use('/v1', v1SearchRouter);
-app.use('/v1', v1ImageRouter);
+app.use('/api/v1', v1AuthRouter);
+app.use('/api/v1', v1UserRouter);
+app.use('/api/v1', v1StoreRouter);
+app.use('/api/v1', v1CourseRouter);
+app.use('/api/v1', v1RankRouter);
+app.use('/api/v1', v1SearchRouter);
+app.use('/api/v1', v1ImageRouter);
 
 // page not found
 app.use((req, res) => {
