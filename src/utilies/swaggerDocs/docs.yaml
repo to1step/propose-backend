@@ -21,7 +21,7 @@ tags:
   - name: imageController
     description: 이미지 관련 api
 paths:
-  /v1/auth/local/sign-in:
+  /api/v1/auth/local/sign-in:
     post:
       tags:
         - AuthController
@@ -50,7 +50,7 @@ paths:
                     type: boolean
                     description: 로그인 성공
                     example: true
-  /v1/auth/local/email-validation:
+  /api/v1/auth/local/email-validation:
     post:
       tags:
         - AuthController
@@ -74,7 +74,7 @@ paths:
                     type: boolean
                     description: 사용중이면 true / 사용중이 아니면 false 반환
                     example: true
-  /v1/auth/local/nickname-validation:
+  /api/v1/auth/local/nickname-validation:
     post:
       tags:
         - AuthController
@@ -98,7 +98,7 @@ paths:
                     type: boolean
                     description: 사용중이면 true / 사용중이 아니면 false 반환
                     example: true
-  /v1/auth/local/email-code:
+  /api/v1/auth/local/email-code:
     post:
       tags:
         - AuthController
@@ -122,7 +122,7 @@ paths:
                     type: boolean
                     description: 이메일 전송 성공
                     example: true
-  /v1/auth/local/email-verification:
+  /api/v1/auth/local/email-verification:
     post:
       tags:
         - AuthController
@@ -146,7 +146,7 @@ paths:
                     type: boolean
                     description: 회원가입 성공
                     example: true
-  /v1/auth/refresh-token:
+  /api/v1/auth/refresh-token:
     post:
       tags:
         - AuthController
@@ -170,7 +170,7 @@ paths:
                     type: boolean
                     description: 토큰 재발급 성공
                     example: true
-  /v1/auth/sign-out:
+  /api/v1/auth/sign-out:
     post:
       tags:
         - AuthController
@@ -191,7 +191,7 @@ paths:
                     type: boolean
                     description: 로그아웃 성공
                     example: true
-  /v1/users/me:
+  /api/v1/users/me:
     get:
       tags:
         - UserController
@@ -253,7 +253,7 @@ paths:
                     type: boolean
                     description: 회원탈퇴 성공
                     example: true
-  /v1/stores/:
+  /api/v1/stores/:
     post:
       tags:
         - StoreController
@@ -280,7 +280,7 @@ paths:
                     type: boolean
                     description: 가게 생성 성공
                     example: true
-  /v1/stores/me:
+  /api/v1/stores/me:
     get:
       tags:
         - StoreController
@@ -298,7 +298,7 @@ paths:
                 type: array
                 items:
                     $ref: "#/components/schemas/GetStoreDto"
-  /v1/stores/location:
+  /api/v1/stores/location:
     get:
       tags:
         - StoreController
@@ -317,7 +317,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/GetStoreDto"
-  /v1/stores/{storeUUID}:
+  /api/v1/stores/{storeUUID}:
     get:
       tags:
         - StoreController
@@ -397,7 +397,7 @@ paths:
                     type: boolean
                     description: 가게 삭제 성공
                     example: true
-  /v1/stores/{storeUUID}/like:
+  /api/v1/stores/{storeUUID}/like:
     post:
       tags:
         - StoreController
@@ -452,7 +452,7 @@ paths:
                     type: boolean
                     description: 가게 좋아요 취소 성공
                     example: true
-  /v1/stores/{storeUUID}/review:
+  /api/v1/stores/{storeUUID}/review:
     post:
       tags:
         - StoreController
@@ -486,7 +486,7 @@ paths:
                     type: boolean
                     description: 가게 리뷰 작성 성공
                     example: true
-  /v1/stores/{storeUUID}/reviews/{storeReviewUUID}:
+  /api/v1/stores/{storeUUID}/reviews/{storeReviewUUID}:
     patch:
       tags:
         - StoreController
@@ -559,7 +559,7 @@ paths:
                     type: boolean
                     description: 가게 리뷰 삭제 성공
                     example: true
-  /v1/stores/{storeUUID}/image:
+  /api/v1/stores/{storeUUID}/image:
     post:
       tags:
         - StoreController
@@ -593,7 +593,7 @@ paths:
                     type: boolean
                     description: 가게 이미지 생성 성공
                     example: true
-  /v1/courses/:
+  /api/v1/courses/:
     post:
       tags:
         - CourseController
@@ -620,7 +620,7 @@ paths:
                     type: boolean
                     description: 코스 생성 성공
                     example: true
-  /v1/courses/me:
+  /api/v1/courses/me:
     get:
       tags:
         - CourseController
@@ -637,7 +637,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EntireCourseDto"
-  /v1/courses/{courseUUID}:
+  /api/v1/courses/{courseUUID}:
     get:
       tags:
         - CourseController
@@ -717,7 +717,7 @@ paths:
                     type: boolean
                     description: 코스 삭제 성공
                     example: true
-  /v1/courses/{courseUUID}/like:
+  /api/v1/courses/{courseUUID}/like:
     post:
       tags:
         - CourseController
@@ -772,7 +772,7 @@ paths:
                     type: boolean
                     description: 코스 좋아요 취소 성공
                     example: true
-  /v1/courses/{courseUUID}/review:
+  /api/v1/courses/{courseUUID}/review:
     post:
       tags:
         - CourseController
@@ -806,7 +806,7 @@ paths:
                     type: boolean
                     description: 코스 리뷰 작성 성공
                     example: true
-  /v1/courses/{courseUUID}/reviews/{courseReviewUUID}:
+  /api/v1/courses/{courseUUID}/reviews/{courseReviewUUID}:
     patch:
       tags:
         - CourseController
@@ -879,7 +879,7 @@ paths:
                     type: boolean
                     description: 코스 리뷰 삭제 성공
                     example: true
-  '/v1/rank':
+  '/api/v1/rank':
     get:
       tags:
         - RankController
@@ -902,7 +902,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TopStoresDto'
-  /v1/search/tags:
+  /api/v1/search/tags:
     get:
       tags:
         - SearchController
@@ -930,7 +930,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/GetStoreDto"
-  /v1/search/keyword:
+  /api/v1/search/keyword:
     get:
       tags:
         - SearchController
@@ -958,7 +958,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/GetStoreDto"
-  /v1/images:
+  /api/v1/images:
     post:
       tags:
         - imageController
