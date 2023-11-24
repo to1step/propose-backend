@@ -614,7 +614,7 @@ class StoreService {
 			user: userUUID,
 			store: storeUUID,
 			imageSrc: src,
-		});
+		}).save();
 	}
 
 	/**
