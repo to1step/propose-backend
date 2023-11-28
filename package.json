@@ -1,9 +1,14 @@
 {
-  "name": "backend",
+  "name": "@to1step/propose-backend",
   "version": "1.2.0",
   "description": "",
   "main": "dist/src/lib/server.js",
+  "types": "src/types.d.ts",
   "author": "rkdden, gkqkehs7",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/to1step/propose-backend.git"
+  },
   "scripts": {
     "lint": "eslint \"./src/**/*.{ts,js}\"",
     "lint:fix": "eslint --fix \"./src/**/*.{ts,js}\"",
