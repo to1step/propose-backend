@@ -86,7 +86,11 @@ if (process.env.NODE_ENV === 'seed') {
 
 app.use(
 	cors({
-		origin: true,
+		origin: [
+			'https://komatzip.wo.tc',
+			'https://www.komatzip.wo.tc',
+			'http://localhost:3000',
+		],
 		credentials: true,
 	})
 );
