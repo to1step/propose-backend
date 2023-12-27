@@ -84,31 +84,19 @@ if (process.env.NODE_ENV === 'seed') {
 	})();
 }
 
-const allowedOrigins = [
-	'https://komatzip.wo.tc',
-	'https://www.komatzip.wo.tc',
-	'http://localhost:3000',
-];
 app.use(
 	cors({
-		origin: function (origin, callback) {
-			// 요청한 도메인이 허용 목록에 포함되어 있는지 확인
-			if (!origin || allowedOrigins.includes(origin)) {
-				callback(null, true);
-			} else {
-				callback(new Error('Not Allowed Origin!'));
-			}
-		},
+		origin: [
+			'https://komatzip.wo.tc',
+			'https://www.komatzip.wo.tc',
+			'http://localhost:3000',
+		],
 		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 		credentials: true,
 		optionsSuccessStatus: 204,
 	})
 );
-app.all('/*', (req: Request, res: Response, next: NextFunction) => {
-	res.header('Access-Control-Allow-Origin', '*');
-	res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-	next();
-});
+
 app.set('port', process.env.PORT || 4000);
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
