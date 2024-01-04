@@ -82,6 +82,7 @@ export const seedingCourses = async (numbers: number) => {
 		return new CourseModel({
 			uuid: uuid,
 			user: randomUserUUID,
+			userName: faker.internet.userName(),
 			name: name,
 			stores: randomStoresUUID,
 			representImage: representImage,

@@ -24,6 +24,7 @@ enum ErrorCode {
 	DUPLICATE_STORE_LIKE_ERROR = 1303, // 좋아요를 눌렀는데 다시 누르는 경우
 	STORE_LIKE_NOT_FOUND = 1304, // 좋아요를 누른 기록이 없는데 좋아요를 취소하는 경우
 	STORE_REVIEW_NOT_FOUND = 1305, // 가게 리뷰 조회시 없는 리뷰
+	STORE_IMAGE_NOT_FOUND = 1306, // 가게 리뷰 이미지 없음
 
 	// 코스 관련 에러 코드
 	COURSE_NOT_FOUND = 1400, // 코스 조회시 없는 코스

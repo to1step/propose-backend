@@ -14,6 +14,7 @@ export const seedingUsers = async (numbers: number) => {
 
 	userDatas.map(async () => {
 		const uuid = faker.string.uuid();
+		const userName = faker.internet.userName();
 		const email = faker.internet.email();
 		const password = faker.internet.password();
 		const nickname = faker.internet.userName();

@@ -251,6 +251,32 @@ router.post(
 	}
 );
 
+router.delete(
+	'/stores/:storeUUID/image/:imageUUID',
+	checkAccessToken,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { storeUUID, imageUUID } = req.params;
+
+			if (!storeUUID || imageUUID) {
+				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
+					{ data: 'Invalid query' },
+				]);
+			}
+
+			await storeService.removeStoreReviewImage(
+				req.userUUID,
+				storeUUID,
+				imageUUID
+			);
+
+			res.json({ data: true });
+		} catch (error) {
+			next(error);
+		}
+	}
+);
+
 router.patch(
 	'/stores/:storeUUID/reviews/:storeReviewUUID',
 	checkAccessToken,

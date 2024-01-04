@@ -610,11 +610,48 @@ class StoreService {
 			]);
 		}
 
+		const newUUID = v4();
+
 		await new StoreImageModel({
+			uuid: newUUID,
 			user: userUUID,
 			store: storeUUID,
 			imageSrc: src,
 		}).save();
+	}
+
+	async removeStoreReviewImage(
+		userUUID: string,
+		storeUUID: string,
+		imageUUID: string
+	) {
+		const store = await StoreModel.findOne({
+			uuid: storeUUID,
+			deletedAt: null,
+		});
+
+		if (!store) {
+			// 삭제되었거나 없는 가게일 경우
+			throw new InternalServerError(ErrorCode.STORE_NOT_FOUND, [
+				{ data: 'Store not found' },
+			]);
+		}
+
+		const image = await StoreImageModel.findOne({
+			user: userUUID,
+			store: storeUUID,
+			uuid: imageUUID,
+			deletedAt: null,
+		});
+
+		if (!image) {
+			throw new InternalServerError(ErrorCode.STORE_IMAGE_NOT_FOUND, [
+				{ data: 'Image not found' },
+			]);
+		}
+
+		image.deletedAt = new Date();
+		await image.save();
 	}
 
 	/**
