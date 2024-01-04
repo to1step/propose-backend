@@ -76,9 +76,9 @@ const swaggerSpec = YAML.load(path.join(__dirname, 'swagger.yaml'));
 if (process.env.NODE_ENV === 'seed') {
 	(async () => {
 		await seedingTags();
-		await seedingUsers(1000);
-		await seedingStores(10000);
-		await seedingCourses(10000);
+		await seedingUsers(100);
+		await seedingStores(1000);
+		await seedingCourses(1000);
 		await Promise.all([seedingStoreReviews(), seedingCourseReviews()]);
 		await Promise.all([seedingStoreLike(), seedingCourseLike()]);
 	})();
