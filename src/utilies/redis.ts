@@ -12,7 +12,11 @@ class Redis {
 	private readonly client: RedisClientType;
 
 	constructor() {
-		if (process.env.NODE_ENV === 'local' || process.env.NODE_ENV === 'test') {
+		if (
+			process.env.NODE_ENV === 'local' ||
+			process.env.NODE_ENV === 'test' ||
+			process.env.NODE_ENV === 'seed'
+		) {
 			this.client = createClient({
 				url: process.env.DEV_REDIS_URL,
 			});
