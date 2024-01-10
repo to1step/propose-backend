@@ -23,7 +23,7 @@ export const seedingUsers = async (numbers: number) => {
 		const commentAlarm = true;
 		const updateAlarm = true;
 
-		await new UserModel({
+		return new UserModel({
 			uuid: uuid,
 			email: email,
 			password: password,
