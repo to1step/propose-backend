@@ -178,7 +178,6 @@ type StoreImage = {
 	user: string;
 	store: string;
 	imageSrc: string;
-	deletedAt: Date | null;
 };
 
 type CreateStoreReviewImageForm = {

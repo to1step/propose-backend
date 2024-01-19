@@ -53,6 +53,7 @@ class ModelConverter {
 
 	static toStoreReviewImage(storeImage: StoreImageDAO): StoreImage {
 		return {
+			uuid: storeImage.uuid,
 			user: storeImage.user,
 			store: storeImage.store,
 			imageSrc: storeImage.imageSrc,
