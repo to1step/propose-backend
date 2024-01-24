@@ -258,7 +258,7 @@ router.delete(
 		try {
 			const { storeUUID, imageUUID } = req.params;
 
-			if (!storeUUID || imageUUID) {
+			if (!storeUUID || !imageUUID) {
 				throw new BadRequestError(ErrorCode.INVALID_QUERY, [
 					{ data: 'Invalid query' },
 				]);
