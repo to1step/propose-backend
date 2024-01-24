@@ -12,21 +12,21 @@ export const seedingCourseReviews = async () => {
 
 	const courses = await CourseModel.find();
 
-	courses.map(async (course) => {
-		for (let j = 0; j <= 5; j += 1) {
+	await Promise.all(
+		courses.map(async (course) => {
 			const uuid = faker.string.uuid();
 			const randomUser =
 				randomUsers[Math.floor(Math.random() * randomUsers.length)];
 			const randomUserUUID = randomUser.uuid;
 
-			new CourseReviewModel({
+			return new CourseReviewModel({
 				uuid: uuid,
 				user: randomUserUUID,
 				course: course.uuid,
 				review: faker.lorem.sentence(),
 			}).save();
-		}
-	});
+		})
+	);
 
 	logger.info('Complete seeding course reviews...');
 };

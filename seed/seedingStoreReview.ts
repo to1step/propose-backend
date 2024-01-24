@@ -12,22 +12,23 @@ export const seedingStoreReviews = async () => {
 
 	const stores = await StoreModel.find();
 
-	stores.map(async (store) => {
-		// eslint-disable-next-line no-unreachable-loop
-		for (let j = 0; j <= 5; j += 1) {
+	await Promise.all(
+		stores.map(async (store) => {
+			// eslint-disable-next-line no-unreachable-loop
+
 			const randomUser =
 				randomUsers[Math.floor(Math.random() * randomUsers.length)];
 			const randomUserUUID = randomUser.uuid;
 			const uuid = faker.string.uuid();
 
-			new StoreReviewModel({
+			return new StoreReviewModel({
 				uuid: uuid,
 				user: randomUserUUID,
 				store: store.uuid,
 				review: faker.lorem.sentence(),
 			}).save();
-		}
-	});
+		})
+	);
 
 	logger.info('Complete seeding store reviews...');
 };
