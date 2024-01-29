@@ -6,6 +6,7 @@ import {
 	CreateStoreReviewImageForm,
 	Store,
 	StoreEntireInfo,
+	StoreWithUser,
 	UpdateStoreForm,
 	UpdateStoreReviewForm,
 } from '../types/type';
@@ -262,7 +263,15 @@ class StoreService {
 	 * 내가 등록한 가게들 가져오기
 	 * @param userUUID
 	 */
-	async getMyStores(userUUID: string): Promise<Store[]> {
+	async getMyStores(userUUID: string): Promise<StoreWithUser[]> {
+		const user = await UserModel.findOne({ uuid: userUUID, deletedAt: null });
+
+		if (!user) {
+			throw new BadRequestError(ErrorCode.USER_NOT_FOUND, [
+				{ data: 'User not found' },
+			]);
+		}
+
 		const stores = await StoreModel.find({ user: userUUID, deletedAt: null });
 
 		if (stores.length === 0) {
@@ -270,7 +279,10 @@ class StoreService {
 		}
 
 		return stores.map((store) => {
-			return ModelConverter.toStore(store);
+			return {
+				user: ModelConverter.toUser(user),
+				store: ModelConverter.toStore(store),
+			};
 		});
 	}
 

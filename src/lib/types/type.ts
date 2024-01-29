@@ -109,6 +109,11 @@ type Store = {
 	endTime: string | null;
 };
 
+type StoreWithUser = {
+	store: Store;
+	user: User;
+};
+
 export type StoreReview = {
 	uuid: string;
 	user: string;
@@ -283,6 +288,7 @@ export type {
 	Tokens,
 	ChangeProfileForm,
 	Store,
+	StoreWithUser,
 	StoreEntireInfo,
 	CreateStoreForm,
 	UpdateStoreForm,
