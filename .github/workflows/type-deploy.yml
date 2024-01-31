@@ -1,5 +1,11 @@
 name: Publish Package to npm
-on: [push]
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'package.json'
 
 jobs:
   build:
@@ -17,6 +23,7 @@ jobs:
           # Defaults to the user or organization that owns the workflow file
           scope: '@to1step'
       - run: npm ci
-      - run: npm publish
+      - run: npm version patch
+      - run: npm publish || exit 0
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
