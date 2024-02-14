@@ -103,7 +103,6 @@ type Store = {
 	description: string;
 	location: string;
 	coordinates: number[];
-	shortLocation?: string;
 	representImage: string | null;
 	tags: string[];
 	startTime: string | null;

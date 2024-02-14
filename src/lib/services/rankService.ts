@@ -125,7 +125,6 @@ class RankService {
 					description: store.description,
 					coordinates: store.coordinates,
 					location: store.location,
-					shortLocation: store.shortLocation,
 					representImage: store.representImage,
 					tags: store.tags,
 					startTime: store.startTime,

@@ -36,7 +36,6 @@ class ModelConverter {
 			description: store.description,
 			location: store.location,
 			coordinates: store.coordinates,
-			shortLocation: store.shortLocation,
 			representImage: store.representImage,
 			tags: store.tags,
 			startTime: store.startTime,
