@@ -87,6 +87,60 @@ class RankService {
 
 		return result;
 	}
+
+	async getDefaultTop(type: 'store' | 'course'): Promise<Store[] | Course[]> {
+		if (type === 'store') {
+			const topStores = await StoreModel.find({
+				deletedAt: null,
+			})
+				.sort({ averageRating: -1 })
+				.limit(5);
+
+			return topStores.map((topStore) => {
+				return ModelConverter.toStore(topStore);
+			});
+		}
+
+		const topCourses = await CourseModel.find({
+			deletedAt: null,
+		})
+			.sort({ averageRating: -1 })
+			.limit(5);
+
+		const result: any[] = [];
+		for (const key in topCourses) {
+			const topCourse = topCourses[key];
+			const course = ModelConverter.toCourse(topCourse);
+
+			const storeNames: any = [];
+			const storeName = await StoreModel.find({
+				uuid: { $in: course.stores },
+			});
+
+			storeName.forEach((store) => {
+				storeNames.push({
+					uuid: store.uuid,
+					name: store.name,
+					category: store.category,
+					description: store.description,
+					coordinates: store.coordinates,
+					location: store.location,
+					shortLocation: store.shortLocation,
+					representImage: store.representImage,
+					tags: store.tags,
+					startTime: store.startTime,
+					endTime: store.endTime,
+				});
+			});
+
+			result.push({
+				...course,
+				stores: storeNames,
+			});
+		}
+
+		return result;
+	}
 }
 
 export default RankService;

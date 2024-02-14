@@ -24,7 +24,11 @@ router.get('/rank', async (req: Request, res: Response, next: NextFunction) => {
 			]);
 		}
 
-		const store = await rankService.getTop(type, region);
+		let store = await rankService.getTop(type, region);
+
+		if (store.length === 0) {
+			store = await rankService.getDefaultTop(type);
+		}
 
 		res.json({ data: store });
 	} catch (error) {
