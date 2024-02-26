@@ -79,8 +79,8 @@ if (process.env.NODE_ENV === 'seed') {
 		// await seedingUsers(100);
 		// await seedingStores(1000);
 		// await seedingCourses(1000);
-		await Promise.all([seedingStoreReviews(), seedingCourseReviews()]);
-		await Promise.all([seedingStoreLike(), seedingCourseLike()]);
+		// await Promise.all([seedingStoreReviews(), seedingCourseReviews()]);
+		// await Promise.all([seedingStoreLike(), seedingCourseLike()]);
 	})();
 }
 
